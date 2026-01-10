@@ -10,14 +10,72 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { useDentalImageAnalysis } from '@/hooks/useDentalImageAnalysis';
-import { Sparkles, Loader2, Brain, AlertCircle, X } from 'lucide-react';
-import ReactMarkdown from 'react-markdown';
+import { Sparkles, Loader2, Brain, AlertCircle } from 'lucide-react';
 
 interface ImageAnalysisDialogProps {
   imageUrl: string | null;
   isOpen: boolean;
   onClose: () => void;
   analysisType?: 'initial' | 'progress';
+}
+
+// Simple markdown-like text formatter
+function formatAnalysisText(text: string) {
+  const lines = text.split('\n');
+  
+  return lines.map((line, index) => {
+    // Headers
+    if (line.startsWith('####')) {
+      return <h4 key={index} className="mt-3 font-semibold text-foreground">{line.replace(/^####\s*/, '')}</h4>;
+    }
+    if (line.startsWith('###')) {
+      return <h3 key={index} className="mt-4 text-lg font-semibold text-foreground">{line.replace(/^###\s*/, '')}</h3>;
+    }
+    if (line.startsWith('##')) {
+      return <h2 key={index} className="mt-4 text-xl font-semibold text-foreground">{line.replace(/^##\s*/, '')}</h2>;
+    }
+    if (line.startsWith('#')) {
+      return <h1 key={index} className="mt-4 text-2xl font-bold text-foreground">{line.replace(/^#\s*/, '')}</h1>;
+    }
+    
+    // Bold headers like **Text**
+    if (line.match(/^\*\*[^*]+\*\*$/)) {
+      return <p key={index} className="mt-3 font-semibold text-foreground">{line.replace(/\*\*/g, '')}</p>;
+    }
+    
+    // Bullet points
+    if (line.trim().startsWith('-') || line.trim().startsWith('•')) {
+      const content = line.replace(/^\s*[-•]\s*/, '');
+      // Handle bold within bullets
+      const formattedContent = content.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+      return (
+        <li key={index} className="ml-4 text-sm text-muted-foreground" 
+            dangerouslySetInnerHTML={{ __html: formattedContent }} />
+      );
+    }
+    
+    // Numbered lists
+    if (line.trim().match(/^\d+\./)) {
+      const content = line.replace(/^\s*\d+\.\s*/, '');
+      const formattedContent = content.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+      return (
+        <li key={index} className="ml-4 list-decimal text-sm text-muted-foreground"
+            dangerouslySetInnerHTML={{ __html: formattedContent }} />
+      );
+    }
+    
+    // Empty lines
+    if (line.trim() === '') {
+      return <div key={index} className="h-2" />;
+    }
+    
+    // Regular paragraphs with bold handling
+    const formattedContent = line.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+    return (
+      <p key={index} className="text-sm text-muted-foreground"
+         dangerouslySetInnerHTML={{ __html: formattedContent }} />
+    );
+  });
 }
 
 export function ImageAnalysisDialog({
@@ -102,8 +160,8 @@ export function ImageAnalysisDialog({
                   </div>
                 </div>
               ) : analysisResult ? (
-                <div className="prose prose-sm dark:prose-invert max-w-none">
-                  <ReactMarkdown>{analysisResult.analysis}</ReactMarkdown>
+                <div className="space-y-1">
+                  {formatAnalysisText(analysisResult.analysis)}
                 </div>
               ) : hasStartedAnalysis ? (
                 <div className="flex h-full flex-col items-center justify-center gap-2 text-muted-foreground">
