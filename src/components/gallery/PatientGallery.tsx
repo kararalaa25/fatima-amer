@@ -3,9 +3,10 @@ import { useSessionImages } from '@/hooks/useSessions';
 import { InitialPhoto, Session } from '@/types/patient';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
-import { format } from 'date-fns';
-import { Camera, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { ImageAnalysisDialog } from '@/components/analysis/ImageAnalysisDialog';
+import { format } from 'date-fns';
+import { Camera, X, ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
 
 interface PatientGalleryProps {
   patientId: string;
@@ -13,17 +14,37 @@ interface PatientGalleryProps {
   sessions: Session[];
 }
 
-function SessionImages({ sessionId }: { sessionId: string }) {
+function SessionImages({ 
+  sessionId, 
+  onImageClick,
+  onAnalyzeClick 
+}: { 
+  sessionId: string;
+  onImageClick: (images: string[], index: number) => void;
+  onAnalyzeClick: (url: string, type: 'initial' | 'progress') => void;
+}) {
   const { data: images } = useSessionImages(sessionId);
 
   if (!images || images.length === 0) {
-    return null;
+    return (
+      <div className="flex h-20 items-center justify-center text-sm text-muted-foreground">
+        No photos for this session
+      </div>
+    );
   }
+
+  const imageUrls = images.map(img => img.image_url);
 
   return (
     <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
-      {images.map((image) => (
-        <ImageCard key={image.id} src={image.image_url} alt="Session photo" />
+      {images.map((image, index) => (
+        <ImageCard 
+          key={image.id} 
+          src={image.image_url} 
+          alt="Session photo"
+          onClick={() => onImageClick(imageUrls, index)}
+          onAnalyze={() => onAnalyzeClick(image.image_url, 'progress')}
+        />
       ))}
     </div>
   );
@@ -33,22 +54,38 @@ function ImageCard({
   src,
   alt,
   onClick,
+  onAnalyze,
 }: {
   src: string;
   alt: string;
   onClick?: () => void;
+  onAnalyze?: () => void;
 }) {
   return (
-    <div
-      className="group relative aspect-square cursor-pointer overflow-hidden rounded-lg border border-border bg-muted transition-transform hover:scale-[1.02]"
-      onClick={onClick}
-    >
+    <div className="group relative aspect-square overflow-hidden rounded-lg border border-border bg-muted">
       <img
         src={src}
         alt={alt}
-        className="h-full w-full object-cover transition-transform group-hover:scale-105"
+        className="h-full w-full cursor-pointer object-cover transition-transform group-hover:scale-105"
+        onClick={onClick}
       />
       <div className="absolute inset-0 bg-foreground/0 transition-colors group-hover:bg-foreground/10" />
+      
+      {/* Analyze Button Overlay */}
+      <div className="absolute bottom-2 right-2 opacity-0 transition-opacity group-hover:opacity-100">
+        <Button
+          size="sm"
+          variant="secondary"
+          className="h-8 gap-1 bg-card/90 text-xs backdrop-blur-sm hover:bg-card"
+          onClick={(e) => {
+            e.stopPropagation();
+            onAnalyze?.();
+          }}
+        >
+          <Sparkles className="h-3 w-3" />
+          Analyze
+        </Button>
+      </div>
     </div>
   );
 }
@@ -57,6 +94,11 @@ export function PatientGallery({ patientId, initialPhotos, sessions }: PatientGa
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [allImages, setAllImages] = useState<string[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
+  
+  // Analysis state
+  const [analysisImageUrl, setAnalysisImageUrl] = useState<string | null>(null);
+  const [analysisType, setAnalysisType] = useState<'initial' | 'progress'>('initial');
+  const [isAnalysisOpen, setIsAnalysisOpen] = useState(false);
 
   const openLightbox = (images: string[], index: number) => {
     setAllImages(images);
@@ -71,6 +113,12 @@ export function PatientGallery({ patientId, initialPhotos, sessions }: PatientGa
         : (currentIndex + 1) % allImages.length;
     setCurrentIndex(newIndex);
     setSelectedImage(allImages[newIndex]);
+  };
+
+  const openAnalysis = (imageUrl: string, type: 'initial' | 'progress') => {
+    setAnalysisImageUrl(imageUrl);
+    setAnalysisType(type);
+    setIsAnalysisOpen(true);
   };
 
   const initialImages = initialPhotos.map((p) => p.image_url);
@@ -99,6 +147,7 @@ export function PatientGallery({ patientId, initialPhotos, sessions }: PatientGa
                   src={photo.image_url}
                   alt="Initial photo"
                   onClick={() => openLightbox(initialImages, index)}
+                  onAnalyze={() => openAnalysis(photo.image_url, 'initial')}
                 />
               ))}
             </div>
@@ -118,7 +167,11 @@ export function PatientGallery({ patientId, initialPhotos, sessions }: PatientGa
             )}
           </CardHeader>
           <CardContent>
-            <SessionImages sessionId={session.id} />
+            <SessionImages 
+              sessionId={session.id} 
+              onImageClick={openLightbox}
+              onAnalyzeClick={openAnalysis}
+            />
           </CardContent>
         </Card>
       ))}
@@ -158,21 +211,46 @@ export function PatientGallery({ patientId, initialPhotos, sessions }: PatientGa
             )}
 
             {selectedImage && (
-              <img
-                src={selectedImage}
-                alt="Full size"
-                className="h-auto max-h-[80vh] w-full rounded-lg object-contain"
-              />
-            )}
-
-            {allImages.length > 1 && (
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full bg-background/80 px-3 py-1 text-sm">
-                {currentIndex + 1} / {allImages.length}
-              </div>
+              <>
+                <img
+                  src={selectedImage}
+                  alt="Full size"
+                  className="h-auto max-h-[80vh] w-full rounded-lg object-contain"
+                />
+                
+                {/* Analyze button in lightbox */}
+                <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 items-center gap-4">
+                  <Button
+                    variant="secondary"
+                    className="bg-card/90 backdrop-blur-sm hover:bg-card"
+                    onClick={() => {
+                      setSelectedImage(null);
+                      openAnalysis(selectedImage, 'progress');
+                    }}
+                  >
+                    <Sparkles className="mr-2 h-4 w-4" />
+                    Analyze with AI
+                  </Button>
+                  
+                  {allImages.length > 1 && (
+                    <span className="rounded-full bg-background/80 px-3 py-1 text-sm">
+                      {currentIndex + 1} / {allImages.length}
+                    </span>
+                  )}
+                </div>
+              </>
             )}
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* AI Analysis Dialog */}
+      <ImageAnalysisDialog
+        imageUrl={analysisImageUrl}
+        isOpen={isAnalysisOpen}
+        onClose={() => setIsAnalysisOpen(false)}
+        analysisType={analysisType}
+      />
     </div>
   );
 }
