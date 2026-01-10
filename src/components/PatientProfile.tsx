@@ -177,22 +177,22 @@ export function PatientProfile() {
       {/* Content */}
       <main className="container mx-auto px-4 py-8">
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 lg:w-auto lg:grid-cols-none">
-            <TabsTrigger value="overview" className="flex items-center gap-2">
+          <TabsList className="inline-flex h-auto w-full flex-wrap justify-start gap-1 bg-muted p-1 sm:w-auto sm:flex-nowrap">
+            <TabsTrigger value="overview" className="flex items-center gap-2 px-3 py-2">
               <FileText className="h-4 w-4" />
-              <span className="hidden sm:inline">Overview</span>
+              <span>Overview</span>
             </TabsTrigger>
-            <TabsTrigger value="dental" className="flex items-center gap-2">
+            <TabsTrigger value="dental" className="flex items-center gap-2 px-3 py-2">
               <Stethoscope className="h-4 w-4" />
-              <span className="hidden sm:inline">Dental Chart</span>
+              <span>Dental Chart</span>
             </TabsTrigger>
-            <TabsTrigger value="sessions" className="flex items-center gap-2">
+            <TabsTrigger value="sessions" className="flex items-center gap-2 px-3 py-2">
               <Calendar className="h-4 w-4" />
-              <span className="hidden sm:inline">Sessions</span>
+              <span>Sessions</span>
             </TabsTrigger>
-            <TabsTrigger value="gallery" className="flex items-center gap-2">
+            <TabsTrigger value="gallery" className="flex items-center gap-2 px-3 py-2">
               <Camera className="h-4 w-4" />
-              <span className="hidden sm:inline">Gallery</span>
+              <span>Gallery</span>
             </TabsTrigger>
           </TabsList>
 
