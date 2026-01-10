@@ -11,9 +11,9 @@ interface ToothProps {
 
 function Tooth({ quadrant, number, status, onClick }: ToothProps) {
   const statusColors = {
-    present: 'bg-success hover:bg-success/80 text-success-foreground',
+    present: 'bg-card hover:bg-muted text-foreground',
     missing: 'bg-destructive hover:bg-destructive/80 text-destructive-foreground',
-    filling: 'bg-warning hover:bg-warning/80 text-warning-foreground',
+    filling: 'bg-green-500 hover:bg-green-600 text-white',
   };
 
   return (
@@ -80,7 +80,7 @@ export function PalmerNotationChart({ teeth, onToothClick, readonly }: PalmerNot
         <h3 className="text-lg font-semibold text-foreground">Palmer Notation Chart</h3>
         <div className="flex gap-4 text-xs">
           <div className="flex items-center gap-1">
-            <div className="h-4 w-4 rounded bg-success" />
+            <div className="h-4 w-4 rounded border-2 border-border bg-card" />
             <span>Present</span>
           </div>
           <div className="flex items-center gap-1">
@@ -88,7 +88,7 @@ export function PalmerNotationChart({ teeth, onToothClick, readonly }: PalmerNot
             <span>Missing</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="h-4 w-4 rounded bg-warning" />
+            <div className="h-4 w-4 rounded bg-green-500" />
             <span>Filling</span>
           </div>
         </div>
