@@ -14,7 +14,277 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      dental_chart: {
+        Row: {
+          created_at: string
+          id: string
+          patient_id: string
+          quadrant: number
+          status: string
+          tooth_number: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          patient_id: string
+          quadrant: number
+          status?: string
+          tooth_number: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          patient_id?: string
+          quadrant?: number
+          status?: string
+          tooth_number?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dental_chart_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      initial_photos: {
+        Row: {
+          created_at: string
+          id: string
+          image_type: string | null
+          image_url: string
+          patient_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          image_type?: string | null
+          image_url: string
+          patient_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          image_type?: string | null
+          image_url?: string
+          patient_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "initial_photos_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      patients: {
+        Row: {
+          age: number
+          ap_relation: string | null
+          canine_relation: string | null
+          chief_complaint: string | null
+          created_at: string
+          habits: string | null
+          horizontal_relation: string | null
+          id: string
+          incisor_relation: string | null
+          lips: string | null
+          lower_buccal: string | null
+          lower_labial: string | null
+          lower_space_available: number | null
+          lower_space_required: number | null
+          molar_relation: string | null
+          name: string
+          oral_hygiene: string | null
+          overbite_mm: number | null
+          overjet_mm: number | null
+          tongue_position: string | null
+          tongue_size: string | null
+          updated_at: string
+          upper_buccal: string | null
+          upper_labial: string | null
+          upper_space_available: number | null
+          upper_space_required: number | null
+          vertical_relation: string | null
+        }
+        Insert: {
+          age: number
+          ap_relation?: string | null
+          canine_relation?: string | null
+          chief_complaint?: string | null
+          created_at?: string
+          habits?: string | null
+          horizontal_relation?: string | null
+          id?: string
+          incisor_relation?: string | null
+          lips?: string | null
+          lower_buccal?: string | null
+          lower_labial?: string | null
+          lower_space_available?: number | null
+          lower_space_required?: number | null
+          molar_relation?: string | null
+          name: string
+          oral_hygiene?: string | null
+          overbite_mm?: number | null
+          overjet_mm?: number | null
+          tongue_position?: string | null
+          tongue_size?: string | null
+          updated_at?: string
+          upper_buccal?: string | null
+          upper_labial?: string | null
+          upper_space_available?: number | null
+          upper_space_required?: number | null
+          vertical_relation?: string | null
+        }
+        Update: {
+          age?: number
+          ap_relation?: string | null
+          canine_relation?: string | null
+          chief_complaint?: string | null
+          created_at?: string
+          habits?: string | null
+          horizontal_relation?: string | null
+          id?: string
+          incisor_relation?: string | null
+          lips?: string | null
+          lower_buccal?: string | null
+          lower_labial?: string | null
+          lower_space_available?: number | null
+          lower_space_required?: number | null
+          molar_relation?: string | null
+          name?: string
+          oral_hygiene?: string | null
+          overbite_mm?: number | null
+          overjet_mm?: number | null
+          tongue_position?: string | null
+          tongue_size?: string | null
+          updated_at?: string
+          upper_buccal?: string | null
+          upper_labial?: string | null
+          upper_space_available?: number | null
+          upper_space_required?: number | null
+          vertical_relation?: string | null
+        }
+        Relationships: []
+      }
+      session_images: {
+        Row: {
+          created_at: string
+          id: string
+          image_type: string | null
+          image_url: string
+          session_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          image_type?: string | null
+          image_url: string
+          session_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          image_type?: string | null
+          image_url?: string
+          session_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "session_images_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sessions: {
+        Row: {
+          created_at: string
+          id: string
+          patient_id: string
+          session_date: string
+          treatment_performed: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          patient_id: string
+          session_date?: string
+          treatment_performed?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          patient_id?: string
+          session_date?: string
+          treatment_performed?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sessions_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      treatment_plans: {
+        Row: {
+          appliance_types: string[] | null
+          created_at: string
+          estimated_duration: string | null
+          extraction_plan: string | null
+          id: string
+          patient_id: string
+          primary_goals: string | null
+          special_instructions: string | null
+          updated_at: string
+        }
+        Insert: {
+          appliance_types?: string[] | null
+          created_at?: string
+          estimated_duration?: string | null
+          extraction_plan?: string | null
+          id?: string
+          patient_id: string
+          primary_goals?: string | null
+          special_instructions?: string | null
+          updated_at?: string
+        }
+        Update: {
+          appliance_types?: string[] | null
+          created_at?: string
+          estimated_duration?: string | null
+          extraction_plan?: string | null
+          id?: string
+          patient_id?: string
+          primary_goals?: string | null
+          special_instructions?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "treatment_plans_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
