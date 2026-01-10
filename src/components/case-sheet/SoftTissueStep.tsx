@@ -46,23 +46,37 @@ export function SoftTissueStep({ data, onChange }: SoftTissueStepProps) {
 
         <div className="space-y-2">
           <Label htmlFor="tongue_size">Tongue Size</Label>
-          <Input
-            id="tongue_size"
+          <Select
             value={data.tongue_size}
-            onChange={(e) => onChange('tongue_size', e.target.value)}
-            placeholder="e.g., Normal, Macroglossia"
-          />
+            onValueChange={(value) => onChange('tongue_size', value)}
+          >
+            <SelectTrigger id="tongue_size">
+              <SelectValue placeholder="Select tongue size" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Normal">Normal</SelectItem>
+              <SelectItem value="Macroglossia">Macroglossia</SelectItem>
+              <SelectItem value="Microglossia">Microglossia</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
       <div className="space-y-2">
         <Label htmlFor="tongue_position">Tongue Position</Label>
-        <Input
-          id="tongue_position"
+        <Select
           value={data.tongue_position}
-          onChange={(e) => onChange('tongue_position', e.target.value)}
-          placeholder="Describe tongue position at rest"
-        />
+          onValueChange={(value) => onChange('tongue_position', value)}
+        >
+          <SelectTrigger id="tongue_position">
+            <SelectValue placeholder="Select tongue position" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="Normal/Dorsum">Normal/Dorsum</SelectItem>
+            <SelectItem value="Low">Low</SelectItem>
+            <SelectItem value="Forward/Thrust">Forward/Thrust</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       <div className="space-y-2">
