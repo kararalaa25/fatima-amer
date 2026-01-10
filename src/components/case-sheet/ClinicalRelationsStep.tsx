@@ -46,22 +46,35 @@ export function ClinicalRelationsStep({ data, onChange }: ClinicalRelationsStepP
 
         <div className="space-y-2">
           <Label htmlFor="horizontal_relation">Horizontal Relation</Label>
-          <Input
-            id="horizontal_relation"
+          <Select
             value={data.horizontal_relation}
-            onChange={(e) => onChange('horizontal_relation', e.target.value)}
-            placeholder="Enter horizontal relation"
-          />
+            onValueChange={(value) => onChange('horizontal_relation', value)}
+          >
+            <SelectTrigger id="horizontal_relation">
+              <SelectValue placeholder="Select horizontal relation" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Symmetrical">Symmetrical</SelectItem>
+              <SelectItem value="Not Symmetrical">Not Symmetrical</SelectItem>
+              <SelectItem value="Normal">Normal</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         <div className="space-y-2">
           <Label htmlFor="vertical_relation">Vertical Relation</Label>
-          <Input
-            id="vertical_relation"
+          <Select
             value={data.vertical_relation}
-            onChange={(e) => onChange('vertical_relation', e.target.value)}
-            placeholder="Enter vertical relation"
-          />
+            onValueChange={(value) => onChange('vertical_relation', value)}
+          >
+            <SelectTrigger id="vertical_relation">
+              <SelectValue placeholder="Select vertical relation" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Long">Long</SelectItem>
+              <SelectItem value="Short">Short</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
