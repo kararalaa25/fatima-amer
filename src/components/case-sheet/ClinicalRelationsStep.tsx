@@ -36,12 +36,20 @@ export function ClinicalRelationsStep({ data, onChange }: ClinicalRelationsStepP
       <div className="grid gap-6 md:grid-cols-3">
         <div className="space-y-2">
           <Label htmlFor="ap_relation">AP/Horizontal Relation</Label>
-          <Input
-            id="ap_relation"
+          <Select
             value={data.ap_relation}
-            onChange={(e) => onChange('ap_relation', e.target.value)}
-            placeholder="e.g., Class I, II, III"
-          />
+            onValueChange={(value) => onChange('ap_relation', value)}
+          >
+            <SelectTrigger id="ap_relation">
+              <SelectValue placeholder="Select AP relation" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Class I">Class I</SelectItem>
+              <SelectItem value="Class II div 1">Class II div 1</SelectItem>
+              <SelectItem value="Class II div 2">Class II div 2</SelectItem>
+              <SelectItem value="Class III">Class III</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         <div className="space-y-2">
@@ -54,9 +62,11 @@ export function ClinicalRelationsStep({ data, onChange }: ClinicalRelationsStepP
               <SelectValue placeholder="Select horizontal relation" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="Symmetrical">Symmetrical</SelectItem>
-              <SelectItem value="Not Symmetrical">Not Symmetrical</SelectItem>
               <SelectItem value="Normal">Normal</SelectItem>
+              <SelectItem value="Increased">Increased</SelectItem>
+              <SelectItem value="Reduced">Reduced</SelectItem>
+              <SelectItem value="Edge-to-Edge">Edge-to-Edge</SelectItem>
+              <SelectItem value="Crossbite">Crossbite</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -71,8 +81,10 @@ export function ClinicalRelationsStep({ data, onChange }: ClinicalRelationsStepP
               <SelectValue placeholder="Select vertical relation" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="Long">Long</SelectItem>
-              <SelectItem value="Short">Short</SelectItem>
+              <SelectItem value="Normal">Normal</SelectItem>
+              <SelectItem value="Deep Bite">Deep Bite</SelectItem>
+              <SelectItem value="Open Bite">Open Bite</SelectItem>
+              <SelectItem value="Reduced">Reduced</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -107,32 +119,56 @@ export function ClinicalRelationsStep({ data, onChange }: ClinicalRelationsStepP
       <div className="grid gap-6 md:grid-cols-3">
         <div className="space-y-2">
           <Label htmlFor="molar_relation">Molar Relation</Label>
-          <Input
-            id="molar_relation"
+          <Select
             value={data.molar_relation}
-            onChange={(e) => onChange('molar_relation', e.target.value)}
-            placeholder="e.g., Class I, II, III"
-          />
+            onValueChange={(value) => onChange('molar_relation', value)}
+          >
+            <SelectTrigger id="molar_relation">
+              <SelectValue placeholder="Select molar relation" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Class I">Class I</SelectItem>
+              <SelectItem value="Class II">Class II</SelectItem>
+              <SelectItem value="Class III">Class III</SelectItem>
+              <SelectItem value="Quarter-unit Class II">Quarter-unit Class II</SelectItem>
+              <SelectItem value="Half-unit Class II">Half-unit Class II</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         <div className="space-y-2">
           <Label htmlFor="canine_relation">Canine Relation</Label>
-          <Input
-            id="canine_relation"
+          <Select
             value={data.canine_relation}
-            onChange={(e) => onChange('canine_relation', e.target.value)}
-            placeholder="Enter canine relation"
-          />
+            onValueChange={(value) => onChange('canine_relation', value)}
+          >
+            <SelectTrigger id="canine_relation">
+              <SelectValue placeholder="Select canine relation" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Class I">Class I</SelectItem>
+              <SelectItem value="Class II">Class II</SelectItem>
+              <SelectItem value="Class III">Class III</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         <div className="space-y-2">
           <Label htmlFor="incisor_relation">Incisor Relation</Label>
-          <Input
-            id="incisor_relation"
+          <Select
             value={data.incisor_relation}
-            onChange={(e) => onChange('incisor_relation', e.target.value)}
-            placeholder="Enter incisor relation"
-          />
+            onValueChange={(value) => onChange('incisor_relation', value)}
+          >
+            <SelectTrigger id="incisor_relation">
+              <SelectValue placeholder="Select incisor relation" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Class I">Class I</SelectItem>
+              <SelectItem value="Class II div 1">Class II div 1</SelectItem>
+              <SelectItem value="Class II div 2">Class II div 2</SelectItem>
+              <SelectItem value="Class III">Class III</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
