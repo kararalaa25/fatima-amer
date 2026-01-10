@@ -198,113 +198,227 @@ export function PatientProfile() {
 
           {/* Overview Tab */}
           <TabsContent value="overview" className="space-y-6">
+            {/* Edit Button */}
+            <div className="flex justify-end">
+              <Button variant="outline" onClick={() => navigate(`/patient/${id}/edit`)}>
+                <FileText className="mr-2 h-4 w-4" />
+                Edit Patient Details
+              </Button>
+            </div>
+
             <div className="grid gap-6 lg:grid-cols-2">
               {/* Basic Info */}
               <Card>
                 <CardHeader>
-                  <CardTitle>Basic Information</CardTitle>
+                  <CardTitle className="text-lg font-bold">Basic Information</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <p className="text-sm text-muted-foreground">Name</p>
+                      <p className="text-sm font-semibold text-muted-foreground">Name</p>
                       <p className="font-medium">{patient.name}</p>
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground">Age</p>
+                      <p className="text-sm font-semibold text-muted-foreground">Age</p>
                       <p className="font-medium">{patient.age} years</p>
                     </div>
                   </div>
-                  {patient.chief_complaint && (
-                    <div>
-                      <p className="text-sm text-muted-foreground">Chief Complaint</p>
-                      <p className="font-medium">{patient.chief_complaint}</p>
-                    </div>
-                  )}
+                  <div>
+                    <p className="text-sm font-semibold text-muted-foreground">Chief Complaint</p>
+                    <p className="font-medium">{patient.chief_complaint || 'Not Recorded'}</p>
+                  </div>
                 </CardContent>
               </Card>
 
               {/* Clinical Relations */}
               <Card>
                 <CardHeader>
-                  <CardTitle>Clinical Relations</CardTitle>
+                  <CardTitle className="text-lg font-bold">Clinical Relations</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-2 gap-4 text-sm">
-                    {patient.ap_relation && (
-                      <div>
-                        <p className="text-muted-foreground">AP Relation</p>
-                        <p className="font-medium">{patient.ap_relation}</p>
-                      </div>
-                    )}
-                    {patient.molar_relation && (
-                      <div>
-                        <p className="text-muted-foreground">Molar Relation</p>
-                        <p className="font-medium">{patient.molar_relation}</p>
-                      </div>
-                    )}
-                    {patient.overbite_mm && (
-                      <div>
-                        <p className="text-muted-foreground">Overbite</p>
-                        <p className="font-medium">{patient.overbite_mm} mm</p>
-                      </div>
-                    )}
-                    {patient.overjet_mm && (
-                      <div>
-                        <p className="text-muted-foreground">Overjet</p>
-                        <p className="font-medium">{patient.overjet_mm} mm</p>
-                      </div>
-                    )}
-                    {patient.oral_hygiene && (
-                      <div>
-                        <p className="text-muted-foreground">Oral Hygiene</p>
+                    <div>
+                      <p className="font-semibold text-muted-foreground">AP Relation</p>
+                      <p className="font-medium">{patient.ap_relation || 'Not Recorded'}</p>
+                    </div>
+                    <div>
+                      <p className="font-semibold text-muted-foreground">Molar Relation</p>
+                      <p className="font-medium">{patient.molar_relation || 'Not Recorded'}</p>
+                    </div>
+                    <div>
+                      <p className="font-semibold text-muted-foreground">Canine Relation</p>
+                      <p className="font-medium">{patient.canine_relation || 'Not Recorded'}</p>
+                    </div>
+                    <div>
+                      <p className="font-semibold text-muted-foreground">Incisor Relation</p>
+                      <p className="font-medium">{patient.incisor_relation || 'Not Recorded'}</p>
+                    </div>
+                    <div>
+                      <p className="font-semibold text-muted-foreground">Horizontal Relation</p>
+                      <p className="font-medium">{patient.horizontal_relation || 'Not Recorded'}</p>
+                    </div>
+                    <div>
+                      <p className="font-semibold text-muted-foreground">Vertical Relation</p>
+                      <p className="font-medium">{patient.vertical_relation || 'Not Recorded'}</p>
+                    </div>
+                    <div>
+                      <p className="font-semibold text-muted-foreground">Overbite</p>
+                      <p className="font-medium">{patient.overbite_mm != null ? `${patient.overbite_mm} mm` : 'Not Recorded'}</p>
+                    </div>
+                    <div>
+                      <p className="font-semibold text-muted-foreground">Overjet</p>
+                      <p className="font-medium">{patient.overjet_mm != null ? `${patient.overjet_mm} mm` : 'Not Recorded'}</p>
+                    </div>
+                    <div className="col-span-2">
+                      <p className="font-semibold text-muted-foreground">Oral Hygiene</p>
+                      {patient.oral_hygiene ? (
                         <Badge variant="outline">{patient.oral_hygiene}</Badge>
-                      </div>
-                    )}
+                      ) : (
+                        <p className="font-medium">Not Recorded</p>
+                      )}
+                    </div>
                   </div>
                 </CardContent>
               </Card>
 
-              {/* Treatment Plan */}
-              {treatmentPlan && (
-                <Card className="lg:col-span-2">
-                  <CardHeader>
-                    <CardTitle>Treatment Plan</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    {treatmentPlan.primary_goals && (
-                      <div>
-                        <p className="text-sm text-muted-foreground">Primary Goals</p>
-                        <p className="font-medium">{treatmentPlan.primary_goals}</p>
-                      </div>
-                    )}
-                    {treatmentPlan.appliance_types && treatmentPlan.appliance_types.length > 0 && (
-                      <div>
-                        <p className="mb-2 text-sm text-muted-foreground">Appliances</p>
-                        <div className="flex flex-wrap gap-2">
-                          {treatmentPlan.appliance_types.map((type) => (
-                            <Badge key={type}>{type}</Badge>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                    <div className="grid grid-cols-2 gap-4">
-                      {treatmentPlan.extraction_plan && (
-                        <div>
-                          <p className="text-sm text-muted-foreground">Extraction Plan</p>
-                          <p className="font-medium">{treatmentPlan.extraction_plan}</p>
-                        </div>
-                      )}
-                      {treatmentPlan.estimated_duration && (
-                        <div>
-                          <p className="text-sm text-muted-foreground">Duration</p>
-                          <p className="font-medium">{treatmentPlan.estimated_duration}</p>
-                        </div>
-                      )}
+              {/* Soft Tissue & Myofunctional */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg font-bold">Soft Tissue & Myofunctional</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <p className="font-semibold text-muted-foreground">Lips</p>
+                      <p className="font-medium">{patient.lips || 'Not Recorded'}</p>
                     </div>
-                  </CardContent>
-                </Card>
-              )}
+                    <div>
+                      <p className="font-semibold text-muted-foreground">Tongue Position</p>
+                      <p className="font-medium">{patient.tongue_position || 'Not Recorded'}</p>
+                    </div>
+                    <div>
+                      <p className="font-semibold text-muted-foreground">Tongue Size</p>
+                      <p className="font-medium">{patient.tongue_size || 'Not Recorded'}</p>
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-muted-foreground">Habits</p>
+                    <p className="font-medium text-sm">{patient.habits || 'Not Recorded'}</p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Segment & Space Analysis */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg font-bold">Segment & Space Analysis</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <p className="font-semibold text-muted-foreground">Upper Buccal</p>
+                      <p className="font-medium">{patient.upper_buccal || 'Not Recorded'}</p>
+                    </div>
+                    <div>
+                      <p className="font-semibold text-muted-foreground">Lower Buccal</p>
+                      <p className="font-medium">{patient.lower_buccal || 'Not Recorded'}</p>
+                    </div>
+                    <div>
+                      <p className="font-semibold text-muted-foreground">Upper Labial</p>
+                      <p className="font-medium">{patient.upper_labial || 'Not Recorded'}</p>
+                    </div>
+                    <div>
+                      <p className="font-semibold text-muted-foreground">Lower Labial</p>
+                      <p className="font-medium">{patient.lower_labial || 'Not Recorded'}</p>
+                    </div>
+                  </div>
+                  
+                  {/* Upper Arch Space Analysis */}
+                  {(patient.upper_buccal === 'Crowded' || patient.upper_buccal === 'Spacing' ||
+                    patient.upper_labial === 'Crowded' || patient.upper_labial === 'Spacing') && (
+                    <div className="border-t pt-4">
+                      <p className="font-semibold text-muted-foreground mb-2">Upper Arch Space</p>
+                      <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <p className="text-muted-foreground">Available</p>
+                          <p className="font-medium">{patient.upper_space_available != null ? `${patient.upper_space_available} mm` : 'Not Recorded'}</p>
+                        </div>
+                        <div>
+                          <p className="text-muted-foreground">Required</p>
+                          <p className="font-medium">{patient.upper_space_required != null ? `${patient.upper_space_required} mm` : 'Not Recorded'}</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Lower Arch Space Analysis */}
+                  {(patient.lower_buccal === 'Crowded' || patient.lower_buccal === 'Spacing' ||
+                    patient.lower_labial === 'Crowded' || patient.lower_labial === 'Spacing') && (
+                    <div className="border-t pt-4">
+                      <p className="font-semibold text-muted-foreground mb-2">Lower Arch Space</p>
+                      <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <p className="text-muted-foreground">Available</p>
+                          <p className="font-medium">{patient.lower_space_available != null ? `${patient.lower_space_available} mm` : 'Not Recorded'}</p>
+                        </div>
+                        <div>
+                          <p className="text-muted-foreground">Required</p>
+                          <p className="font-medium">{patient.lower_space_required != null ? `${patient.lower_space_required} mm` : 'Not Recorded'}</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Treatment Plan */}
+              <Card className="lg:col-span-2">
+                <CardHeader>
+                  <CardTitle className="text-lg font-bold">Treatment Plan</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <p className="text-sm font-semibold text-muted-foreground">Primary Goals</p>
+                    <p className="font-medium">{treatmentPlan?.primary_goals || 'Not Recorded'}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-muted-foreground mb-2">Appliance Types</p>
+                    {treatmentPlan?.appliance_types && treatmentPlan.appliance_types.length > 0 ? (
+                      <div className="flex flex-wrap gap-2">
+                        {treatmentPlan.appliance_types.map((type) => (
+                          <Badge key={type}>{type}</Badge>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="font-medium">Not Recorded</p>
+                    )}
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-sm font-semibold text-muted-foreground">Extraction Plan</p>
+                      <p className="font-medium">{treatmentPlan?.extraction_plan || 'Not Recorded'}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-muted-foreground">Estimated Duration</p>
+                      <p className="font-medium">{treatmentPlan?.estimated_duration || 'Not Recorded'}</p>
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-muted-foreground">Special Instructions</p>
+                    <p className="font-medium">{treatmentPlan?.special_instructions || 'Not Recorded'}</p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Dental Chart Preview */}
+              <Card className="lg:col-span-2">
+                <CardHeader>
+                  <CardTitle className="text-lg font-bold">Dental Chart</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <PalmerNotationChart teeth={dentalChartMap} onToothClick={() => {}} readonly />
+                </CardContent>
+              </Card>
             </div>
           </TabsContent>
 
