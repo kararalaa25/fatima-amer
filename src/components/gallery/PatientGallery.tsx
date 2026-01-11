@@ -62,11 +62,11 @@ function ImageCard({
   onAnalyze?: () => void;
 }) {
   return (
-    <div className="group relative aspect-square overflow-hidden rounded-lg border border-border bg-muted">
+    <div className="group relative aspect-[4/3] overflow-hidden rounded-lg border border-border bg-muted">
       <img
         src={src}
         alt={alt}
-        className="h-full w-full cursor-pointer object-cover transition-transform group-hover:scale-105"
+        className="h-full w-full cursor-pointer object-contain transition-transform group-hover:scale-105"
         onClick={onClick}
       />
       <div className="absolute inset-0 bg-foreground/0 transition-colors group-hover:bg-foreground/10" />
