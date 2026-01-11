@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/table';
 import { Search, UserPlus, Stethoscope, Users } from 'lucide-react';
 import { format } from 'date-fns';
+import { PatientActionsMenu } from './dashboard/PatientActionsMenu';
 
 export function PatientDashboard() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -152,10 +153,11 @@ export function PatientDashboard() {
                         <TableCell>
                           {format(new Date(patient.updated_at), 'MMM d, yyyy')}
                         </TableCell>
-                        <TableCell className="text-right">
-                          <Button variant="ghost" size="sm">
-                            View
-                          </Button>
+                        <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
+                          <PatientActionsMenu
+                            patientId={patient.id}
+                            patientName={patient.name}
+                          />
                         </TableCell>
                       </TableRow>
                     ))}

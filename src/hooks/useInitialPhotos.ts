@@ -56,3 +56,27 @@ export function useUploadInitialPhoto() {
     },
   });
 }
+
+export function useCreateInitialPhoto() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async ({ patient_id, image_url, image_type }: { patient_id: string; image_url: string; image_type: string }) => {
+      const { data, error } = await supabase
+        .from('initial_photos')
+        .insert({
+          patient_id,
+          image_url,
+          image_type,
+        })
+        .select()
+        .single();
+      
+      if (error) throw error;
+      return data as InitialPhoto;
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['initial-photos', variables.patient_id] });
+    },
+  });
+}
