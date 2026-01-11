@@ -50,3 +50,21 @@ export function useUpsertTreatmentPlan() {
     },
   });
 }
+
+export function useDeleteTreatmentPlan() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async (patientId: string) => {
+      const { error } = await supabase
+        .from('treatment_plans')
+        .delete()
+        .eq('patient_id', patientId);
+      
+      if (error) throw error;
+    },
+    onSuccess: (_, patientId) => {
+      queryClient.invalidateQueries({ queryKey: ['treatment-plan', patientId] });
+    },
+  });
+}

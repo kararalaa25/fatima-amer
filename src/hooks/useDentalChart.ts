@@ -54,3 +54,21 @@ export function useUpdateToothStatus() {
     },
   });
 }
+
+export function useClearDentalChart() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async (patientId: string) => {
+      const { error } = await supabase
+        .from('dental_chart')
+        .delete()
+        .eq('patient_id', patientId);
+      
+      if (error) throw error;
+    },
+    onSuccess: (_, patientId) => {
+      queryClient.invalidateQueries({ queryKey: ['dental-chart', patientId] });
+    },
+  });
+}
