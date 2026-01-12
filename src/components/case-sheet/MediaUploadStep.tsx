@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -9,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Camera, Upload, X, Trash2 } from 'lucide-react';
+import { Camera, Upload, X, Image as ImageIcon } from 'lucide-react';
 import { ImageViewerDialog } from './ImageViewerDialog';
 
 const IMAGE_TYPES = [
@@ -41,14 +41,20 @@ interface MediaUploadStepProps {
 
 export function MediaUploadStep({ images, onImagesChange }: MediaUploadStepProps) {
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
-  const [pendingType, setPendingType] = useState<string>('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
-    if (!files) return;
+    if (!files || files.length === 0) return;
+
+    const newImages: UploadedImage[] = [];
+    let processedCount = 0;
 
     Array.from(files).forEach((file) => {
-      if (!file.type.startsWith('image/')) return;
+      if (!file.type.startsWith('image/')) {
+        processedCount++;
+        return;
+      }
 
       const reader = new FileReader();
       reader.onload = () => {
@@ -58,13 +64,24 @@ export function MediaUploadStep({ images, onImagesChange }: MediaUploadStepProps
           preview: reader.result as string,
           type: '', // Will be selected by user
         };
-        onImagesChange([...images, newImage]);
+        newImages.push(newImage);
+        processedCount++;
+
+        // When all files are processed, update state
+        if (processedCount === files.length) {
+          onImagesChange([...images, ...newImages]);
+        }
       };
       reader.readAsDataURL(file);
     });
 
+    // Reset input value to allow selecting same files again
     e.target.value = '';
   }, [images, onImagesChange]);
+
+  const handleButtonClick = () => {
+    fileInputRef.current?.click();
+  };
 
   const handleTypeChange = (imageId: string, type: string) => {
     onImagesChange(
@@ -87,17 +104,17 @@ export function MediaUploadStep({ images, onImagesChange }: MediaUploadStepProps
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-semibold text-foreground">Clinical Images</h3>
+        <h3 className="text-lg font-semibold text-foreground">Diagnostic Media</h3>
         <p className="text-sm text-muted-foreground">
           Upload X-rays and clinical photographs. Each image must have a type assigned.
         </p>
       </div>
 
       {/* Upload Area */}
-      <Card className="border-2 border-dashed border-border bg-muted/30">
+      <Card className="border-2 border-dashed border-primary/30 bg-primary/5 glass-card hover:border-primary/50 transition-smooth">
         <CardContent className="p-8">
-          <label className="flex cursor-pointer flex-col items-center gap-4">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+          <div className="flex flex-col items-center gap-4">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/20 border border-primary/30">
               <Upload className="h-8 w-8 text-primary" />
             </div>
             <div className="text-center">
@@ -105,51 +122,63 @@ export function MediaUploadStep({ images, onImagesChange }: MediaUploadStepProps
                 Drop images here or click to upload
               </p>
               <p className="text-sm text-muted-foreground">
-                Supports PNG, JPG, JPEG up to 10MB
+                Supports PNG, JPG, JPEG • Multiple files allowed
               </p>
             </div>
             <input
+              ref={fileInputRef}
               type="file"
               accept="image/*"
               multiple
               className="hidden"
               onChange={handleFileSelect}
             />
-            <Button type="button" variant="outline">
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={handleButtonClick}
+              className="glow-border transition-smooth"
+            >
               <Camera className="mr-2 h-4 w-4" />
               Select Images
             </Button>
-          </label>
+          </div>
         </CardContent>
       </Card>
 
       {/* Warning for missing types */}
       {missingTypes > 0 && (
-        <div className="rounded-lg border border-warning bg-warning/10 p-3 text-sm text-warning">
-          <strong>{missingTypes} image(s)</strong> missing required type. Please assign a type to
-          all images before saving.
+        <div className="rounded-lg border border-warning/50 bg-warning/10 p-3 text-sm text-warning flex items-center gap-2">
+          <ImageIcon className="h-4 w-4 shrink-0" />
+          <span>
+            <strong>{missingTypes} image(s)</strong> missing required type label. Please assign a type to all images.
+          </span>
         </div>
       )}
 
       {/* Uploaded Images Grid */}
       {images.length > 0 && (
         <div className="space-y-4">
-          <Label className="text-base">Uploaded Images ({images.length})</Label>
+          <Label className="text-base text-foreground">Uploaded Images ({images.length})</Label>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {images.map((image, index) => (
-              <Card key={image.id} className="overflow-hidden">
+              <Card key={image.id} className="overflow-hidden glass-card border-0 glow-border transition-smooth hover:scale-[1.02]">
                 <div className="relative aspect-[4/3]">
                   <img
                     src={image.preview}
                     alt={`Upload ${index + 1}`}
-                    className="h-full w-full cursor-pointer object-contain bg-muted"
+                    className="h-full w-full cursor-pointer object-contain bg-muted/50"
                     onClick={() => setSelectedImageIndex(index)}
+                    loading="lazy"
                   />
                   <Button
                     variant="destructive"
                     size="icon"
                     className="absolute right-2 top-2 h-7 w-7"
-                    onClick={() => handleRemoveImage(image.id)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleRemoveImage(image.id);
+                    }}
                   >
                     <X className="h-4 w-4" />
                   </Button>
@@ -164,10 +193,10 @@ export function MediaUploadStep({ images, onImagesChange }: MediaUploadStepProps
                     value={image.type}
                     onValueChange={(value) => handleTypeChange(image.id, value)}
                   >
-                    <SelectTrigger className={!image.type ? 'border-warning' : ''}>
+                    <SelectTrigger className={`bg-muted/50 ${!image.type ? 'border-warning' : 'border-border/50'}`}>
                       <SelectValue placeholder="Select image type *" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="bg-popover border-border">
                       {IMAGE_TYPES.map((type) => (
                         <SelectItem key={type.value} value={type.value}>
                           {type.label}
@@ -188,7 +217,10 @@ export function MediaUploadStep({ images, onImagesChange }: MediaUploadStepProps
           isOpen={selectedImageIndex !== null}
           onClose={() => setSelectedImageIndex(null)}
           imageSrc={images[selectedImageIndex]?.preview || ''}
-          imageType={images[selectedImageIndex]?.type || 'Unknown'}
+          imageType={
+            IMAGE_TYPES.find((t) => t.value === images[selectedImageIndex]?.type)?.label ||
+            'Unknown'
+          }
           onImageUpdate={(updatedPreview) => handleImageUpdate(selectedImageIndex, updatedPreview)}
         />
       )}

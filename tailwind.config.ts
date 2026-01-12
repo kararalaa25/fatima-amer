@@ -66,9 +66,9 @@ export default {
 				foreground: 'hsl(var(--warning-foreground))'
 			},
 			dental: {
-				present: 'hsl(145 60% 45%)',
-				missing: 'hsl(0 72% 50%)',
-				filling: 'hsl(45 90% 50%)'
+				present: 'hsl(150 70% 45%)',
+				missing: 'hsl(0 80% 55%)',
+				filling: 'hsl(45 90% 55%)'
 			}
 		},
   		borderRadius: {
@@ -92,11 +92,29 @@ export default {
   				to: {
   					height: '0'
   				}
-  			}
+  			},
+			'glow-pulse': {
+				'0%, 100%': {
+					boxShadow: '0 0 20px hsl(210 100% 55% / 0.3)'
+				},
+				'50%': {
+					boxShadow: '0 0 30px hsl(210 100% 55% / 0.5)'
+				}
+			},
+			'float': {
+				'0%, 100%': {
+					transform: 'translateY(0)'
+				},
+				'50%': {
+					transform: 'translateY(-10px)'
+				}
+			}
   		},
   		animation: {
   			'accordion-down': 'accordion-down 0.2s ease-out',
-  			'accordion-up': 'accordion-up 0.2s ease-out'
+  			'accordion-up': 'accordion-up 0.2s ease-out',
+			'glow-pulse': 'glow-pulse 3s ease-in-out infinite',
+			'float': 'float 6s ease-in-out infinite'
   		},
   		boxShadow: {
   			'2xs': 'var(--shadow-2xs)',
@@ -105,11 +123,13 @@ export default {
   			md: 'var(--shadow-md)',
   			lg: 'var(--shadow-lg)',
   			xl: 'var(--shadow-xl)',
-  			'2xl': 'var(--shadow-2xl)'
+  			'2xl': 'var(--shadow-2xl)',
+			'glow': 'var(--shadow-glow)',
+			'glow-accent': 'var(--shadow-glow-accent)'
   		},
   		fontFamily: {
   			sans: [
-  				'Poppins',
+  				'Inter',
   				'ui-sans-serif',
   				'system-ui',
   				'-apple-system',
@@ -120,15 +140,6 @@ export default {
   				'Arial',
   				'Noto Sans',
   				'sans-serif'
-  			],
-  			serif: [
-  				'Merriweather',
-  				'ui-serif',
-  				'Georgia',
-  				'Cambria',
-  				'Times New Roman',
-  				'Times',
-  				'serif'
   			],
   			mono: [
   				'JetBrains Mono',
