@@ -61,12 +61,22 @@ function ImageCard({
   onClick?: () => void;
   onAnalyze?: () => void;
 }) {
+  const [isLoaded, setIsLoaded] = useState(false);
+
   return (
     <div className="group relative aspect-[4/3] overflow-hidden rounded-lg border border-border bg-muted">
+      {/* Skeleton loader */}
+      {!isLoaded && (
+        <div className="absolute inset-0 animate-pulse bg-muted" />
+      )}
       <img
         src={src}
         alt={alt}
-        className="h-full w-full cursor-pointer object-contain transition-transform group-hover:scale-105"
+        loading="lazy"
+        onLoad={() => setIsLoaded(true)}
+        className={`h-full w-full cursor-pointer object-contain transition-all duration-300 group-hover:scale-105 ${
+          isLoaded ? 'opacity-100' : 'opacity-0'
+        }`}
         onClick={onClick}
       />
       <div className="absolute inset-0 bg-foreground/0 transition-colors group-hover:bg-foreground/10" />

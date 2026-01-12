@@ -11,53 +11,92 @@ serve(async (req) => {
   }
 
   try {
-    const { clinicalData } = await req.json();
+    const { clinicalData, dentalChartSummary, availableImages } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    const systemPrompt = `You are an experienced orthodontist AI assistant. Based on the clinical findings provided, generate a professional orthodontic diagnosis and treatment plan recommendation.
+    const systemPrompt = `You are an expert orthodontist AI assistant with 20+ years of clinical experience. Based on the comprehensive clinical findings provided, generate a DETAILED orthodontic treatment plan.
 
-Your response must be a JSON object with the following structure:
+Your response MUST be a JSON object with this EXACT structure:
 {
-  "diagnosis": "A comprehensive initial diagnosis based on the clinical findings",
-  "primary_goals": "Specific treatment objectives to address the identified issues",
-  "recommended_appliances": ["Array of recommended appliance types from: Metal Braces, Ceramic Braces, Lingual Braces, Clear Aligners, Palatal Expander, Headgear, Retainers, Space Maintainer, Functional Appliance"],
-  "extraction_recommendation": "If extractions are recommended, specify which teeth, otherwise state 'No extractions recommended'",
-  "estimated_duration": "Estimated treatment duration (e.g., '18-24 months')",
-  "special_considerations": "Any special instructions or considerations based on the findings"
+  "diagnosis": "Comprehensive initial diagnosis based on all clinical findings",
+  "leveling_alignment": {
+    "starting_wire": "Specific starting wire (e.g., '0.012 NiTi' for severe crowding, '0.014 NiTi' for moderate crowding)",
+    "wire_sequence": ["Array of wires in sequence, e.g., '0.012 NiTi', '0.014 NiTi', '0.016 NiTi', '0.016x0.022 NiTi', '0.017x0.025 NiTi', '0.019x0.025 SS'"],
+    "rationale": "Why this wire sequence was chosen based on the crowding severity"
+  },
+  "space_management": {
+    "approach": "Space creation / Space maintenance / Space closure",
+    "coil_type": "Open Coils (to create space) or Closed Coils (to maintain space) or Power Chain (to close space)",
+    "details": "Specific details about where and how to apply"
+  },
+  "ipr_strategy": {
+    "amount_mm": 0.0,
+    "timing": "Session 1 / After leveling / When 0.018x0.025 SS is reached",
+    "location": "Specify teeth for IPR (e.g., 'Lower anterior 3-3' or 'Upper 2-2')",
+    "rationale": "Why IPR is needed or not needed based on space analysis"
+  },
+  "mechanics": {
+    "elastics": "Type and configuration (e.g., 'Class II elastics 3/16\" 6oz from upper canine to lower molar' or 'No elastics needed')",
+    "auxiliaries": "Any auxiliaries needed (e.g., 'Laceback, Torquing springs, Power arms')",
+    "adjustments": "Specific bracket adjustments or repositioning needed"
+  },
+  "primary_goals": "Clear treatment objectives",
+  "recommended_appliances": ["Array from: Metal Braces, Ceramic Braces, Clear Aligners, Palatal Expander, Headgear, Retainers, Functional Appliance"],
+  "extraction_recommendation": "Specific teeth if needed (e.g., '14, 24, 34, 44') or 'No extractions recommended'",
+  "estimated_duration": "Treatment duration (e.g., '18-24 months')",
+  "special_considerations": "Patient-specific notes and precautions"
 }
 
-Be professional, thorough, and base your recommendations strictly on the clinical data provided. If certain data is missing, note that in your assessment.`;
+CRITICAL CLINICAL RULES:
+1. Starting wire selection based on crowding:
+   - Severe crowding (>6mm space deficiency): Start with 0.012 NiTi
+   - Moderate crowding (3-6mm): Start with 0.014 NiTi
+   - Mild crowding (<3mm): Can start with 0.016 NiTi
 
-    const userPrompt = `Please analyze the following orthodontic clinical findings and provide a diagnosis with treatment recommendations:
+2. IPR Timing:
+   - If overjet > 5mm or significant crowding: Suggest IPR
+   - Light IPR can be done in Session 1 for mild cases
+   - Heavy IPR (>0.5mm per contact) should wait until 0.018x0.025 SS
 
-**Skeletal & Jaw Relations:**
+3. Elastics based on molar relation:
+   - Class II molar: Class II elastics (upper canine to lower molar)
+   - Class III molar: Class III elastics (lower canine to upper molar)
+   - Class I: Usually no anteroposterior elastics needed
+
+4. Space management:
+   - Positive space discrepancy: Use closed coils or power chain
+   - Negative space discrepancy: Use open coils or consider IPR/extractions`;
+
+    const userPrompt = `Please analyze the following orthodontic case and provide a DETAILED treatment plan:
+
+**SKELETAL & JAW RELATIONS:**
 - AP Relation: ${clinicalData.ap_relation || 'Not recorded'}
 - Horizontal Relation: ${clinicalData.horizontal_relation || 'Not recorded'}
 - Vertical Relation: ${clinicalData.vertical_relation || 'Not recorded'}
 
-**Dental Relations:**
+**DENTAL RELATIONS:**
 - Molar Relation: ${clinicalData.molar_relation || 'Not recorded'}
 - Canine Relation: ${clinicalData.canine_relation || 'Not recorded'}
 - Incisor Relation: ${clinicalData.incisor_relation || 'Not recorded'}
 
-**Measurements:**
+**MEASUREMENTS:**
 - Overbite: ${clinicalData.overbite_mm ? `${clinicalData.overbite_mm}mm` : 'Not recorded'}
 - Overjet: ${clinicalData.overjet_mm ? `${clinicalData.overjet_mm}mm` : 'Not recorded'}
 
-**Oral Health:**
+**ORAL HEALTH:**
 - Oral Hygiene: ${clinicalData.oral_hygiene || 'Not recorded'}
 
-**Soft Tissue Assessment:**
+**SOFT TISSUE ASSESSMENT:**
 - Lips: ${clinicalData.lips || 'Not recorded'}
 - Tongue Position: ${clinicalData.tongue_position || 'Not recorded'}
 - Tongue Size: ${clinicalData.tongue_size || 'Not recorded'}
 - Habits: ${clinicalData.habits || 'Not recorded'}
 
-**Segment Analysis:**
+**SEGMENT ANALYSIS:**
 - Upper Buccal: ${clinicalData.upper_buccal || 'Not recorded'}
 - Lower Buccal: ${clinicalData.lower_buccal || 'Not recorded'}
 - Upper Labial: ${clinicalData.upper_labial || 'Not recorded'}
@@ -67,9 +106,16 @@ Be professional, thorough, and base your recommendations strictly on the clinica
 - Lower Arch Space Available: ${clinicalData.lower_space_available || 'Not recorded'}mm
 - Lower Arch Space Required: ${clinicalData.lower_space_required || 'Not recorded'}mm
 
-**Chief Complaint:** ${clinicalData.chief_complaint || 'Not recorded'}
+**DENTAL CHART SUMMARY:**
+- Missing Teeth: ${dentalChartSummary?.missingTeeth?.join(', ') || 'None recorded'}
+- Total Teeth Marked: ${dentalChartSummary?.totalTeethMarked || 0}
 
-Please provide your professional diagnosis and treatment recommendations.`;
+**AVAILABLE DIAGNOSTIC IMAGES:**
+${availableImages?.length > 0 ? availableImages.join(', ') : 'No images uploaded'}
+
+**CHIEF COMPLAINT:** ${clinicalData.chief_complaint || 'Not recorded'}
+
+Based on this comprehensive data, provide a detailed sequential treatment plan with specific wire recommendations, IPR strategy, and mechanics.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -78,7 +124,7 @@ Please provide your professional diagnosis and treatment recommendations.`;
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
+        model: "google/gemini-2.5-flash",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt }
