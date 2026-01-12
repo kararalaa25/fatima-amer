@@ -298,17 +298,20 @@ export function CaseSheetForm() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen cosmic-bg relative">
+      {/* Planet decoration */}
+      <div className="cosmic-planet animate-float" />
+      
       {/* Header */}
-      <header className="border-b border-border bg-card">
+      <header className="relative z-10 border-b border-border/50 glass-card">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center gap-3">
             <Button variant="ghost" size="icon" onClick={() => navigate('/')}>
               <ArrowLeft className="h-5 w-5" />
             </Button>
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
-                <Stethoscope className="h-5 w-5 text-primary-foreground" />
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/20 border border-primary/30 animate-glow-pulse">
+                <Stethoscope className="h-5 w-5 text-primary" />
               </div>
               <div>
                 <h1 className="text-xl font-bold text-foreground">New Patient Case Sheet</h1>
@@ -322,7 +325,7 @@ export function CaseSheetForm() {
       </header>
 
       {/* Sticky Progress Steps with Navigation */}
-      <div className="sticky top-0 z-50 border-b border-border bg-card/95 backdrop-blur-sm shadow-sm">
+      <div className="sticky top-0 z-50 border-b border-border/50 glass-card shadow-lg">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between py-3">
             {/* Previous Button */}
@@ -397,8 +400,8 @@ export function CaseSheetForm() {
       </div>
 
       {/* Form Content */}
-      <main className="container mx-auto px-4 py-8">
-        <Card className="mx-auto max-w-4xl">
+      <main className="container mx-auto px-4 py-8 relative z-10">
+        <Card className="mx-auto max-w-4xl glass-card border-0 glow-border">
           <CardContent className="p-6">{renderStep()}</CardContent>
         </Card>
 
