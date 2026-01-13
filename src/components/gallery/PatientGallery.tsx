@@ -27,7 +27,7 @@ function SessionImages({
 
   if (!images || images.length === 0) {
     return (
-      <div className="flex h-20 items-center justify-center text-sm text-muted-foreground">
+      <div className="flex h-20 items-center justify-center text-sm text-muted-foreground font-medium">
         No photos for this session
       </div>
     );
@@ -64,35 +64,35 @@ function ImageCard({
   const [isLoaded, setIsLoaded] = useState(false);
 
   return (
-    <div className="group relative aspect-[4/3] overflow-hidden rounded-lg border border-border bg-muted">
+    <div className="group relative glass-image-card aspect-[4/3] overflow-hidden">
       {/* Skeleton loader */}
       {!isLoaded && (
-        <div className="absolute inset-0 animate-pulse bg-muted" />
+        <div className="absolute inset-0 animate-pulse bg-muted rounded-3xl" />
       )}
       <img
         src={src}
         alt={alt}
         loading="lazy"
         onLoad={() => setIsLoaded(true)}
-        className={`h-full w-full cursor-pointer object-contain transition-all duration-300 group-hover:scale-105 ${
+        className={`h-full w-full cursor-pointer object-cover transition-all duration-300 group-hover:scale-105 ${
           isLoaded ? 'opacity-100' : 'opacity-0'
         }`}
         onClick={onClick}
       />
-      <div className="absolute inset-0 bg-foreground/0 transition-colors group-hover:bg-foreground/10" />
+      <div className="absolute inset-0 bg-foreground/0 transition-colors group-hover:bg-foreground/5" />
       
       {/* Analyze Button Overlay */}
-      <div className="absolute bottom-2 right-2 opacity-0 transition-opacity group-hover:opacity-100">
+      <div className="absolute bottom-3 right-3 opacity-0 transition-opacity group-hover:opacity-100">
         <Button
           size="sm"
-          variant="secondary"
-          className="h-8 gap-1 bg-card/90 text-xs backdrop-blur-sm hover:bg-card"
+          className="h-8 gap-1 glass-card-solid text-xs font-semibold rounded-xl hover:bg-primary/10"
+          variant="ghost"
           onClick={(e) => {
             e.stopPropagation();
             onAnalyze?.();
           }}
         >
-          <Sparkles className="h-3 w-3" />
+          <Sparkles className="h-3 w-3 text-primary" />
           Analyze
         </Button>
       </div>
@@ -136,10 +136,10 @@ export function PatientGallery({ patientId, initialPhotos, sessions }: PatientGa
   return (
     <div className="space-y-8">
       {/* Initial Photography */}
-      <Card>
+      <Card className="glass-card border-0">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Camera className="h-5 w-5" />
+          <CardTitle className="flex items-center gap-2 font-bold text-foreground">
+            <Camera className="h-5 w-5 text-primary" />
             Initial Photography
           </CardTitle>
         </CardHeader>
@@ -147,7 +147,7 @@ export function PatientGallery({ patientId, initialPhotos, sessions }: PatientGa
           {initialPhotos.length === 0 ? (
             <div className="flex h-40 flex-col items-center justify-center text-muted-foreground">
               <Camera className="mb-2 h-12 w-12" />
-              <p>No initial photos uploaded</p>
+              <p className="font-medium">No initial photos uploaded</p>
             </div>
           ) : (
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
@@ -167,13 +167,13 @@ export function PatientGallery({ patientId, initialPhotos, sessions }: PatientGa
 
       {/* Session Photos */}
       {sessions.map((session) => (
-        <Card key={session.id}>
+        <Card key={session.id} className="glass-card border-0">
           <CardHeader>
-            <CardTitle className="text-base">
+            <CardTitle className="text-base font-bold text-foreground">
               Session: {format(new Date(session.session_date), 'MMMM d, yyyy')}
             </CardTitle>
             {session.treatment_performed && (
-              <p className="text-sm text-muted-foreground">{session.treatment_performed}</p>
+              <p className="text-sm text-muted-foreground font-medium">{session.treatment_performed}</p>
             )}
           </CardHeader>
           <CardContent>
@@ -193,7 +193,7 @@ export function PatientGallery({ patientId, initialPhotos, sessions }: PatientGa
             <Button
               variant="ghost"
               size="icon"
-              className="absolute right-2 top-2 z-10 bg-background/80 hover:bg-background"
+              className="absolute right-2 top-2 z-10 glass-card-solid rounded-xl hover:bg-primary/10"
               onClick={() => setSelectedImage(null)}
             >
               <X className="h-5 w-5" />
@@ -204,7 +204,7 @@ export function PatientGallery({ patientId, initialPhotos, sessions }: PatientGa
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="absolute left-2 top-1/2 z-10 -translate-y-1/2 bg-background/80 hover:bg-background"
+                  className="absolute left-2 top-1/2 z-10 -translate-y-1/2 glass-card-solid rounded-xl hover:bg-primary/10"
                   onClick={() => navigate('prev')}
                 >
                   <ChevronLeft className="h-5 w-5" />
@@ -212,7 +212,7 @@ export function PatientGallery({ patientId, initialPhotos, sessions }: PatientGa
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="absolute right-2 top-1/2 z-10 -translate-y-1/2 bg-background/80 hover:bg-background"
+                  className="absolute right-2 top-1/2 z-10 -translate-y-1/2 glass-card-solid rounded-xl hover:bg-primary/10"
                   onClick={() => navigate('next')}
                 >
                   <ChevronRight className="h-5 w-5" />
@@ -225,25 +225,25 @@ export function PatientGallery({ patientId, initialPhotos, sessions }: PatientGa
                 <img
                   src={selectedImage}
                   alt="Full size"
-                  className="h-auto max-h-[80vh] w-full rounded-lg object-contain"
+                  className="h-auto max-h-[80vh] w-full rounded-3xl object-contain"
                 />
                 
                 {/* Analyze button in lightbox */}
                 <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 items-center gap-4">
                   <Button
-                    variant="secondary"
-                    className="bg-card/90 backdrop-blur-sm hover:bg-card"
+                    className="glass-card-solid rounded-xl font-semibold hover:bg-primary/10"
+                    variant="ghost"
                     onClick={() => {
                       setSelectedImage(null);
                       openAnalysis(selectedImage, 'progress');
                     }}
                   >
-                    <Sparkles className="mr-2 h-4 w-4" />
+                    <Sparkles className="mr-2 h-4 w-4 text-primary" />
                     Analyze with AI
                   </Button>
                   
                   {allImages.length > 1 && (
-                    <span className="rounded-full bg-background/80 px-3 py-1 text-sm">
+                    <span className="glass-card-solid rounded-full px-4 py-2 text-sm font-semibold text-foreground">
                       {currentIndex + 1} / {allImages.length}
                     </span>
                   )}
