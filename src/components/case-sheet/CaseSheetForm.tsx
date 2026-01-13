@@ -125,7 +125,7 @@ export function CaseSheetForm() {
     setTimeout(() => {
       setCurrentStep(newStep);
       setIsTransitioning(false);
-    }, 150);
+    }, 100);
   };
 
   const handleSubmit = async () => {
@@ -288,8 +288,8 @@ export function CaseSheetForm() {
     return (
       <div
         className={cn(
-          'transition-all duration-200 ease-in-out',
-          isTransitioning ? 'translate-x-2 opacity-0' : 'translate-x-0 opacity-100'
+          'transition-all duration-150 ease-out',
+          isTransitioning ? 'translate-x-4 opacity-0' : 'translate-x-0 opacity-100'
         )}
       >
         {stepContent}
@@ -298,24 +298,21 @@ export function CaseSheetForm() {
   };
 
   return (
-    <div className="min-h-screen cosmic-bg relative">
-      {/* Planet decoration */}
-      <div className="cosmic-planet animate-float" />
-      
+    <div className="min-h-screen mesh-gradient-bg relative">
       {/* Header */}
-      <header className="relative z-10 border-b border-border/50 glass-card">
+      <header className="relative z-10 glass-nav">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" onClick={() => navigate('/')}>
+            <Button variant="ghost" size="icon" onClick={() => navigate('/')} className="rounded-2xl">
               <ArrowLeft className="h-5 w-5" />
             </Button>
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/20 border border-primary/30 animate-glow-pulse">
+              <div className="flex h-10 w-10 items-center justify-center rounded-2xl glass-card">
                 <Stethoscope className="h-5 w-5 text-primary" />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-foreground">New Patient Case Sheet</h1>
-                <p className="text-sm text-muted-foreground">
+                <h1 className="text-lg font-bold text-foreground">New Patient Case Sheet</h1>
+                <p className="text-sm text-muted-foreground font-medium">
                   Step {currentStep} of {STEPS.length} — {STEPS[currentStep - 1]?.title}
                 </p>
               </div>
@@ -325,7 +322,7 @@ export function CaseSheetForm() {
       </header>
 
       {/* Sticky Progress Steps with Navigation */}
-      <div className="sticky top-0 z-50 border-b border-border/50 glass-card shadow-lg">
+      <div className="sticky top-0 z-50 glass-nav shadow-lg">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between py-3">
             {/* Previous Button */}
@@ -334,7 +331,7 @@ export function CaseSheetForm() {
               size="sm"
               onClick={() => changeStep(currentStep - 1)}
               disabled={currentStep === 1}
-              className="shrink-0"
+              className="shrink-0 rounded-xl font-semibold"
             >
               <ArrowLeft className="mr-1 h-4 w-4" />
               <span className="hidden sm:inline">Previous</span>
@@ -347,31 +344,31 @@ export function CaseSheetForm() {
                   key={step.id}
                   onClick={() => changeStep(step.id)}
                   className={cn(
-                    'flex min-w-max items-center gap-1 px-2 py-1 text-sm transition-all duration-200 sm:gap-2 sm:px-3',
+                    'flex min-w-max items-center gap-1 px-2 py-1 text-sm transition-all duration-150 sm:gap-2 sm:px-3',
                     currentStep === step.id
-                      ? 'font-semibold text-primary scale-105'
+                      ? 'font-bold text-primary scale-105'
                       : 'text-muted-foreground hover:text-foreground'
                   )}
                 >
                   <span
                     className={cn(
-                      'flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold transition-all duration-200',
+                      'flex h-8 w-8 items-center justify-center rounded-xl text-xs font-bold transition-all duration-150',
                       currentStep === step.id
                         ? 'bg-primary text-primary-foreground shadow-md'
                         : currentStep > step.id
-                        ? 'bg-green-500 text-white'
-                        : 'bg-muted text-muted-foreground'
+                        ? 'bg-success text-success-foreground'
+                        : 'glass-card-solid text-muted-foreground'
                     )}
                   >
                     {currentStep > step.id ? (
-                      <Check className="h-3.5 w-3.5" />
+                      <Check className="h-4 w-4" />
                     ) : step.id === 7 ? (
-                      <Brain className="h-3.5 w-3.5" />
+                      <Brain className="h-4 w-4" />
                     ) : (
                       step.id
                     )}
                   </span>
-                  <span className="hidden lg:inline">{step.title}</span>
+                  <span className="hidden lg:inline font-medium">{step.title}</span>
                   {index < STEPS.length - 1 && (
                     <ArrowRight className="ml-1 h-3 w-3 text-muted-foreground/50 sm:ml-2 sm:h-4 sm:w-4" />
                   )}
@@ -384,13 +381,13 @@ export function CaseSheetForm() {
               <Button
                 size="sm"
                 onClick={() => changeStep(currentStep + 1)}
-                className="shrink-0"
+                className="shrink-0 rounded-xl font-semibold"
               >
                 <span className="hidden sm:inline">Next</span>
                 <ArrowRight className="ml-1 h-4 w-4" />
               </Button>
             ) : (
-              <Button size="sm" onClick={handleSubmit} disabled={isSubmitting} className="shrink-0">
+              <Button size="sm" onClick={handleSubmit} disabled={isSubmitting} className="shrink-0 rounded-xl font-semibold">
                 <Save className="mr-1 h-4 w-4" />
                 <span className="hidden sm:inline">{isSubmitting ? 'Saving...' : 'Save'}</span>
               </Button>
@@ -401,7 +398,7 @@ export function CaseSheetForm() {
 
       {/* Form Content */}
       <main className="container mx-auto px-4 py-8 relative z-10">
-        <Card className="mx-auto max-w-4xl glass-card border-0 glow-border">
+        <Card className="mx-auto max-w-4xl glass-card border-0">
           <CardContent className="p-6">{renderStep()}</CardContent>
         </Card>
 
@@ -411,18 +408,19 @@ export function CaseSheetForm() {
             variant="outline"
             onClick={() => changeStep(currentStep - 1)}
             disabled={currentStep === 1}
+            className="rounded-2xl glass-card border-0 font-semibold"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
             Previous
           </Button>
 
           {currentStep < STEPS.length ? (
-            <Button onClick={() => changeStep(currentStep + 1)}>
+            <Button onClick={() => changeStep(currentStep + 1)} className="rounded-2xl font-semibold">
               Next
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           ) : (
-            <Button onClick={handleSubmit} disabled={isSubmitting}>
+            <Button onClick={handleSubmit} disabled={isSubmitting} className="rounded-2xl font-semibold">
               <Save className="mr-2 h-4 w-4" />
               {isSubmitting ? 'Saving...' : 'Save Case Sheet'}
             </Button>
