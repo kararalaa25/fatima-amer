@@ -9,26 +9,29 @@ import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { BasicInfoStep } from './BasicInfoStep';
 import { ClinicalRelationsStep } from './ClinicalRelationsStep';
-import { SoftTissueStep } from './SoftTissueStep';
+import { ExtraOralStep } from './ExtraOralStep';
 import { SegmentAnalysisStep } from './SegmentAnalysisStep';
 import { TreatmentPlanStep } from './TreatmentPlanStep';
 import { MediaUploadStep, UploadedImage } from './MediaUploadStep';
 import { AITreatmentPlanStep } from './AITreatmentPlanStep';
+import { CephalometricStep } from './CephalometricStep';
 import { PalmerNotationChart } from '@/components/dental-chart/PalmerNotationChart';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import { ToothStatus } from '@/types/patient';
 import { ArrowLeft, ArrowRight, Save, Stethoscope, Check, Brain } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 
-// New step order per "Clinician-First" workflow
+// Updated 8-step workflow
 const STEPS = [
   { id: 1, title: 'Basic Info', icon: '📋' },
   { id: 2, title: 'Clinical', icon: '🔬' },
-  { id: 3, title: 'Soft Tissue', icon: '👄' },
+  { id: 3, title: 'Extra-Oral', icon: '👤' },
   { id: 4, title: 'Dental Chart', icon: '🦷' },
   { id: 5, title: 'Segments', icon: '📐' },
-  { id: 6, title: 'Media', icon: '📷' },
-  { id: 7, title: 'AI Treatment', icon: '🧠' },
+  { id: 6, title: 'Cephalometric', icon: '📊' },
+  { id: 7, title: 'Media', icon: '📷' },
+  { id: 8, title: 'AI Treatment', icon: '🧠' },
 ];
 
 export function CaseSheetForm() {
@@ -43,28 +46,50 @@ export function CaseSheetForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
 
-  // Form state
-  const [formData, setFormData] = useState({
-    // Basic Info
+  // Form state - Basic Info (expanded)
+  const [basicData, setBasicData] = useState({
     name: '',
     age: '' as number | '',
     chief_complaint: '',
-    // Clinical Relations
+    date_of_birth: '',
+    address: '',
+    medical_history: [] as string[],
+    current_medications: [] as string[],
+  });
+
+  // Clinical Relations (enhanced)
+  const [clinicalData, setClinicalData] = useState({
     ap_relation: '',
     horizontal_relation: '',
     vertical_relation: '',
     overbite_mm: '' as number | '',
     overjet_mm: '' as number | '',
     molar_relation: '',
+    molar_class_subdivision: '',
     canine_relation: '',
+    canine_class_subdivision: '',
     incisor_relation: '',
     oral_hygiene: '',
-    // Soft Tissue
+    crossbite_anterior: '',
+    crossbite_posterior: '',
+    midline_shift: '',
+    midline_discrepancy: '' as number | '',
+  });
+
+  // Extra-Oral Examination (new)
+  const [extraOralData, setExtraOralData] = useState({
     lips: '',
     habits: '',
     tongue_position: '',
     tongue_size: '',
-    // Segment Analysis
+    lip_strain: false,
+    nasolabial_angle: '' as number | '',
+    mentolabial_sulcus: '',
+    max_jaw_opening: '' as number | '',
+  });
+
+  // Segment Analysis
+  const [segmentData, setSegmentData] = useState({
     upper_buccal: '',
     lower_buccal: '',
     upper_labial: '',
@@ -73,6 +98,18 @@ export function CaseSheetForm() {
     upper_space_required: '' as number | '',
     lower_space_available: '' as number | '',
     lower_space_required: '' as number | '',
+  });
+
+  // Cephalometric Analysis (new)
+  const [cephData, setCephData] = useState({
+    ceph_sna: '' as number | '',
+    ceph_snb: '' as number | '',
+    ceph_anb: '' as number | '',
+    ceph_wits: '' as number | '',
+    ceph_sn_mp: '' as number | '',
+    ceph_fma: '' as number | '',
+    ceph_facial_angle: '' as number | '',
+    ceph_gonial_angle: '' as number | '',
   });
 
   const [treatmentData, setTreatmentData] = useState({
@@ -87,8 +124,24 @@ export function CaseSheetForm() {
   const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
   const [aiPlanFinalized, setAiPlanFinalized] = useState(false);
 
-  const handleFormChange = (field: string, value: string | number) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+  const handleBasicChange = (field: string, value: string | number | string[]) => {
+    setBasicData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleClinicalChange = (field: string, value: string | number) => {
+    setClinicalData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleExtraOralChange = (field: string, value: string | number | boolean) => {
+    setExtraOralData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleSegmentChange = (field: string, value: string | number) => {
+    setSegmentData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleCephChange = (field: string, value: number | '') => {
+    setCephData((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleTreatmentChange = (field: string, value: string | string[]) => {
@@ -128,8 +181,17 @@ export function CaseSheetForm() {
     }, 100);
   };
 
+  // Combine all form data for AI analysis
+  const getAllFormData = () => ({
+    ...basicData,
+    ...clinicalData,
+    ...extraOralData,
+    ...segmentData,
+    ...cephData,
+  });
+
   const handleSubmit = async () => {
-    if (!formData.name || !formData.age) {
+    if (!basicData.name || !basicData.age) {
       toast({
         title: 'Validation Error',
         description: 'Please fill in all required fields (Name and Age)',
@@ -147,39 +209,39 @@ export function CaseSheetForm() {
         description: 'Please assign a type to all uploaded images',
         variant: 'destructive',
       });
-      changeStep(6);
+      changeStep(7);
       return;
     }
 
     setIsSubmitting(true);
 
     try {
-      // Create patient
+      // Create patient with all data
       const patientPayload = {
-        name: formData.name,
-        age: formData.age as number,
-        chief_complaint: formData.chief_complaint || undefined,
-        ap_relation: formData.ap_relation || undefined,
-        horizontal_relation: formData.horizontal_relation || undefined,
-        vertical_relation: formData.vertical_relation || undefined,
-        overbite_mm: formData.overbite_mm ? Number(formData.overbite_mm) : undefined,
-        overjet_mm: formData.overjet_mm ? Number(formData.overjet_mm) : undefined,
-        molar_relation: formData.molar_relation || undefined,
-        canine_relation: formData.canine_relation || undefined,
-        incisor_relation: formData.incisor_relation || undefined,
-        oral_hygiene: (formData.oral_hygiene as 'Good' | 'Fair' | 'Poor') || undefined,
-        lips: (formData.lips as 'Competent' | 'Incompetent' | 'Potentially Competent') || undefined,
-        habits: formData.habits || undefined,
-        tongue_position: formData.tongue_position || undefined,
-        tongue_size: formData.tongue_size || undefined,
-        upper_buccal: (formData.upper_buccal as 'Aligned' | 'Crowded' | 'Spacing') || undefined,
-        lower_buccal: (formData.lower_buccal as 'Aligned' | 'Crowded' | 'Spacing') || undefined,
-        upper_labial: (formData.upper_labial as 'Aligned' | 'Crowded' | 'Spacing') || undefined,
-        lower_labial: (formData.lower_labial as 'Aligned' | 'Crowded' | 'Spacing') || undefined,
-        upper_space_available: formData.upper_space_available ? Number(formData.upper_space_available) : undefined,
-        upper_space_required: formData.upper_space_required ? Number(formData.upper_space_required) : undefined,
-        lower_space_available: formData.lower_space_available ? Number(formData.lower_space_available) : undefined,
-        lower_space_required: formData.lower_space_required ? Number(formData.lower_space_required) : undefined,
+        name: basicData.name,
+        age: basicData.age as number,
+        chief_complaint: basicData.chief_complaint || undefined,
+        ap_relation: clinicalData.ap_relation || undefined,
+        horizontal_relation: clinicalData.horizontal_relation || undefined,
+        vertical_relation: clinicalData.vertical_relation || undefined,
+        overbite_mm: clinicalData.overbite_mm ? Number(clinicalData.overbite_mm) : undefined,
+        overjet_mm: clinicalData.overjet_mm ? Number(clinicalData.overjet_mm) : undefined,
+        molar_relation: clinicalData.molar_relation || undefined,
+        canine_relation: clinicalData.canine_relation || undefined,
+        incisor_relation: clinicalData.incisor_relation || undefined,
+        oral_hygiene: (clinicalData.oral_hygiene as 'Good' | 'Fair' | 'Poor') || undefined,
+        lips: (extraOralData.lips as 'Competent' | 'Incompetent' | 'Potentially Competent') || undefined,
+        habits: extraOralData.habits || undefined,
+        tongue_position: extraOralData.tongue_position || undefined,
+        tongue_size: extraOralData.tongue_size || undefined,
+        upper_buccal: (segmentData.upper_buccal as 'Aligned' | 'Crowded' | 'Spacing') || undefined,
+        lower_buccal: (segmentData.lower_buccal as 'Aligned' | 'Crowded' | 'Spacing') || undefined,
+        upper_labial: (segmentData.upper_labial as 'Aligned' | 'Crowded' | 'Spacing') || undefined,
+        lower_labial: (segmentData.lower_labial as 'Aligned' | 'Crowded' | 'Spacing') || undefined,
+        upper_space_available: segmentData.upper_space_available ? Number(segmentData.upper_space_available) : undefined,
+        upper_space_required: segmentData.upper_space_required ? Number(segmentData.upper_space_required) : undefined,
+        lower_space_available: segmentData.lower_space_available ? Number(segmentData.lower_space_available) : undefined,
+        lower_space_required: segmentData.lower_space_required ? Number(segmentData.lower_space_required) : undefined,
       };
 
       const patient = await createPatient.mutateAsync(patientPayload);
@@ -256,21 +318,23 @@ export function CaseSheetForm() {
     const stepContent = (() => {
       switch (currentStep) {
         case 1:
-          return <BasicInfoStep data={formData} onChange={handleFormChange} />;
+          return <BasicInfoStep data={basicData} onChange={handleBasicChange} />;
         case 2:
-          return <ClinicalRelationsStep data={formData} onChange={handleFormChange} />;
+          return <ClinicalRelationsStep data={clinicalData} onChange={handleClinicalChange} />;
         case 3:
-          return <SoftTissueStep data={formData} onChange={handleFormChange} />;
+          return <ExtraOralStep data={extraOralData} onChange={handleExtraOralChange} />;
         case 4:
           return <PalmerNotationChart teeth={dentalChart} onToothClick={handleToothClick} />;
         case 5:
-          return <SegmentAnalysisStep data={formData} onChange={handleFormChange} />;
+          return <SegmentAnalysisStep data={segmentData} onChange={handleSegmentChange} />;
         case 6:
-          return <MediaUploadStep images={uploadedImages} onImagesChange={setUploadedImages} />;
+          return <CephalometricStep data={cephData} onChange={handleCephChange} />;
         case 7:
+          return <MediaUploadStep images={uploadedImages} onImagesChange={setUploadedImages} />;
+        case 8:
           return (
             <AITreatmentPlanStep
-              clinicalData={formData}
+              clinicalData={getAllFormData()}
               dentalChart={dentalChart}
               uploadedImages={uploadedImages}
               treatmentData={treatmentData}
@@ -302,21 +366,24 @@ export function CaseSheetForm() {
       {/* Header */}
       <header className="relative z-10 glass-nav">
         <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" onClick={() => navigate('/')} className="rounded-2xl">
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
+          <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-2xl glass-card">
-                <Stethoscope className="h-5 w-5 text-primary" />
-              </div>
-              <div>
-                <h1 className="text-lg font-bold text-foreground">New Patient Case Sheet</h1>
-                <p className="text-sm text-muted-foreground font-medium">
-                  Step {currentStep} of {STEPS.length} — {STEPS[currentStep - 1]?.title}
-                </p>
+              <Button variant="ghost" size="icon" onClick={() => navigate('/')} className="rounded-2xl">
+                <ArrowLeft className="h-5 w-5" />
+              </Button>
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-2xl glass-card">
+                  <Stethoscope className="h-5 w-5 text-primary" />
+                </div>
+                <div>
+                  <h1 className="text-lg font-bold text-foreground">New Patient Case Sheet</h1>
+                  <p className="text-sm text-muted-foreground font-medium">
+                    Step {currentStep} of {STEPS.length} — {STEPS[currentStep - 1]?.title}
+                  </p>
+                </div>
               </div>
             </div>
+            <ThemeToggle />
           </div>
         </div>
       </header>
@@ -362,7 +429,7 @@ export function CaseSheetForm() {
                   >
                     {currentStep > step.id ? (
                       <Check className="h-4 w-4" />
-                    ) : step.id === 7 ? (
+                    ) : step.id === 8 ? (
                       <Brain className="h-4 w-4" />
                     ) : (
                       step.id
