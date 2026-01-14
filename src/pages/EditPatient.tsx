@@ -10,9 +10,10 @@ import { useToast } from '@/hooks/use-toast';
 import { ArrowLeft, Save } from 'lucide-react';
 import { BasicInfoStep } from '@/components/case-sheet/BasicInfoStep';
 import { ClinicalRelationsStep } from '@/components/case-sheet/ClinicalRelationsStep';
-import { SoftTissueStep } from '@/components/case-sheet/SoftTissueStep';
+import { ExtraOralStep } from '@/components/case-sheet/ExtraOralStep';
 import { SegmentAnalysisStep } from '@/components/case-sheet/SegmentAnalysisStep';
 import { TreatmentPlanStep } from '@/components/case-sheet/TreatmentPlanStep';
+import { CephalometricStep } from '@/components/case-sheet/CephalometricStep';
 import { PalmerNotationChart } from '@/components/dental-chart/PalmerNotationChart';
 import { ToothStatus } from '@/types/patient';
 
@@ -29,15 +30,15 @@ export default function EditPatientPage() {
   const updateToothStatus = useUpdateToothStatus();
   const upsertTreatmentPlan = useUpsertTreatmentPlan();
 
-  // Basic info form state (matching BasicInfoStep expected types)
-  const [basicData, setBasicData] = useState<{
-    name: string;
-    age: number | '';
-    chief_complaint: string;
-  }>({
+  // Basic info form state
+  const [basicData, setBasicData] = useState({
     name: '',
-    age: '',
+    age: '' as number | '',
     chief_complaint: '',
+    date_of_birth: '',
+    address: '',
+    medical_history: [] as string[],
+    current_medications: [] as string[],
   });
 
   // Clinical relations form state
@@ -48,17 +49,27 @@ export default function EditPatientPage() {
     overbite_mm: '' as number | '',
     overjet_mm: '' as number | '',
     molar_relation: '',
+    molar_class_subdivision: '',
     canine_relation: '',
+    canine_class_subdivision: '',
     incisor_relation: '',
     oral_hygiene: '',
+    crossbite_anterior: '',
+    crossbite_posterior: '',
+    midline_shift: '',
+    midline_discrepancy: '' as number | '',
   });
 
-  // Soft tissue form state
-  const [softTissueData, setSoftTissueData] = useState({
+  // Extra-oral form state (renamed from soft tissue)
+  const [extraOralData, setExtraOralData] = useState({
     lips: '',
     habits: '',
     tongue_position: '',
     tongue_size: '',
+    lip_strain: false,
+    nasolabial_angle: '' as number | '',
+    mentolabial_sulcus: '',
+    max_jaw_opening: '' as number | '',
   });
 
   // Segment analysis form state
@@ -71,6 +82,18 @@ export default function EditPatientPage() {
     upper_space_required: '' as number | '',
     lower_space_available: '' as number | '',
     lower_space_required: '' as number | '',
+  });
+
+  // Cephalometric data
+  const [cephData, setCephData] = useState({
+    ceph_sna: '' as number | '',
+    ceph_snb: '' as number | '',
+    ceph_anb: '' as number | '',
+    ceph_wits: '' as number | '',
+    ceph_sn_mp: '' as number | '',
+    ceph_fma: '' as number | '',
+    ceph_facial_angle: '' as number | '',
+    ceph_gonial_angle: '' as number | '',
   });
 
   const [treatmentData, setTreatmentData] = useState({
@@ -90,6 +113,10 @@ export default function EditPatientPage() {
         name: patient.name || '',
         age: patient.age || '',
         chief_complaint: patient.chief_complaint || '',
+        date_of_birth: '',
+        address: '',
+        medical_history: [],
+        current_medications: [],
       });
       setClinicalData({
         ap_relation: patient.ap_relation || '',
@@ -98,15 +125,25 @@ export default function EditPatientPage() {
         overbite_mm: patient.overbite_mm ?? '',
         overjet_mm: patient.overjet_mm ?? '',
         molar_relation: patient.molar_relation || '',
+        molar_class_subdivision: '',
         canine_relation: patient.canine_relation || '',
+        canine_class_subdivision: '',
         incisor_relation: patient.incisor_relation || '',
         oral_hygiene: patient.oral_hygiene || '',
+        crossbite_anterior: '',
+        crossbite_posterior: '',
+        midline_shift: '',
+        midline_discrepancy: '',
       });
-      setSoftTissueData({
+      setExtraOralData({
         lips: patient.lips || '',
         habits: patient.habits || '',
         tongue_position: patient.tongue_position || '',
         tongue_size: patient.tongue_size || '',
+        lip_strain: false,
+        nasolabial_angle: '',
+        mentolabial_sulcus: '',
+        max_jaw_opening: '',
       });
       setSegmentData({
         upper_buccal: patient.upper_buccal || '',
@@ -145,7 +182,7 @@ export default function EditPatientPage() {
     }
   }, [dentalChartData]);
 
-  const handleBasicChange = (field: string, value: string | number) => {
+  const handleBasicChange = (field: string, value: string | number | string[]) => {
     setBasicData((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -153,12 +190,16 @@ export default function EditPatientPage() {
     setClinicalData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleSoftTissueChange = (field: string, value: string) => {
-    setSoftTissueData((prev) => ({ ...prev, [field]: value }));
+  const handleExtraOralChange = (field: string, value: string | number | boolean) => {
+    setExtraOralData((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleSegmentChange = (field: string, value: string | number) => {
     setSegmentData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleCephChange = (field: string, value: number | '') => {
+    setCephData((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleTreatmentChange = (field: string, value: string | string[]) => {
@@ -189,10 +230,10 @@ export default function EditPatientPage() {
         canine_relation: clinicalData.canine_relation || undefined,
         incisor_relation: clinicalData.incisor_relation || undefined,
         oral_hygiene: (clinicalData.oral_hygiene as 'Good' | 'Fair' | 'Poor') || undefined,
-        lips: (softTissueData.lips as 'Competent' | 'Incompetent' | 'Potentially Competent') || undefined,
-        habits: softTissueData.habits || undefined,
-        tongue_position: softTissueData.tongue_position || undefined,
-        tongue_size: softTissueData.tongue_size || undefined,
+        lips: (extraOralData.lips as 'Competent' | 'Incompetent' | 'Potentially Competent') || undefined,
+        habits: extraOralData.habits || undefined,
+        tongue_position: extraOralData.tongue_position || undefined,
+        tongue_size: extraOralData.tongue_size || undefined,
         upper_buccal: (segmentData.upper_buccal as 'Aligned' | 'Crowded' | 'Spacing') || undefined,
         lower_buccal: (segmentData.lower_buccal as 'Aligned' | 'Crowded' | 'Spacing') || undefined,
         upper_labial: (segmentData.upper_labial as 'Aligned' | 'Crowded' | 'Spacing') || undefined,
@@ -235,7 +276,7 @@ export default function EditPatientPage() {
 
   if (patientLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center mesh-gradient-bg">
         <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
       </div>
     );
@@ -243,7 +284,7 @@ export default function EditPatientPage() {
 
   if (!patient) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center">
+      <div className="flex min-h-screen flex-col items-center justify-center mesh-gradient-bg">
         <p className="text-lg text-muted-foreground">Patient not found</p>
         <Button variant="link" onClick={() => navigate('/')}>
           Return to Dashboard
@@ -253,13 +294,13 @@ export default function EditPatientPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen mesh-gradient-bg">
       {/* Header */}
-      <header className="border-b border-border bg-card">
+      <header className="glass-nav sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Button variant="ghost" size="icon" onClick={() => navigate(`/patient/${id}`)}>
+              <Button variant="ghost" size="icon" onClick={() => navigate(`/patient/${id}`)} className="rounded-2xl">
                 <ArrowLeft className="h-5 w-5" />
               </Button>
               <div>
@@ -267,7 +308,7 @@ export default function EditPatientPage() {
                 <p className="text-sm text-muted-foreground">Modify patient details and clinical data</p>
               </div>
             </div>
-            <Button onClick={handleSave}>
+            <Button onClick={handleSave} className="rounded-2xl">
               <Save className="mr-2 h-4 w-4" />
               Save Changes
             </Button>
@@ -276,18 +317,19 @@ export default function EditPatientPage() {
       </header>
 
       {/* Content */}
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-8 relative z-10">
         <Tabs defaultValue="basic" className="space-y-6">
-          <TabsList className="inline-flex h-auto w-full flex-wrap justify-start gap-1 bg-muted p-1 sm:w-auto sm:flex-nowrap">
-            <TabsTrigger value="basic" className="px-3 py-2">Basic Info</TabsTrigger>
-            <TabsTrigger value="clinical" className="px-3 py-2">Clinical Relations</TabsTrigger>
-            <TabsTrigger value="soft-tissue" className="px-3 py-2">Soft Tissue</TabsTrigger>
-            <TabsTrigger value="segment" className="px-3 py-2">Segment Analysis</TabsTrigger>
-            <TabsTrigger value="dental-chart" className="px-3 py-2">Dental Chart</TabsTrigger>
-            <TabsTrigger value="treatment" className="px-3 py-2">Treatment Plan</TabsTrigger>
+          <TabsList className="inline-flex h-auto w-full flex-wrap justify-start gap-1 glass-card-solid p-1 sm:w-auto sm:flex-nowrap border-0">
+            <TabsTrigger value="basic" className="px-3 py-2 rounded-xl">Basic Info</TabsTrigger>
+            <TabsTrigger value="clinical" className="px-3 py-2 rounded-xl">Clinical</TabsTrigger>
+            <TabsTrigger value="extra-oral" className="px-3 py-2 rounded-xl">Extra-Oral</TabsTrigger>
+            <TabsTrigger value="segment" className="px-3 py-2 rounded-xl">Segments</TabsTrigger>
+            <TabsTrigger value="dental-chart" className="px-3 py-2 rounded-xl">Dental Chart</TabsTrigger>
+            <TabsTrigger value="ceph" className="px-3 py-2 rounded-xl">Cephalometric</TabsTrigger>
+            <TabsTrigger value="treatment" className="px-3 py-2 rounded-xl">Treatment</TabsTrigger>
           </TabsList>
 
-          <Card>
+          <Card className="glass-card border-0">
             <CardContent className="p-6">
               <TabsContent value="basic" className="mt-0">
                 <BasicInfoStep data={basicData} onChange={handleBasicChange} />
@@ -297,8 +339,8 @@ export default function EditPatientPage() {
                 <ClinicalRelationsStep data={clinicalData} onChange={handleClinicalChange} />
               </TabsContent>
 
-              <TabsContent value="soft-tissue" className="mt-0">
-                <SoftTissueStep data={softTissueData} onChange={handleSoftTissueChange} />
+              <TabsContent value="extra-oral" className="mt-0">
+                <ExtraOralStep data={extraOralData} onChange={handleExtraOralChange} />
               </TabsContent>
 
               <TabsContent value="segment" className="mt-0">
@@ -319,6 +361,10 @@ export default function EditPatientPage() {
                     readonly={false}
                   />
                 </div>
+              </TabsContent>
+
+              <TabsContent value="ceph" className="mt-0">
+                <CephalometricStep data={cephData} onChange={handleCephChange} />
               </TabsContent>
 
               <TabsContent value="treatment" className="mt-0">

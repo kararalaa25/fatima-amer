@@ -86,22 +86,44 @@ export type Database = {
       }
       patients: {
         Row: {
+          address: string | null
           age: number
           ap_relation: string | null
+          canine_class_subdivision: string | null
           canine_relation: string | null
+          ceph_anb: number | null
+          ceph_facial_angle: number | null
+          ceph_fma: number | null
+          ceph_gonial_angle: number | null
+          ceph_sn_mp: number | null
+          ceph_sna: number | null
+          ceph_snb: number | null
+          ceph_wits: number | null
           chief_complaint: string | null
           created_at: string
+          crossbite_anterior: string | null
+          crossbite_posterior: string | null
+          current_medications: string[] | null
+          date_of_birth: string | null
           habits: string | null
           horizontal_relation: string | null
           id: string
           incisor_relation: string | null
+          lip_strain: boolean | null
           lips: string | null
           lower_buccal: string | null
           lower_labial: string | null
           lower_space_available: number | null
           lower_space_required: number | null
+          max_jaw_opening: number | null
+          medical_history: string[] | null
+          mentolabial_sulcus: string | null
+          midline_discrepancy: number | null
+          midline_shift: string | null
+          molar_class_subdivision: string | null
           molar_relation: string | null
           name: string
+          nasolabial_angle: number | null
           oral_hygiene: string | null
           overbite_mm: number | null
           overjet_mm: number | null
@@ -115,22 +137,44 @@ export type Database = {
           vertical_relation: string | null
         }
         Insert: {
+          address?: string | null
           age: number
           ap_relation?: string | null
+          canine_class_subdivision?: string | null
           canine_relation?: string | null
+          ceph_anb?: number | null
+          ceph_facial_angle?: number | null
+          ceph_fma?: number | null
+          ceph_gonial_angle?: number | null
+          ceph_sn_mp?: number | null
+          ceph_sna?: number | null
+          ceph_snb?: number | null
+          ceph_wits?: number | null
           chief_complaint?: string | null
           created_at?: string
+          crossbite_anterior?: string | null
+          crossbite_posterior?: string | null
+          current_medications?: string[] | null
+          date_of_birth?: string | null
           habits?: string | null
           horizontal_relation?: string | null
           id?: string
           incisor_relation?: string | null
+          lip_strain?: boolean | null
           lips?: string | null
           lower_buccal?: string | null
           lower_labial?: string | null
           lower_space_available?: number | null
           lower_space_required?: number | null
+          max_jaw_opening?: number | null
+          medical_history?: string[] | null
+          mentolabial_sulcus?: string | null
+          midline_discrepancy?: number | null
+          midline_shift?: string | null
+          molar_class_subdivision?: string | null
           molar_relation?: string | null
           name: string
+          nasolabial_angle?: number | null
           oral_hygiene?: string | null
           overbite_mm?: number | null
           overjet_mm?: number | null
@@ -144,22 +188,44 @@ export type Database = {
           vertical_relation?: string | null
         }
         Update: {
+          address?: string | null
           age?: number
           ap_relation?: string | null
+          canine_class_subdivision?: string | null
           canine_relation?: string | null
+          ceph_anb?: number | null
+          ceph_facial_angle?: number | null
+          ceph_fma?: number | null
+          ceph_gonial_angle?: number | null
+          ceph_sn_mp?: number | null
+          ceph_sna?: number | null
+          ceph_snb?: number | null
+          ceph_wits?: number | null
           chief_complaint?: string | null
           created_at?: string
+          crossbite_anterior?: string | null
+          crossbite_posterior?: string | null
+          current_medications?: string[] | null
+          date_of_birth?: string | null
           habits?: string | null
           horizontal_relation?: string | null
           id?: string
           incisor_relation?: string | null
+          lip_strain?: boolean | null
           lips?: string | null
           lower_buccal?: string | null
           lower_labial?: string | null
           lower_space_available?: number | null
           lower_space_required?: number | null
+          max_jaw_opening?: number | null
+          medical_history?: string[] | null
+          mentolabial_sulcus?: string | null
+          midline_discrepancy?: number | null
+          midline_shift?: string | null
+          molar_class_subdivision?: string | null
           molar_relation?: string | null
           name?: string
+          nasolabial_angle?: number | null
           oral_hygiene?: string | null
           overbite_mm?: number | null
           overjet_mm?: number | null

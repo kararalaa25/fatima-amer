@@ -42,7 +42,7 @@ export interface DentalChartTooth {
   patient_id: string;
   quadrant: 1 | 2 | 3 | 4;
   tooth_number: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
-  status: 'present' | 'missing' | 'filling';
+  status: 'present' | 'missing' | 'filling' | 'impacted';
 }
 
 export interface TreatmentPlan {
@@ -82,4 +82,4 @@ export interface InitialPhoto {
   created_at: string;
 }
 
-export type ToothStatus = 'present' | 'missing' | 'filling';
+export type ToothStatus = 'present' | 'missing' | 'filling' | 'impacted';

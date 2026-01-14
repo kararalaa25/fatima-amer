@@ -16,9 +16,15 @@ interface ClinicalRelationsStepProps {
     overbite_mm: number | '';
     overjet_mm: number | '';
     molar_relation: string;
+    molar_class_subdivision: string;
     canine_relation: string;
+    canine_class_subdivision: string;
     incisor_relation: string;
     oral_hygiene: string;
+    crossbite_anterior: string;
+    crossbite_posterior: string;
+    midline_shift: string;
+    midline_discrepancy: number | '';
   };
   onChange: (field: string, value: string | number) => void;
 }
@@ -27,153 +33,250 @@ export function ClinicalRelationsStep({ data, onChange }: ClinicalRelationsStepP
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-semibold text-foreground">Clinical Relations</h3>
+        <h3 className="text-lg font-semibold text-foreground">Clinical Relations & Classification</h3>
         <p className="text-sm text-muted-foreground">
-          Document the patient's clinical relationships and measurements
+          Document occlusal relationships and classifications
         </p>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-3">
-        <div className="space-y-2">
-          <Label htmlFor="ap_relation">AP/Horizontal Relation</Label>
-          <Select
-            value={data.ap_relation}
-            onValueChange={(value) => onChange('ap_relation', value)}
-          >
-            <SelectTrigger id="ap_relation">
-              <SelectValue placeholder="Select AP relation" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="Class I">Class I</SelectItem>
-              <SelectItem value="Class II div 1">Class II div 1</SelectItem>
-              <SelectItem value="Class II div 2">Class II div 2</SelectItem>
-              <SelectItem value="Class III">Class III</SelectItem>
-            </SelectContent>
-          </Select>
+      {/* Molar & Canine Classification */}
+      <div className="rounded-2xl border border-border/50 bg-card/30 p-5">
+        <h4 className="mb-4 font-semibold text-foreground flex items-center gap-2">
+          <span className="text-lg">🦷</span>
+          Molar & Canine Classification
+        </h4>
+        <div className="grid gap-5 md:grid-cols-2">
+          {/* Molar Relation */}
+          <div className="space-y-3">
+            <Label>Molar Relation</Label>
+            <Select
+              value={data.molar_relation}
+              onValueChange={(value) => onChange('molar_relation', value)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select molar class" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Class I">Class I</SelectItem>
+                <SelectItem value="Class II">Class II</SelectItem>
+                <SelectItem value="Class III">Class III</SelectItem>
+              </SelectContent>
+            </Select>
+            
+            {data.molar_relation === 'Class II' && (
+              <Select
+                value={data.molar_class_subdivision || ''}
+                onValueChange={(value) => onChange('molar_class_subdivision', value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select subdivision" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Division 1">Division 1</SelectItem>
+                  <SelectItem value="Division 2">Division 2</SelectItem>
+                  <SelectItem value="Subdivision">Subdivision (unilateral)</SelectItem>
+                </SelectContent>
+              </Select>
+            )}
+          </div>
+
+          {/* Canine Relation */}
+          <div className="space-y-3">
+            <Label>Canine Relation</Label>
+            <Select
+              value={data.canine_relation}
+              onValueChange={(value) => onChange('canine_relation', value)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select canine class" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Class I">Class I</SelectItem>
+                <SelectItem value="Class II">Class II</SelectItem>
+                <SelectItem value="Class III">Class III</SelectItem>
+              </SelectContent>
+            </Select>
+
+            {data.canine_relation === 'Class II' && (
+              <Select
+                value={data.canine_class_subdivision || ''}
+                onValueChange={(value) => onChange('canine_class_subdivision', value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select subdivision" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Division 1">Division 1</SelectItem>
+                  <SelectItem value="Division 2">Division 2</SelectItem>
+                </SelectContent>
+              </Select>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Incisor Classification */}
+      <div className="rounded-2xl border border-border/50 bg-card/30 p-5">
+        <h4 className="mb-4 font-semibold text-foreground flex items-center gap-2">
+          <span className="text-lg">🔬</span>
+          Incisor Relation
+        </h4>
+        <Select
+          value={data.incisor_relation}
+          onValueChange={(value) => onChange('incisor_relation', value)}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Select incisor relation" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="Class I">Class I</SelectItem>
+            <SelectItem value="Class II Division 1">Class II Division 1</SelectItem>
+            <SelectItem value="Class II Division 2">Class II Division 2</SelectItem>
+            <SelectItem value="Class III">Class III</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Overjet & Overbite */}
+      <div className="rounded-2xl border border-border/50 bg-card/30 p-5">
+        <h4 className="mb-4 font-semibold text-foreground flex items-center gap-2">
+          <span className="text-lg">📏</span>
+          Overjet & Overbite
+        </h4>
+        <div className="grid gap-5 md:grid-cols-2">
+          <div className="space-y-2">
+            <Label htmlFor="overjet_mm">Overjet (mm)</Label>
+            <Input
+              id="overjet_mm"
+              type="number"
+              step="0.5"
+              value={data.overjet_mm}
+              onChange={(e) => onChange('overjet_mm', parseFloat(e.target.value) || '')}
+              placeholder="Normal: 2-4mm"
+            />
+            <p className="text-xs text-muted-foreground">Normal: 2-4mm. Increased if &gt;4mm.</p>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="overbite_mm">Overbite (mm)</Label>
+            <Input
+              id="overbite_mm"
+              type="number"
+              step="0.5"
+              value={data.overbite_mm}
+              onChange={(e) => onChange('overbite_mm', parseFloat(e.target.value) || '')}
+              placeholder="Normal: 2-4mm"
+            />
+            <p className="text-xs text-muted-foreground">Deep bite if &gt;4mm. Open bite if negative.</p>
+          </div>
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="horizontal_relation">Horizontal Relation</Label>
-          <Select
-            value={data.horizontal_relation}
-            onValueChange={(value) => onChange('horizontal_relation', value)}
-          >
-            <SelectTrigger id="horizontal_relation">
-              <SelectValue placeholder="Select horizontal relation" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="Normal">Normal</SelectItem>
-              <SelectItem value="Increased">Increased</SelectItem>
-              <SelectItem value="Reduced">Reduced</SelectItem>
-              <SelectItem value="Edge-to-Edge">Edge-to-Edge</SelectItem>
-              <SelectItem value="Crossbite">Crossbite</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="vertical_relation">Vertical Relation</Label>
+        <div className="mt-4">
+          <Label htmlFor="vertical_relation">Vertical Relation Classification</Label>
           <Select
             value={data.vertical_relation}
             onValueChange={(value) => onChange('vertical_relation', value)}
           >
-            <SelectTrigger id="vertical_relation">
+            <SelectTrigger className="mt-2">
               <SelectValue placeholder="Select vertical relation" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="Normal">Normal</SelectItem>
               <SelectItem value="Deep Bite">Deep Bite</SelectItem>
               <SelectItem value="Open Bite">Open Bite</SelectItem>
-              <SelectItem value="Reduced">Reduced</SelectItem>
+              <SelectItem value="Edge-to-Edge">Edge-to-Edge</SelectItem>
             </SelectContent>
           </Select>
         </div>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
-        <div className="space-y-2">
-          <Label htmlFor="overbite_mm">Overbite (mm)</Label>
-          <Input
-            id="overbite_mm"
-            type="number"
-            step="0.1"
-            value={data.overbite_mm}
-            onChange={(e) => onChange('overbite_mm', parseFloat(e.target.value) || '')}
-            placeholder="Enter overbite measurement"
-          />
-        </div>
+      {/* Crossbite */}
+      <div className="rounded-2xl border border-border/50 bg-card/30 p-5">
+        <h4 className="mb-4 font-semibold text-foreground flex items-center gap-2">
+          <span className="text-lg">↔️</span>
+          Crossbite Assessment
+        </h4>
+        <div className="grid gap-5 md:grid-cols-2">
+          <div className="space-y-2">
+            <Label>Anterior Crossbite</Label>
+            <Select
+              value={data.crossbite_anterior || ''}
+              onValueChange={(value) => onChange('crossbite_anterior', value)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select anterior crossbite" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="None">None</SelectItem>
+                <SelectItem value="Single Tooth">Single Tooth</SelectItem>
+                <SelectItem value="Multiple Teeth">Multiple Teeth</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="overjet_mm">Overjet (mm)</Label>
-          <Input
-            id="overjet_mm"
-            type="number"
-            step="0.1"
-            value={data.overjet_mm}
-            onChange={(e) => onChange('overjet_mm', parseFloat(e.target.value) || '')}
-            placeholder="Enter overjet measurement"
-          />
-        </div>
-      </div>
-
-      <div className="grid gap-6 md:grid-cols-3">
-        <div className="space-y-2">
-          <Label htmlFor="molar_relation">Molar Relation</Label>
-          <Select
-            value={data.molar_relation}
-            onValueChange={(value) => onChange('molar_relation', value)}
-          >
-            <SelectTrigger id="molar_relation">
-              <SelectValue placeholder="Select molar relation" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="Class I">Class I</SelectItem>
-              <SelectItem value="Class II">Class II</SelectItem>
-              <SelectItem value="Class III">Class III</SelectItem>
-              <SelectItem value="Quarter-unit Class II">Quarter-unit Class II</SelectItem>
-              <SelectItem value="Half-unit Class II">Half-unit Class II</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="canine_relation">Canine Relation</Label>
-          <Select
-            value={data.canine_relation}
-            onValueChange={(value) => onChange('canine_relation', value)}
-          >
-            <SelectTrigger id="canine_relation">
-              <SelectValue placeholder="Select canine relation" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="Class I">Class I</SelectItem>
-              <SelectItem value="Class II">Class II</SelectItem>
-              <SelectItem value="Class III">Class III</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="incisor_relation">Incisor Relation</Label>
-          <Select
-            value={data.incisor_relation}
-            onValueChange={(value) => onChange('incisor_relation', value)}
-          >
-            <SelectTrigger id="incisor_relation">
-              <SelectValue placeholder="Select incisor relation" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="Class I">Class I</SelectItem>
-              <SelectItem value="Class II div 1">Class II div 1</SelectItem>
-              <SelectItem value="Class II div 2">Class II div 2</SelectItem>
-              <SelectItem value="Class III">Class III</SelectItem>
-            </SelectContent>
-          </Select>
+          <div className="space-y-2">
+            <Label>Posterior Crossbite</Label>
+            <Select
+              value={data.crossbite_posterior || ''}
+              onValueChange={(value) => onChange('crossbite_posterior', value)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select posterior crossbite" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="None">None</SelectItem>
+                <SelectItem value="Unilateral">Unilateral</SelectItem>
+                <SelectItem value="Bilateral">Bilateral</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
       </div>
 
+      {/* Midline */}
+      <div className="rounded-2xl border border-border/50 bg-card/30 p-5">
+        <h4 className="mb-4 font-semibold text-foreground flex items-center gap-2">
+          <span className="text-lg">⬆️</span>
+          Midline Assessment
+        </h4>
+        <div className="grid gap-5 md:grid-cols-2">
+          <div className="space-y-2">
+            <Label>Midline Shift</Label>
+            <Select
+              value={data.midline_shift || ''}
+              onValueChange={(value) => onChange('midline_shift', value)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select midline deviation" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="None">Coincident (None)</SelectItem>
+                <SelectItem value="Right">Shifted to Right</SelectItem>
+                <SelectItem value="Left">Shifted to Left</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {(data.midline_shift === 'Right' || data.midline_shift === 'Left') && (
+            <div className="space-y-2">
+              <Label htmlFor="midline_discrepancy">Discrepancy (mm)</Label>
+              <Input
+                id="midline_discrepancy"
+                type="number"
+                step="0.5"
+                min={0}
+                value={data.midline_discrepancy || ''}
+                onChange={(e) => onChange('midline_discrepancy', parseFloat(e.target.value) || '')}
+                placeholder="Enter shift amount in mm"
+              />
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Oral Hygiene */}
       <div className="space-y-2">
-        <Label htmlFor="oral_hygiene">Oral Hygiene</Label>
+        <Label htmlFor="oral_hygiene">Oral Hygiene Status</Label>
         <Select
           value={data.oral_hygiene}
           onValueChange={(value) => onChange('oral_hygiene', value)}
