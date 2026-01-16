@@ -10,6 +10,7 @@ import Auth from "./pages/Auth";
 import NewPatient from "./pages/NewPatient";
 import PatientPage from "./pages/Patient";
 import EditPatientPage from "./pages/EditPatient";
+import CaseManagement from "./pages/CaseManagement";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -50,6 +51,14 @@ function AppRoutes() {
           element={
             <ProtectedRoute>
               <EditPatientPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/case-management"
+          element={
+            <ProtectedRoute>
+              <CaseManagement />
             </ProtectedRoute>
           }
         />
