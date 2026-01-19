@@ -20,16 +20,20 @@ import {
   X,
   ChevronLeft,
   ChevronRight,
+  AlertCircle,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { SessionImageCard } from './SessionImageCard';
 import { ImageCropEditor } from './ImageCropEditor';
 import { SeverityBadge, calculateSeverity, SeverityLevel } from './SeverityBadge';
+import { validateImageFile, formatFileSize, MAX_FILE_SIZE } from '@/lib/imageUtils';
 import { cn } from '@/lib/utils';
 
 interface SessionImage {
   id: string;
   src: string;
+  fileName?: string;
+  fileSize?: number;
 }
 
 const CATEGORIES = [
@@ -50,30 +54,61 @@ export function CaseManagementDashboard() {
   const [editingImage, setEditingImage] = useState<{ id: string; src: string } | null>(null);
   const [viewingImage, setViewingImage] = useState<string | null>(null);
   const [currentViewIndex, setCurrentViewIndex] = useState(0);
+  const [uploadErrors, setUploadErrors] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Calculate severity based on description and image count
   const severity: SeverityLevel = calculateSeverity(description, images.length);
 
-  const handleFileSelect = useCallback((files: FileList | null) => {
+  const processFiles = useCallback((files: FileList | null) => {
     if (!files) return;
 
-    const newImages: SessionImage[] = [];
-    
-    Array.from(files).forEach((file) => {
-      if (!file.type.startsWith('image/')) return;
+    const errors: string[] = [];
+    const validFiles: File[] = [];
 
+    // Validate each file
+    Array.from(files).forEach((file) => {
+      const validation = validateImageFile(file);
+      if (validation.valid) {
+        validFiles.push(file);
+      } else {
+        errors.push(`${file.name}: ${validation.error}`);
+      }
+    });
+
+    // Show errors if any
+    if (errors.length > 0) {
+      setUploadErrors(errors);
+      errors.forEach((error) => toast.error(error));
+    }
+
+    // Process valid files
+    validFiles.forEach((file) => {
       const reader = new FileReader();
       reader.onload = (e) => {
         const newImage: SessionImage = {
           id: `img-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
           src: e.target?.result as string,
+          fileName: file.name,
+          fileSize: file.size,
         };
         setImages((prev) => [...prev, newImage]);
       };
+      reader.onerror = () => {
+        toast.error(`Failed to read file: ${file.name}`);
+      };
       reader.readAsDataURL(file);
     });
+
+    if (validFiles.length > 0) {
+      toast.success(`${validFiles.length} image${validFiles.length > 1 ? 's' : ''} added`);
+    }
   }, []);
+
+  const handleFileSelect = useCallback((files: FileList | null) => {
+    setUploadErrors([]);
+    processFiles(files);
+  }, [processFiles]);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -148,6 +183,7 @@ export function CaseManagementDashboard() {
     setImages([]);
     setDescription('');
     setCategory('');
+    setUploadErrors([]);
     toast.success('Session deleted');
   }, []);
 
@@ -231,6 +267,19 @@ export function CaseManagementDashboard() {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
+          {/* Upload Errors */}
+          {uploadErrors.length > 0 && (
+            <div className="glass-card-solid border border-destructive/20 rounded-2xl p-4 space-y-2">
+              <div className="flex items-center gap-2 text-destructive font-medium">
+                <AlertCircle className="h-4 w-4" />
+                Upload Errors
+              </div>
+              {uploadErrors.map((error, index) => (
+                <p key={index} className="text-sm text-muted-foreground">{error}</p>
+              ))}
+            </div>
+          )}
+
           {/* Drop Zone */}
           <div
             onDragOver={handleDragOver}
@@ -247,7 +296,7 @@ export function CaseManagementDashboard() {
             <input
               ref={fileInputRef}
               type="file"
-              accept="image/*"
+              accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
               multiple
               onChange={(e) => handleFileSelect(e.target.files)}
               className="hidden"
@@ -267,7 +316,7 @@ export function CaseManagementDashboard() {
                   Drop images here or click to upload
                 </p>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Supports JPG, PNG, WebP • Multiple files allowed
+                  JPG, PNG, WebP • Max {formatFileSize(MAX_FILE_SIZE)} per file
                 </p>
               </div>
             </div>
