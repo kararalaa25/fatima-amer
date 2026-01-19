@@ -32,6 +32,7 @@ import {
   Upload,
   Calendar,
   Stethoscope,
+  FolderOpen,
 } from 'lucide-react';
 import { format } from 'date-fns';
 
@@ -157,6 +158,10 @@ export function PatientProfile() {
               </div>
             </div>
             <div className="flex gap-2">
+              <Button variant="outline" onClick={() => navigate(`/case-management/${id}`)}>
+                <FolderOpen className="mr-2 h-4 w-4" />
+                Case Management
+              </Button>
               <input
                 type="file"
                 ref={fileInputRef}

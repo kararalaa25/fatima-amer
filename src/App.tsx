@@ -55,7 +55,7 @@ function AppRoutes() {
           }
         />
         <Route
-          path="/case-management"
+          path="/case-management/:patientId"
           element={
             <ProtectedRoute>
               <CaseManagement />

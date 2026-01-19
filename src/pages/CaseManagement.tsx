@@ -3,10 +3,26 @@ import { CaseManagementDashboard } from '@/components/case-management/CaseManage
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, FolderOpen } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 export default function CaseManagement() {
   const navigate = useNavigate();
+  const { patientId } = useParams<{ patientId: string }>();
+
+  if (!patientId) {
+    return (
+      <PageTransition>
+        <div className="min-h-screen mesh-gradient-bg flex items-center justify-center">
+          <div className="text-center">
+            <p className="text-muted-foreground mb-4">No patient selected</p>
+            <Button onClick={() => navigate('/')} className="rounded-2xl">
+              Go to Dashboard
+            </Button>
+          </div>
+        </div>
+      </PageTransition>
+    );
+  }
 
   return (
     <PageTransition>
@@ -43,7 +59,7 @@ export default function CaseManagement() {
 
         {/* Main Content */}
         <main className="container mx-auto px-4 py-8 relative z-10">
-          <CaseManagementDashboard />
+          <CaseManagementDashboard patientId={patientId} />
         </main>
       </div>
     </PageTransition>
