@@ -1,1 +1,4 @@
 project_id = "thsdzmqwlpeasimfvhgp"
+
+[functions.smile-transformation]
+verify_jwt = false

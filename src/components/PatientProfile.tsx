@@ -33,8 +33,10 @@ import {
   Calendar,
   Stethoscope,
   FolderOpen,
+  Sparkles,
 } from 'lucide-react';
 import { format } from 'date-fns';
+import { SmileTransformation } from '@/components/smile-transformation/SmileTransformation';
 
 export function PatientProfile() {
   const { id } = useParams<{ id: string }>();
@@ -198,6 +200,10 @@ export function PatientProfile() {
             <TabsTrigger value="gallery" className="flex items-center gap-2 px-3 py-2">
               <Camera className="h-4 w-4" />
               <span>Gallery</span>
+            </TabsTrigger>
+            <TabsTrigger value="transformation" className="flex items-center gap-2 px-3 py-2">
+              <Sparkles className="h-4 w-4" />
+              <span>Smile Transformation</span>
             </TabsTrigger>
           </TabsList>
 
@@ -544,6 +550,14 @@ export function PatientProfile() {
               patientId={id!}
               initialPhotos={initialPhotos || []}
               sessions={sessions || []}
+            />
+          </TabsContent>
+
+          {/* Smile Transformation Tab */}
+          <TabsContent value="transformation">
+            <SmileTransformation 
+              patientId={id!} 
+              patientName={patient.name} 
             />
           </TabsContent>
         </Tabs>

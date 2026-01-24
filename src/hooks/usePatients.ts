@@ -1,11 +1,14 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Patient } from '@/types/patient';
+import { toast } from 'sonner';
 
 export function usePatients() {
   return useQuery({
     queryKey: ['patients'],
-    queryFn: async () => {
+    queryFn: async (): Promise<Patient[]> => {
+      const { data: { user } } = await supabase.auth.getUser();
+      
       const { data, error } = await supabase
         .from('patients')
         .select('*')
@@ -17,10 +20,12 @@ export function usePatients() {
   });
 }
 
-export function usePatient(id: string) {
+export function usePatient(id: string | undefined) {
   return useQuery({
     queryKey: ['patient', id],
-    queryFn: async () => {
+    queryFn: async (): Promise<Patient | null> => {
+      if (!id) throw new Error('Patient ID is required');
+      
       const { data, error } = await supabase
         .from('patients')
         .select('*')
@@ -39,9 +44,16 @@ export function useCreatePatient() {
   
   return useMutation({
     mutationFn: async (patient: Omit<Patient, 'id' | 'created_at' | 'updated_at'>) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      const patientData = {
+        ...patient,
+        user_id: user?.id ?? null,
+      };
+      
       const { data, error } = await supabase
         .from('patients')
-        .insert(patient)
+        .insert(patientData)
         .select()
         .single();
       
@@ -50,6 +62,10 @@ export function useCreatePatient() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['patients'] });
+      toast.success('Patient created successfully');
+    },
+    onError: (error: Error) => {
+      toast.error('Failed to create patient', { description: error.message });
     },
   });
 }
@@ -72,6 +88,10 @@ export function useUpdatePatient() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['patients'] });
       queryClient.invalidateQueries({ queryKey: ['patient', data.id] });
+      toast.success('Patient updated successfully');
+    },
+    onError: (error: Error) => {
+      toast.error('Failed to update patient', { description: error.message });
     },
   });
 }
@@ -90,6 +110,10 @@ export function useDeletePatient() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['patients'] });
+      toast.success('Patient deleted successfully');
+    },
+    onError: (error: Error) => {
+      toast.error('Failed to delete patient', { description: error.message });
     },
   });
 }

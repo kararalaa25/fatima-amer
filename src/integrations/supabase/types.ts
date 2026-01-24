@@ -23,6 +23,7 @@ export type Database = {
           status: string
           tooth_number: number
           updated_at: string
+          user_id: string | null
         }
         Insert: {
           created_at?: string
@@ -32,6 +33,7 @@ export type Database = {
           status?: string
           tooth_number: number
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
           created_at?: string
@@ -41,6 +43,7 @@ export type Database = {
           status?: string
           tooth_number?: number
           updated_at?: string
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -59,6 +62,7 @@ export type Database = {
           image_type: string | null
           image_url: string
           patient_id: string
+          user_id: string | null
         }
         Insert: {
           created_at?: string
@@ -66,6 +70,7 @@ export type Database = {
           image_type?: string | null
           image_url: string
           patient_id: string
+          user_id?: string | null
         }
         Update: {
           created_at?: string
@@ -73,6 +78,7 @@ export type Database = {
           image_type?: string | null
           image_url?: string
           patient_id?: string
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -134,6 +140,7 @@ export type Database = {
           upper_labial: string | null
           upper_space_available: number | null
           upper_space_required: number | null
+          user_id: string | null
           vertical_relation: string | null
         }
         Insert: {
@@ -185,6 +192,7 @@ export type Database = {
           upper_labial?: string | null
           upper_space_available?: number | null
           upper_space_required?: number | null
+          user_id?: string | null
           vertical_relation?: string | null
         }
         Update: {
@@ -236,7 +244,41 @@ export type Database = {
           upper_labial?: string | null
           upper_space_available?: number | null
           upper_space_required?: number | null
+          user_id?: string | null
           vertical_relation?: string | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          is_activated: boolean | null
+          updated_at: string
+          user_id: string
+          workspace_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          is_activated?: boolean | null
+          updated_at?: string
+          user_id: string
+          workspace_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          is_activated?: boolean | null
+          updated_at?: string
+          user_id?: string
+          workspace_id?: string | null
         }
         Relationships: []
       }
@@ -247,6 +289,7 @@ export type Database = {
           image_type: string | null
           image_url: string
           session_id: string
+          user_id: string | null
         }
         Insert: {
           created_at?: string
@@ -254,6 +297,7 @@ export type Database = {
           image_type?: string | null
           image_url: string
           session_id: string
+          user_id?: string | null
         }
         Update: {
           created_at?: string
@@ -261,6 +305,7 @@ export type Database = {
           image_type?: string | null
           image_url?: string
           session_id?: string
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -280,6 +325,7 @@ export type Database = {
           session_date: string
           treatment_performed: string | null
           updated_at: string
+          user_id: string | null
         }
         Insert: {
           created_at?: string
@@ -288,6 +334,7 @@ export type Database = {
           session_date?: string
           treatment_performed?: string | null
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
           created_at?: string
@@ -296,6 +343,7 @@ export type Database = {
           session_date?: string
           treatment_performed?: string | null
           updated_at?: string
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -318,6 +366,7 @@ export type Database = {
           primary_goals: string | null
           special_instructions: string | null
           updated_at: string
+          user_id: string | null
         }
         Insert: {
           appliance_types?: string[] | null
@@ -329,6 +378,7 @@ export type Database = {
           primary_goals?: string | null
           special_instructions?: string | null
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
           appliance_types?: string[] | null
@@ -340,6 +390,7 @@ export type Database = {
           primary_goals?: string | null
           special_instructions?: string | null
           updated_at?: string
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -351,15 +402,40 @@ export type Database = {
           },
         ]
       }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_user_activated: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "doctor" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -486,6 +562,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "doctor", "user"],
+    },
   },
 } as const
