@@ -5,6 +5,9 @@ import { Database } from '@/integrations/supabase/types';
 
 type AppRole = Database['public']['Enums']['app_role'];
 
+// Admin email - only this email can access admin panel
+const ADMIN_EMAIL = 'kararkhafaji892@gmail.com';
+
 interface UserWithRole {
   id: string;
   user_id: string;
@@ -18,21 +21,15 @@ interface UserWithRole {
 export function useAdmin() {
   const queryClient = useQueryClient();
 
-  // Check if current user is admin
+  // Check if current user is admin by email
   const { data: isAdmin, isLoading: isCheckingAdmin } = useQuery({
     queryKey: ['is-admin'],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return false;
-
-      const { data } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', user.id)
-        .eq('role', 'admin')
-        .maybeSingle();
-
-      return !!data;
+      
+      // Check if user email matches admin email
+      return user.email === ADMIN_EMAIL;
     },
   });
 
@@ -73,22 +70,45 @@ export function useAdmin() {
     enabled: isAdmin,
   });
 
-  // Activate/deactivate user
-  const toggleActivation = useMutation({
-    mutationFn: async ({ userId, activate }: { userId: string; activate: boolean }) => {
+  // Activate user
+  const activateUser = useMutation({
+    mutationFn: async (userId: string) => {
       const { error } = await supabase
         .from('profiles')
-        .update({ is_activated: activate })
+        .update({ is_activated: true })
         .eq('user_id', userId);
 
       if (error) throw error;
     },
-    onSuccess: (_, { activate }) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-users'] });
-      toast.success(activate ? 'User activated' : 'User deactivated');
+      toast.success('User activated successfully!', {
+        description: 'The user can now access their private workspace.',
+      });
     },
     onError: (error: any) => {
-      toast.error('Failed to update user', { description: error.message });
+      toast.error('Failed to activate user', { description: error.message });
+    },
+  });
+
+  // Ban/deactivate user
+  const banUser = useMutation({
+    mutationFn: async (userId: string) => {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ is_activated: false })
+        .eq('user_id', userId);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-users'] });
+      toast.success('User banned', {
+        description: 'The user can no longer access the platform.',
+      });
+    },
+    onError: (error: any) => {
+      toast.error('Failed to ban user', { description: error.message });
     },
   });
 
@@ -139,7 +159,8 @@ export function useAdmin() {
     isCheckingAdmin,
     users,
     isLoadingUsers,
-    toggleActivation,
+    activateUser,
+    banUser,
     addRole,
     removeRole,
     pendingUsers: users?.filter(u => !u.is_activated) || [],
