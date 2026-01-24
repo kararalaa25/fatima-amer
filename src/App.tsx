@@ -11,6 +11,7 @@ import NewPatient from "./pages/NewPatient";
 import PatientPage from "./pages/Patient";
 import EditPatientPage from "./pages/EditPatient";
 import CaseManagement from "./pages/CaseManagement";
+import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -59,6 +60,14 @@ function AppRoutes() {
           element={
             <ProtectedRoute>
               <CaseManagement />
+            </ProtectedRoute>
+          }
+          />
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute>
+              <AdminDashboard />
             </ProtectedRoute>
           }
         />

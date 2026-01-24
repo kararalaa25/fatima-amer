@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usePatients } from '@/hooks/usePatients';
 import { useAuth } from '@/hooks/useAuth';
+import { useAdmin } from '@/hooks/useAdmin';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,7 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Search, Plus, Stethoscope, Users, LogOut, User, Sparkles } from 'lucide-react';
+import { Search, Plus, Stethoscope, Users, LogOut, User, Sparkles, Shield } from 'lucide-react';
 import { format } from 'date-fns';
 import { PatientActionsMenu } from './dashboard/PatientActionsMenu';
 
@@ -21,6 +22,7 @@ export function PatientDashboard() {
   const [searchQuery, setSearchQuery] = useState('');
   const { data: patients, isLoading } = usePatients();
   const { signOut, isPreviewMode } = useAuth();
+  const { isAdmin } = useAdmin();
   const navigate = useNavigate();
 
   const filteredPatients = patients?.filter(
@@ -52,6 +54,17 @@ export function PatientDashboard() {
               </div>
             </div>
             <div className="flex items-center gap-2">
+              {isAdmin && (
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  onClick={() => navigate('/admin')}
+                  className="rounded-2xl glass-card text-muted-foreground hover:text-foreground transition-smooth"
+                  title="Admin Dashboard"
+                >
+                  <Shield className="h-5 w-5" />
+                </Button>
+              )}
               <Button 
                 variant="ghost" 
                 size="icon" 
