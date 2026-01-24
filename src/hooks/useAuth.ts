@@ -4,9 +4,21 @@ import { supabase } from '@/integrations/supabase/client';
 
 const PREVIEW_BYPASS_KEY = 'ortho_preview_bypass';
 
+interface Profile {
+  id: string;
+  user_id: string;
+  full_name: string;
+  email: string;
+  workspace_id: string;
+  is_activated: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [isPreviewMode, setIsPreviewMode] = useState(false);
 
@@ -21,17 +33,42 @@ export function useAuth() {
 
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+      async (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
+        
+        if (session?.user) {
+          // Fetch profile data
+          const { data: profileData } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('user_id', session.user.id)
+            .single();
+          
+          setProfile(profileData);
+        } else {
+          setProfile(null);
+        }
+        
         setLoading(false);
       }
     );
 
     // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
+      
+      if (session?.user) {
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('user_id', session.user.id)
+          .single();
+        
+        setProfile(profileData);
+      }
+      
       setLoading(false);
     });
 
@@ -42,15 +79,19 @@ export function useAuth() {
     // Clear preview bypass
     localStorage.removeItem(PREVIEW_BYPASS_KEY);
     setIsPreviewMode(false);
+    setProfile(null);
     await supabase.auth.signOut();
   };
 
   return {
     user,
     session,
+    profile,
     loading,
     signOut,
     isAuthenticated: !!session || isPreviewMode,
+    isActivated: profile?.is_activated ?? false,
     isPreviewMode,
+    workspaceId: profile?.workspace_id ?? null,
   };
 }
