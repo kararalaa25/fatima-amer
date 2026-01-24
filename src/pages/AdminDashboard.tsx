@@ -14,41 +14,18 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import {
   ArrowLeft,
   Loader2,
   Shield,
   Users,
   UserCheck,
   UserX,
-  MoreHorizontal,
-  ShieldCheck,
   ShieldAlert,
   Clock,
+  Check,
+  Ban,
 } from 'lucide-react';
 import { format } from 'date-fns';
-import { Database } from '@/integrations/supabase/types';
-
-type AppRole = Database['public']['Enums']['app_role'];
-
-const roleColors: Record<AppRole, string> = {
-  admin: 'bg-destructive/10 text-destructive border-destructive/20',
-  doctor: 'bg-primary/10 text-primary border-primary/20',
-  user: 'bg-muted text-muted-foreground border-border',
-};
-
-const roleIcons: Record<AppRole, React.ReactNode> = {
-  admin: <ShieldAlert className="h-3 w-3" />,
-  doctor: <ShieldCheck className="h-3 w-3" />,
-  user: <Shield className="h-3 w-3" />,
-};
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
@@ -58,9 +35,8 @@ export default function AdminDashboard() {
     isCheckingAdmin,
     users,
     isLoadingUsers,
-    toggleActivation,
-    addRole,
-    removeRole,
+    activateUser,
+    banUser,
     pendingUsers,
     activeUsers,
   } = useAdmin();
@@ -195,12 +171,9 @@ export default function AdminDashboard() {
                     ) : (
                       <UserTable
                         users={pendingUsers}
-                        onToggleActivation={(userId, activate) =>
-                          toggleActivation.mutate({ userId, activate })
-                        }
-                        onAddRole={(userId, role) => addRole.mutate({ userId, role })}
-                        onRemoveRole={(userId, role) => removeRole.mutate({ userId, role })}
-                        isLoading={toggleActivation.isPending || addRole.isPending || removeRole.isPending}
+                        onActivate={(userId) => activateUser.mutate(userId)}
+                        onBan={(userId) => banUser.mutate(userId)}
+                        isLoading={activateUser.isPending || banUser.isPending}
                       />
                     )}
                   </TabsContent>
@@ -213,12 +186,9 @@ export default function AdminDashboard() {
                     ) : (
                       <UserTable
                         users={users}
-                        onToggleActivation={(userId, activate) =>
-                          toggleActivation.mutate({ userId, activate })
-                        }
-                        onAddRole={(userId, role) => addRole.mutate({ userId, role })}
-                        onRemoveRole={(userId, role) => removeRole.mutate({ userId, role })}
-                        isLoading={toggleActivation.isPending || addRole.isPending || removeRole.isPending}
+                        onActivate={(userId) => activateUser.mutate(userId)}
+                        onBan={(userId) => banUser.mutate(userId)}
+                        isLoading={activateUser.isPending || banUser.isPending}
                       />
                     )}
                   </TabsContent>
@@ -240,17 +210,14 @@ interface UserTableProps {
     email: string;
     is_activated: boolean;
     created_at: string;
-    roles: AppRole[];
+    roles: string[];
   }>;
-  onToggleActivation: (userId: string, activate: boolean) => void;
-  onAddRole: (userId: string, role: AppRole) => void;
-  onRemoveRole: (userId: string, role: AppRole) => void;
+  onActivate: (userId: string) => void;
+  onBan: (userId: string) => void;
   isLoading: boolean;
 }
 
-function UserTable({ users, onToggleActivation, onAddRole, onRemoveRole, isLoading }: UserTableProps) {
-  const allRoles: AppRole[] = ['admin', 'doctor', 'user'];
-
+function UserTable({ users, onActivate, onBan, isLoading }: UserTableProps) {
   return (
     <div className="rounded-lg border overflow-hidden">
       <Table>
@@ -258,7 +225,6 @@ function UserTable({ users, onToggleActivation, onAddRole, onRemoveRole, isLoadi
           <TableRow className="bg-muted/50">
             <TableHead>User</TableHead>
             <TableHead>Status</TableHead>
-            <TableHead>Roles</TableHead>
             <TableHead>Registered</TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
@@ -286,85 +252,36 @@ function UserTable({ users, onToggleActivation, onAddRole, onRemoveRole, isLoadi
                 )}
               </TableCell>
               <TableCell>
-                <div className="flex flex-wrap gap-1">
-                  {user.roles.map((role) => (
-                    <Badge
-                      key={role}
-                      variant="outline"
-                      className={`${roleColors[role]} flex items-center gap-1`}
-                    >
-                      {roleIcons[role]}
-                      {role}
-                    </Badge>
-                  ))}
-                  {user.roles.length === 0 && (
-                    <span className="text-sm text-muted-foreground">No roles</span>
-                  )}
-                </div>
-              </TableCell>
-              <TableCell>
                 <span className="text-sm text-muted-foreground">
                   {format(new Date(user.created_at), 'MMM d, yyyy')}
                 </span>
               </TableCell>
               <TableCell className="text-right">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" disabled={isLoading}>
-                      <MoreHorizontal className="h-4 w-4" />
+                <div className="flex items-center justify-end gap-2">
+                  {!user.is_activated ? (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="bg-green-500/10 text-green-600 border-green-500/20 hover:bg-green-500/20"
+                      onClick={() => onActivate(user.user_id)}
+                      disabled={isLoading}
+                    >
+                      <Check className="h-4 w-4 mr-1" />
+                      Activate
                     </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-48 bg-popover border shadow-lg">
-                    <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    {user.is_activated ? (
-                      <DropdownMenuItem
-                        onClick={() => onToggleActivation(user.user_id, false)}
-                        className="text-destructive focus:text-destructive"
-                      >
-                        <UserX className="mr-2 h-4 w-4" />
-                        Deactivate
-                      </DropdownMenuItem>
-                    ) : (
-                      <DropdownMenuItem
-                        onClick={() => onToggleActivation(user.user_id, true)}
-                        className="text-green-600 focus:text-green-600"
-                      >
-                        <UserCheck className="mr-2 h-4 w-4" />
-                        Activate
-                      </DropdownMenuItem>
-                    )}
-                    <DropdownMenuSeparator />
-                    <DropdownMenuLabel className="text-xs">Add Role</DropdownMenuLabel>
-                    {allRoles
-                      .filter((role) => !user.roles.includes(role))
-                      .map((role) => (
-                        <DropdownMenuItem
-                          key={`add-${role}`}
-                          onClick={() => onAddRole(user.user_id, role)}
-                        >
-                          {roleIcons[role]}
-                          <span className="ml-2">Add {role}</span>
-                        </DropdownMenuItem>
-                      ))}
-                    {user.roles.length > 0 && (
-                      <>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuLabel className="text-xs">Remove Role</DropdownMenuLabel>
-                        {user.roles.map((role) => (
-                          <DropdownMenuItem
-                            key={`remove-${role}`}
-                            onClick={() => onRemoveRole(user.user_id, role)}
-                            className="text-destructive focus:text-destructive"
-                          >
-                            {roleIcons[role]}
-                            <span className="ml-2">Remove {role}</span>
-                          </DropdownMenuItem>
-                        ))}
-                      </>
-                    )}
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                  ) : (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="bg-destructive/10 text-destructive border-destructive/20 hover:bg-destructive/20"
+                      onClick={() => onBan(user.user_id)}
+                      disabled={isLoading}
+                    >
+                      <Ban className="h-4 w-4 mr-1" />
+                      Ban
+                    </Button>
+                  )}
+                </div>
               </TableCell>
             </TableRow>
           ))}

@@ -4,8 +4,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { Loader2, Mail, Lock, User, Shield, Eye, EyeOff, Info, Stethoscope } from 'lucide-react';
+import { Loader2, Mail, Lock, User, Shield, Eye, EyeOff, Info, Stethoscope, Clock, CheckCircle } from 'lucide-react';
 
 const PREVIEW_BYPASS_KEY = 'ortho_preview_bypass';
 
@@ -15,6 +16,8 @@ export default function AuthPage() {
   const [loading, setLoading] = useState(false);
   const [checkingSession, setCheckingSession] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
+  const [showPendingScreen, setShowPendingScreen] = useState(false);
+  const [pendingUserName, setPendingUserName] = useState('');
 
   // Form fields
   const [fullName, setFullName] = useState('');
@@ -32,15 +35,19 @@ export default function AuthPage() {
     // Check for existing session
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (session) {
-        // Check if user is activated
+        // Check if user email is verified and if they're activated
         const { data: profile } = await supabase
           .from('profiles')
-          .select('is_activated')
+          .select('is_activated, full_name')
           .eq('user_id', session.user.id)
-          .single();
+          .maybeSingle();
 
         if (profile?.is_activated) {
           navigate('/');
+        } else if (profile) {
+          // User exists but not activated - show pending screen
+          setPendingUserName(profile.full_name);
+          setShowPendingScreen(true);
         }
       }
       setCheckingSession(false);
@@ -53,12 +60,16 @@ export default function AuthPage() {
           // Check activation status
           const { data: profile } = await supabase
             .from('profiles')
-            .select('is_activated')
+            .select('is_activated, full_name')
             .eq('user_id', session.user.id)
-            .single();
+            .maybeSingle();
 
           if (profile?.is_activated) {
             navigate('/');
+          } else if (profile) {
+            // User verified email but not activated
+            setPendingUserName(profile.full_name);
+            setShowPendingScreen(true);
           }
         }
       }
@@ -73,6 +84,12 @@ export default function AuthPage() {
       description: 'You are viewing the demo environment with sample data.',
     });
     navigate('/');
+  };
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    setShowPendingScreen(false);
+    setPendingUserName('');
   };
 
   const handleSignUp = async (e: React.FormEvent) => {
@@ -93,7 +110,7 @@ export default function AuthPage() {
         email,
         password,
         options: {
-          emailRedirectTo: window.location.origin,
+          emailRedirectTo: window.location.origin + '/auth',
           data: {
             full_name: fullName,
           },
@@ -102,8 +119,8 @@ export default function AuthPage() {
 
       if (error) throw error;
 
-      toast.success('Access Requested!', {
-        description: 'Your email has been verified. Our admin will activate your private suite within 24 hours.',
+      toast.success('Verification Email Sent!', {
+        description: 'Please check your inbox and click the verification link.',
       });
     } catch (error: any) {
       toast.error('Registration failed', {
@@ -135,18 +152,16 @@ export default function AuthPage() {
         .from('profiles')
         .select('is_activated, full_name')
         .eq('user_id', data.user.id)
-        .single();
+        .maybeSingle();
 
-      if (!profile?.is_activated) {
-        toast.info('Pending Approval', {
-          description: 'Your account is awaiting admin activation. Please check back later.',
-        });
-        await supabase.auth.signOut();
-        return;
+      if (profile?.is_activated) {
+        toast.success(`Welcome back, ${profile.full_name}!`);
+        navigate('/');
+      } else {
+        // Show pending activation screen
+        setPendingUserName(profile?.full_name || 'User');
+        setShowPendingScreen(true);
       }
-
-      toast.success(`Welcome back, ${profile.full_name}!`);
-      navigate('/');
     } catch (error: any) {
       toast.error('Login failed', {
         description: error.message,
@@ -162,6 +177,63 @@ export default function AuthPage() {
         <div className="glass-card p-8">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
+      </div>
+    );
+  }
+
+  // Pending Activation Screen
+  if (showPendingScreen) {
+    return (
+      <div className="min-h-screen mesh-gradient-bg flex items-center justify-center p-4">
+        <Card className="max-w-md w-full glass-card-solid">
+          <CardHeader className="text-center">
+            <div className="mx-auto mb-4 h-20 w-20 rounded-full bg-amber-500/10 flex items-center justify-center">
+              <Clock className="h-10 w-10 text-amber-600" />
+            </div>
+            <CardTitle className="text-2xl">Email Verified</CardTitle>
+            <CardDescription className="text-base mt-2">
+              Please wait for admin activation
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="flex items-start gap-3 p-4 rounded-lg bg-primary/5 border border-primary/10">
+              <CheckCircle className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
+              <div>
+                <p className="font-medium text-foreground">Hello, {pendingUserName}!</p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Your email has been verified successfully. Our admin will review and activate your private clinical workspace within 24 hours.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3 p-4 rounded-lg bg-muted/50 border border-border">
+              <Info className="h-5 w-5 text-muted-foreground mt-0.5 flex-shrink-0" />
+              <div>
+                <p className="text-sm text-muted-foreground">
+                  Once activated, you'll have access to your encrypted, private workspace where only you can see your patient data.
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={() => window.location.reload()}
+              >
+                <Loader2 className="mr-2 h-4 w-4" />
+                Check Activation Status
+              </Button>
+              <Button
+                variant="ghost"
+                className="w-full text-muted-foreground"
+                onClick={handleSignOut}
+              >
+                Sign Out
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     );
   }
@@ -233,7 +305,7 @@ export default function AuthPage() {
             {/* Email */}
             <div className="space-y-2">
               <Label htmlFor="email" className="text-sm font-medium">
-                Clinical Email
+                Email
               </Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -312,7 +384,7 @@ export default function AuthPage() {
             {/* Admin Activation Notice - Only for Registration */}
             {!isLogin && (
               <p className="text-xs text-center text-muted-foreground">
-                Once your email is verified, our admin will activate your private suite within 24 hours.
+                After verifying your email, our admin will activate your private suite within 24 hours.
               </p>
             )}
           </form>
