@@ -92,6 +92,39 @@ export default function AuthPage() {
     setPendingUserName('');
   };
 
+  const handleRefreshStatus = async () => {
+    setLoading(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast.error('Session expired. Please sign in again.');
+        setShowPendingScreen(false);
+        return;
+      }
+
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('is_activated, full_name')
+        .eq('user_id', session.user.id)
+        .maybeSingle();
+
+      if (profile?.is_activated) {
+        toast.success(`Welcome, ${profile.full_name}!`, {
+          description: 'Your workspace has been activated.',
+        });
+        navigate('/');
+      } else {
+        toast.info('Still waiting for activation', {
+          description: 'Please wait for admin approval.',
+        });
+      }
+    } catch (error: any) {
+      toast.error('Failed to check status', { description: error.message });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!fullName || !email || !password) {
@@ -217,12 +250,17 @@ export default function AuthPage() {
 
             <div className="space-y-3">
               <Button
-                variant="outline"
+                variant="default"
                 className="w-full"
-                onClick={() => window.location.reload()}
+                onClick={handleRefreshStatus}
+                disabled={loading}
               >
-                <Loader2 className="mr-2 h-4 w-4" />
-                Check Activation Status
+                {loading ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <CheckCircle className="mr-2 h-4 w-4" />
+                )}
+                Refresh Status
               </Button>
               <Button
                 variant="ghost"

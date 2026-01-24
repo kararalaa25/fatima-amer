@@ -5,8 +5,8 @@ import { Database } from '@/integrations/supabase/types';
 
 type AppRole = Database['public']['Enums']['app_role'];
 
-// Admin email - only this email can access admin panel
-const ADMIN_EMAIL = 'kararkhafaji892@gmail.com';
+// Admin emails - these emails can access admin panel
+const ADMIN_EMAILS = ['kararkhafaji892@gmail.com', 'kararalkhafaji892@gmail.com'];
 
 interface UserWithRole {
   id: string;
@@ -21,15 +21,25 @@ interface UserWithRole {
 export function useAdmin() {
   const queryClient = useQueryClient();
 
-  // Check if current user is admin by email
+  // Check if current user is admin by email or has admin role
   const { data: isAdmin, isLoading: isCheckingAdmin } = useQuery({
     queryKey: ['is-admin'],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return false;
       
-      // Check if user email matches admin email
-      return user.email === ADMIN_EMAIL;
+      // Check if user email matches admin emails
+      if (user.email && ADMIN_EMAILS.includes(user.email)) return true;
+      
+      // Also check if user has admin role in database
+      const { data: roles } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .eq('role', 'admin')
+        .maybeSingle();
+      
+      return !!roles;
     },
   });
 
