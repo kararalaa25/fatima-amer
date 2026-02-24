@@ -21,7 +21,7 @@ function AppRoutes() {
   const location = useLocation();
   
   return (
-    <PageTransition key={location.pathname}>
+    <PageTransition>
       <Routes location={location}>
         <Route path="/auth" element={<Auth />} />
         <Route path="/reset-password" element={<ResetPassword />} />
