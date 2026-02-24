@@ -206,20 +206,36 @@ export default function AuthPage() {
 
       if (error) throw error;
 
-      // Check if user is activated
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('is_activated, full_name')
-        .eq('user_id', data.user.id)
-        .maybeSingle();
+      // Check if user is activated and check admin role in parallel
+      const [profileResult, rolesResult] = await Promise.all([
+        supabase
+          .from('profiles')
+          .select('is_activated, full_name')
+          .eq('user_id', data.user.id)
+          .maybeSingle(),
+        supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', data.user.id),
+      ]);
+
+      const profile = profileResult.data;
+      const isAdmin = rolesResult.data?.some(r => r.role === 'admin');
 
       if (profile?.is_activated) {
         toast.success(`Welcome back, ${profile.full_name}!`);
-        navigate('/');
-      } else {
+        // Auto-redirect admins to admin dashboard
+        navigate(isAdmin ? '/admin' : '/');
+      } else if (profile) {
         // Show pending activation screen
-        setPendingUserName(profile?.full_name || 'User');
+        setPendingUserName(profile.full_name || 'User');
         setShowPendingScreen(true);
+      } else {
+        // Profile not found - edge case, sign out and show error
+        await supabase.auth.signOut();
+        toast.error('Account setup incomplete', {
+          description: 'Please contact support or try registering again.',
+        });
       }
     } catch (error: any) {
       toast.error('Login failed', {
