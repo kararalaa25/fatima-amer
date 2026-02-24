@@ -1,15 +1,17 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAdmin } from '@/hooks/useAdmin';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from '@/components/ui/table';
 import {
-  ArrowLeft, Loader2, Shield, Users, UserCheck, UserX, ShieldAlert, Clock, Check, Ban,
+  ArrowLeft, Loader2, Shield, Users, UserCheck, UserX, ShieldAlert, Clock, Check, Ban, FolderOpen,
 } from 'lucide-react';
 import { format } from 'date-fns';
 
@@ -19,7 +21,9 @@ export default function AdminDashboard() {
   const {
     isAdmin, isCheckingAdmin, users, isLoadingUsers,
     activateUser, banUser, pendingUsers, activeUsers,
+    allPatients, isLoadingAllPatients,
   } = useAdmin();
+  const [doctorFilter, setDoctorFilter] = useState<string>('all');
 
   if (isCheckingAdmin) {
     return (
@@ -38,18 +42,26 @@ export default function AdminDashboard() {
               <ShieldAlert className="h-8 w-8 text-destructive" />
             </div>
             <CardTitle>Access Denied</CardTitle>
-            <CardDescription>You don't have admin privileges to access this page.</CardDescription>
+            <p className="text-sm text-muted-foreground mt-1">You don't have admin privileges.</p>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent>
             <Button variant="outline" className="w-full" onClick={() => navigate('/')}>
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Dashboard
+              <ArrowLeft className="mr-2 h-4 w-4" /> Back to Dashboard
             </Button>
           </CardContent>
         </Card>
       </div>
     );
   }
+
+  // Get unique doctors for filter
+  const doctorNames = Array.from(new Set(
+    (allPatients || []).map(p => p.doctor_name).filter(Boolean)
+  )) as string[];
+
+  const filteredPatients = doctorFilter === 'all'
+    ? allPatients
+    : allPatients?.filter(p => p.doctor_name === doctorFilter);
 
   return (
     <div className="min-h-screen bg-background">
@@ -64,7 +76,7 @@ export default function AdminDashboard() {
                 <Shield className="h-6 w-6 text-primary" />
                 Admin Dashboard
               </h1>
-              <p className="text-muted-foreground">Manage users and access control</p>
+              <p className="text-muted-foreground">Manage users and view all cases</p>
             </div>
           </div>
           <Button variant="outline" onClick={signOut}>Sign Out</Button>
@@ -101,11 +113,11 @@ export default function AdminDashboard() {
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">Pending Approval</p>
-                  <p className="text-3xl font-bold text-warning">{pendingUsers.length}</p>
+                  <p className="text-sm text-muted-foreground">Total Cases</p>
+                  <p className="text-3xl font-bold text-primary">{allPatients?.length || 0}</p>
                 </div>
-                <div className="h-12 w-12 rounded-lg bg-warning/10 flex items-center justify-center">
-                  <Clock className="h-6 w-6 text-warning" />
+                <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <FolderOpen className="h-6 w-6 text-primary" />
                 </div>
               </div>
             </CardContent>
@@ -113,9 +125,12 @@ export default function AdminDashboard() {
         </div>
 
         <Card>
-          <Tabs defaultValue="pending" className="w-full">
+          <Tabs defaultValue="cases" className="w-full">
             <CardHeader>
-              <TabsList className="grid w-full max-w-md grid-cols-2">
+              <TabsList className="grid w-full max-w-lg grid-cols-3">
+                <TabsTrigger value="cases" className="flex items-center gap-2">
+                  <FolderOpen className="h-4 w-4" /> All Cases
+                </TabsTrigger>
                 <TabsTrigger value="pending" className="flex items-center gap-2">
                   <Clock className="h-4 w-4" /> Pending ({pendingUsers.length})
                 </TabsTrigger>
@@ -125,34 +140,98 @@ export default function AdminDashboard() {
               </TabsList>
             </CardHeader>
             <CardContent>
-              {isLoadingUsers ? (
-                <div className="flex items-center justify-center py-12">
-                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              {/* All Cases Tab */}
+              <TabsContent value="cases" className="mt-0">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold text-foreground">Global Case View</h3>
+                  <Select value={doctorFilter} onValueChange={setDoctorFilter}>
+                    <SelectTrigger className="w-[200px]">
+                      <SelectValue placeholder="Filter by Doctor" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Doctors</SelectItem>
+                      {doctorNames.map(name => (
+                        <SelectItem key={name} value={name}>{name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
-              ) : (
-                <>
-                  <TabsContent value="pending" className="mt-0">
-                    {pendingUsers.length === 0 ? (
-                      <div className="text-center py-12">
-                        <UserCheck className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                        <p className="text-muted-foreground">No pending users</p>
-                      </div>
-                    ) : (
-                      <UserTable users={pendingUsers} onActivate={(userId) => activateUser.mutate(userId)} onBan={(userId) => banUser.mutate(userId)} isLoading={activateUser.isPending || banUser.isPending} />
-                    )}
-                  </TabsContent>
-                  <TabsContent value="all" className="mt-0">
-                    {!users || users.length === 0 ? (
-                      <div className="text-center py-12">
-                        <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                        <p className="text-muted-foreground">No users found</p>
-                      </div>
-                    ) : (
-                      <UserTable users={users} onActivate={(userId) => activateUser.mutate(userId)} onBan={(userId) => banUser.mutate(userId)} isLoading={activateUser.isPending || banUser.isPending} />
-                    )}
-                  </TabsContent>
-                </>
-              )}
+                {isLoadingAllPatients ? (
+                  <div className="flex items-center justify-center py-12">
+                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                  </div>
+                ) : !filteredPatients || filteredPatients.length === 0 ? (
+                  <div className="text-center py-12">
+                    <FolderOpen className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                    <p className="text-muted-foreground">No cases found</p>
+                  </div>
+                ) : (
+                  <div className="rounded-lg border overflow-hidden">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Patient Name</TableHead>
+                          <TableHead>Age</TableHead>
+                          <TableHead>Doctor</TableHead>
+                          <TableHead className="hidden md:table-cell">Chief Complaint</TableHead>
+                          <TableHead>Created</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {filteredPatients.map((p) => (
+                          <TableRow key={p.id} className="cursor-pointer hover:bg-muted/50" onClick={() => navigate(`/patient/${p.id}`)}>
+                            <TableCell className="font-medium">{p.name}</TableCell>
+                            <TableCell>{p.age}</TableCell>
+                            <TableCell>
+                              <Badge variant="outline" className="text-xs">
+                                {p.doctor_name || 'Unknown'}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="hidden md:table-cell text-muted-foreground max-w-xs truncate">
+                              {p.chief_complaint || '—'}
+                            </TableCell>
+                            <TableCell className="text-muted-foreground text-sm">
+                              {format(new Date(p.created_at), 'MMM d, yyyy')}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                )}
+              </TabsContent>
+
+              {/* Pending Users Tab */}
+              <TabsContent value="pending" className="mt-0">
+                {isLoadingUsers ? (
+                  <div className="flex items-center justify-center py-12">
+                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                  </div>
+                ) : pendingUsers.length === 0 ? (
+                  <div className="text-center py-12">
+                    <UserCheck className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                    <p className="text-muted-foreground">No pending users</p>
+                  </div>
+                ) : (
+                  <UserTable users={pendingUsers} onActivate={(userId) => activateUser.mutate(userId)} onBan={(userId) => banUser.mutate(userId)} isLoading={activateUser.isPending || banUser.isPending} />
+                )}
+              </TabsContent>
+
+              {/* All Users Tab */}
+              <TabsContent value="all" className="mt-0">
+                {isLoadingUsers ? (
+                  <div className="flex items-center justify-center py-12">
+                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                  </div>
+                ) : !users || users.length === 0 ? (
+                  <div className="text-center py-12">
+                    <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                    <p className="text-muted-foreground">No users found</p>
+                  </div>
+                ) : (
+                  <UserTable users={users} onActivate={(userId) => activateUser.mutate(userId)} onBan={(userId) => banUser.mutate(userId)} isLoading={activateUser.isPending || banUser.isPending} />
+                )}
+              </TabsContent>
             </CardContent>
           </Tabs>
         </Card>
@@ -173,7 +252,7 @@ function UserTable({ users, onActivate, onBan, isLoading }: UserTableProps) {
     <div className="rounded-lg border overflow-hidden">
       <Table>
         <TableHeader>
-          <TableRow className="bg-muted/50">
+          <TableRow>
             <TableHead>User</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Registered</TableHead>

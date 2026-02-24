@@ -5,7 +5,6 @@ import { Database } from '@/integrations/supabase/types';
 
 type AppRole = Database['public']['Enums']['app_role'];
 
-// Admin emails - these emails can access admin panel
 const ADMIN_EMAILS = ['kararkhafaji892@gmail.com', 'kararalkhafaji892@gmail.com'];
 
 interface UserWithRole {
@@ -18,51 +17,49 @@ interface UserWithRole {
   roles: AppRole[];
 }
 
+interface PatientWithDoctor {
+  id: string;
+  name: string;
+  age: number;
+  chief_complaint: string | null;
+  created_at: string;
+  user_id: string | null;
+  doctor_name: string | null;
+}
+
 export function useAdmin() {
   const queryClient = useQueryClient();
 
-  // Check if current user is admin by email or has admin role
   const { data: isAdmin, isLoading: isCheckingAdmin } = useQuery({
     queryKey: ['is-admin'],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return false;
-      
-      // Check if user email matches admin emails
       if (user.email && ADMIN_EMAILS.includes(user.email)) return true;
-      
-      // Also check if user has admin role in database
       const { data: roles } = await supabase
         .from('user_roles')
         .select('role')
         .eq('user_id', user.id)
         .eq('role', 'admin')
         .maybeSingle();
-      
       return !!roles;
     },
   });
 
-  // Fetch all users with their roles
   const { data: users, isLoading: isLoadingUsers } = useQuery({
     queryKey: ['admin-users'],
     queryFn: async () => {
-      // Fetch all profiles
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
         .select('*')
         .order('created_at', { ascending: false });
-
       if (profilesError) throw profilesError;
 
-      // Fetch all roles
       const { data: roles, error: rolesError } = await supabase
         .from('user_roles')
         .select('*');
-
       if (rolesError) throw rolesError;
 
-      // Combine profiles with roles
       const usersWithRoles: UserWithRole[] = (profiles || []).map(profile => ({
         id: profile.id,
         user_id: profile.user_id,
@@ -74,61 +71,77 @@ export function useAdmin() {
           .filter(r => r.user_id === profile.user_id)
           .map(r => r.role),
       }));
-
       return usersWithRoles;
     },
     enabled: isAdmin,
   });
 
-  // Activate user
+  // Fetch ALL patients for admin global case view
+  const { data: allPatients, isLoading: isLoadingAllPatients } = useQuery({
+    queryKey: ['admin-all-patients'],
+    queryFn: async () => {
+      const { data: patients, error } = await supabase
+        .from('patients')
+        .select('id, name, age, chief_complaint, created_at, user_id')
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+
+      // Fetch profiles to map user_id -> doctor name
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('user_id, full_name');
+
+      const profileMap = new Map<string, string>();
+      (profiles || []).forEach(p => profileMap.set(p.user_id, p.full_name));
+
+      const result: PatientWithDoctor[] = (patients || []).map(p => ({
+        ...p,
+        doctor_name: p.user_id ? profileMap.get(p.user_id) || 'Unknown' : 'Unknown',
+      }));
+      return result;
+    },
+    enabled: isAdmin,
+  });
+
   const activateUser = useMutation({
     mutationFn: async (userId: string) => {
       const { error } = await supabase
         .from('profiles')
         .update({ is_activated: true })
         .eq('user_id', userId);
-
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-users'] });
-      toast.success('User activated successfully!', {
-        description: 'The user can now access their private workspace.',
-      });
+      toast.success('User activated successfully!');
     },
     onError: (error: any) => {
       toast.error('Failed to activate user', { description: error.message });
     },
   });
 
-  // Ban/deactivate user
   const banUser = useMutation({
     mutationFn: async (userId: string) => {
       const { error } = await supabase
         .from('profiles')
         .update({ is_activated: false })
         .eq('user_id', userId);
-
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-users'] });
-      toast.success('User banned', {
-        description: 'The user can no longer access the platform.',
-      });
+      toast.success('User banned');
     },
     onError: (error: any) => {
       toast.error('Failed to ban user', { description: error.message });
     },
   });
 
-  // Add role to user
   const addRole = useMutation({
     mutationFn: async ({ userId, role }: { userId: string; role: AppRole }) => {
       const { error } = await supabase
         .from('user_roles')
         .insert({ user_id: userId, role });
-
       if (error) throw error;
     },
     onSuccess: () => {
@@ -144,7 +157,6 @@ export function useAdmin() {
     },
   });
 
-  // Remove role from user
   const removeRole = useMutation({
     mutationFn: async ({ userId, role }: { userId: string; role: AppRole }) => {
       const { error } = await supabase
@@ -152,7 +164,6 @@ export function useAdmin() {
         .delete()
         .eq('user_id', userId)
         .eq('role', role);
-
       if (error) throw error;
     },
     onSuccess: () => {
@@ -175,5 +186,7 @@ export function useAdmin() {
     removeRole,
     pendingUsers: users?.filter(u => !u.is_activated) || [],
     activeUsers: users?.filter(u => u.is_activated) || [],
+    allPatients: allPatients || [],
+    isLoadingAllPatients,
   };
 }
