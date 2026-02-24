@@ -47,11 +47,16 @@ export default function AuthPage() {
       return;
     }
 
-    // Check for existing session
+    // Check for existing session with timeout fallback
+    const sessionTimeout = setTimeout(() => setCheckingSession(false), 3000);
     supabase.auth.getSession().then(async ({ data: { session } }) => {
+      clearTimeout(sessionTimeout);
       if (session) {
         await redirectIfAuthenticated(session.user.id);
       }
+      setCheckingSession(false);
+    }).catch(() => {
+      clearTimeout(sessionTimeout);
       setCheckingSession(false);
     });
 

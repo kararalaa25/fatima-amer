@@ -31,14 +31,17 @@ export function useAuth() {
       return;
     }
 
+    // Safety timeout to prevent infinite loading
+    const loadingTimeout = setTimeout(() => setLoading(false), 5000);
+
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        clearTimeout(loadingTimeout);
         setSession(session);
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          // Fetch profile data
           const { data: profileData } = await supabase
             .from('profiles')
             .select('*')
@@ -56,6 +59,7 @@ export function useAuth() {
 
     // THEN check for existing session
     supabase.auth.getSession().then(async ({ data: { session } }) => {
+      clearTimeout(loadingTimeout);
       setSession(session);
       setUser(session?.user ?? null);
       
@@ -70,9 +74,15 @@ export function useAuth() {
       }
       
       setLoading(false);
+    }).catch(() => {
+      clearTimeout(loadingTimeout);
+      setLoading(false);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      clearTimeout(loadingTimeout);
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signOut = async () => {
