@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { toast } from 'sonner';
 import { Loader2, Mail, Lock, User, Shield, Eye, EyeOff, Info, Stethoscope, Clock, CheckCircle } from 'lucide-react';
 
@@ -23,6 +24,8 @@ export default function AuthPage() {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
 
   useEffect(() => {
     // Check for preview bypass
@@ -120,6 +123,29 @@ export default function AuthPage() {
       }
     } catch (error: any) {
       toast.error('Failed to check status', { description: error.message });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!resetEmail) {
+      toast.error('Please enter your email address');
+      return;
+    }
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      if (error) throw error;
+      toast.success('Password reset email sent!', {
+        description: 'Check your inbox for the reset link.',
+      });
+      setShowForgotPassword(false);
+    } catch (error: any) {
+      toast.error('Failed to send reset email', { description: error.message });
     } finally {
       setLoading(false);
     }
@@ -386,7 +412,18 @@ export default function AuthPage() {
                     <Eye className="h-4 w-4" />
                   )}
                 </button>
-              </div>
+            </div>
+
+            {/* Forgot Password Link */}
+            {isLogin && (
+              <button
+                type="button"
+                onClick={() => setShowForgotPassword(true)}
+                className="text-xs text-primary hover:underline"
+              >
+                Forgot your password?
+              </button>
+            )}
             </div>
 
             {/* Private Workspace Disclaimer - Only for Registration */}
@@ -457,6 +494,45 @@ export default function AuthPage() {
           By continuing, you agree to our Terms of Service and Privacy Policy
         </p>
       </div>
+
+      {/* Forgot Password Dialog */}
+      <Dialog open={showForgotPassword} onOpenChange={setShowForgotPassword}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Reset Password</DialogTitle>
+            <DialogDescription>
+              Enter your email and we'll send you a link to reset your password.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleForgotPassword} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="resetEmail">Email</Label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="resetEmail"
+                  type="email"
+                  placeholder="doctor@clinic.com"
+                  value={resetEmail}
+                  onChange={(e) => setResetEmail(e.target.value)}
+                  className="pl-10"
+                  disabled={loading}
+                />
+              </div>
+            </div>
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Sending...
+                </>
+              ) : (
+                'Send Reset Link'
+              )}
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
