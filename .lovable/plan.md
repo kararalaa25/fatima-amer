@@ -1,107 +1,134 @@
 
 
-# UI/UX Redesign: From Glassmorphism to Flat/Material Design
+# Dark Mode Redesign + Admin Global Case View
 
 ## Overview
-Complete visual overhaul of Ortho Smart Suite, replacing all glassmorphism effects (blurs, transparency, animated gradients) with a clean, flat, clinical design system. This will dramatically improve rendering performance and provide a professional medical look.
+Complete visual overhaul to a dark mode aesthetic with purple (#7c3aed) primary accents, plus an admin "Global Case View" showing all users' cases. Authentication improvements for login reliability.
 
-## Color Palette
+---
 
-| Role | Color | Hex |
-|------|-------|-----|
-| Primary (Medical Blue) | Blue | #005EB8 |
-| Accent (CTA Orange) | Orange | #F58220 |
-| Background | Light Gray | #F8FAFC |
-| Card/Surface | White | #FFFFFF |
-| Text Primary | Dark Gray | #1E293B |
-| Text Secondary | Medium Gray | #64748B |
-| Border | Light Border | #E2E8F0 |
-| Success | Green | #16A34A |
-| Destructive | Red | #DC2626 |
+## 1. Theme Overhaul (src/index.css)
 
-## Changes by File
+Replace the current light-first palette with a dark-first design:
 
-### 1. `src/index.css` -- Full rewrite of theme
-- Remove all `mesh-gradient-bg` styles (animated radial gradients, `::before`, `::after` pseudo-elements, `mesh-flow` keyframes)
-- Remove all `.glass-card`, `.glass-card-solid`, `.glass-nav`, `.glass-input`, `.glass-image-card`, `.fab-glass` utility classes
-- Remove film grain texture overlay
-- Replace CSS variables with solid, opaque colors using the new palette
-- Set `--radius` to `0.5rem` (8px) for sharper corners
-- Remove `--glass-bg`, `--glass-border`, `--glass-highlight`, `--glass-blur` tokens
-- Replace with simple flat utility classes:
-  - `.flat-card` -- solid white bg, 1px border, small shadow
-  - `.flat-nav` -- solid white bg, bottom border
-  - `.flat-input` -- solid white bg, solid border
+| Token | Light Value | Dark Value (default) |
+|-------|-------------|---------------------|
+| --background | 240 6% 6% (#0b0b0e) | same |
+| --foreground | 0 0% 95% | same |
+| --card | 240 5% 10% | same |
+| --primary | 263 70% 58% (#7c3aed) | same |
+| --accent | 263 70% 58% (purple, same as primary) | same |
+| --border | 240 5% 18% | same |
+| --muted | 240 5% 15% | same |
+| --muted-foreground | 240 5% 55% | same |
 
-### 2. `tailwind.config.ts`
-- Remove custom keyframes (`float`, `pulse-soft`) and their animations
-- Remove `glass` shadow
-- Simplify border-radius (remove `3xl`, `4xl`)
-- Update primary/accent color references
+- The app will be dark-only (remove .dark block, make root dark)
+- Remove the light mode variables entirely
+- Update sidebar variables to match dark theme
+- Keep flat-card, flat-nav, flat-input utilities but with dark colors
 
-### 3. `src/pages/Auth.tsx` -- Login page
-- Replace `mesh-gradient-bg` with solid `bg-[#F8FAFC]`
-- Replace `glass-card-solid` on auth card with solid white card, `border border-[#E2E8F0] shadow-sm rounded-lg`
-- Replace `glass-input` on inputs with `border border-[#CBD5E1] bg-white`
-- Change Sign In button to orange CTA (`bg-[#F58220]`)
-- Replace `Stethoscope` logo circle: remove `backdrop-blur-sm`, use solid `bg-[#005EB8]` with white icon
-- Remove loading spinner's glass card wrapper, use simple centered spinner
-- Replace tab toggle `bg-muted/50` with `bg-gray-100`
+## 2. Auth Page (src/pages/Auth.tsx)
 
-### 4. `src/components/PatientDashboard.tsx` -- Main dashboard
-- Replace `mesh-gradient-bg` with `bg-[#F8FAFC]`
-- Replace `glass-nav` header with solid white header + bottom border
-- Replace all `glass-card` on stat cards with solid white cards + border + shadow-sm
-- Replace `glass-card-solid` icon containers with solid colored backgrounds
-- Replace `glass-input` on search with solid bordered input
-- Replace `fab-glass` FAB with solid blue button + simple shadow
-- Remove `transition-smooth` and `hover:scale-[1.02]` on cards
+- Update background to solid `bg-[#0b0b0e]`
+- Auth card: dark card background (`bg-[#14141a]`), subtle border
+- Tab toggle: dark muted background
+- Sign In button: purple (`bg-[#7c3aed]`)
+- Inputs: dark backgrounds with visible borders
+- "Forgot your password?" link stays visible
+- Keep all existing logic (forgot password, signup, demo bypass)
 
-### 5. `src/components/ThemeToggle.tsx`
-- Replace `glass-card` with simple `border bg-white hover:bg-gray-50`
+## 3. Dashboard (src/components/PatientDashboard.tsx)
 
-### 6. `src/components/ProtectedRoute.tsx`
-- Replace `mesh-gradient-bg` and `glass-card` with solid bg and card
+- Dark header bar with "System Operational" green dot indicator
+- Purple "+ New Case" button in header (replaces floating FAB)
+- Stats cards: dark card backgrounds
+- Patient table: dark rows with hover states
+- Keep all existing data/logic
 
-### 7. `src/components/PageTransition.tsx`
-- Simplify transition: reduce duration to 100ms, remove `scale` transform, keep only a fast opacity fade (or remove transition entirely for instant navigation)
+## 4. Case Sheet Form (src/components/case-sheet/CaseSheetForm.tsx)
 
-### 8. `src/pages/AdminDashboard.tsx`
-- Replace all `mesh-gradient-bg`, `glass-card`, `glass-nav` instances with flat equivalents
+- Left sidebar: deep dark (#0b0b0e)
+- Active step: purple background (#7c3aed)
+- Main content area: slightly lighter dark (#14141a)
+- Footer bar: dark with purple "Next Step" button
+- Keep all existing steps and form logic unchanged
 
-### 9. `src/pages/EditPatient.tsx`
-- Replace `mesh-gradient-bg`, `glass-nav`, `glass-card`, `glass-card-solid` with flat equivalents
+## 5. Admin Dashboard - Global Case View (src/pages/AdminDashboard.tsx)
 
-### 10. `src/pages/CaseManagement.tsx`
-- Replace `mesh-gradient-bg`, `glass-nav`, `glass-card` with flat equivalents
+Add a new "All Cases" tab that fetches ALL patients across all users:
 
-### 11. `src/components/case-management/SessionImageCard.tsx`
-- Replace `glass-card-solid` button styles with simple bordered buttons
+- New query in useAdmin hook: `useAllPatients()` that fetches from patients table (admin RLS allows viewing all)
+- Display table with columns: Patient Name, Age, Doctor (from profiles join), Chief Complaint, Created Date
+- Add a "User Filter" dropdown to filter by doctor
+- Keep existing user management tabs
 
-### 12. `src/components/case-management/ImageCropEditor.tsx`
-- Replace `glass-card` on dialog with solid card
-- Replace `glass-card-solid` preview badge with solid badge
+### Database changes needed:
+- Add a PERMISSIVE SELECT policy on `patients` table for admins: `has_role(auth.uid(), 'admin')` so admins can see all patients
+- Same for `profiles` table (already has admin SELECT policy)
 
-### 13. `src/components/case-management/CaseManagementDashboard.tsx`
-- Replace any glass classes with flat equivalents
+## 6. RLS Policy Update (Database Migration)
 
-### 14. `src/components/case-sheet/CaseSheetForm.tsx` and related steps
-- Replace any glass/mesh classes used in the case sheet wizard
+```sql
+-- Allow admins to see ALL patients
+CREATE POLICY "Admins can view all patients"
+ON public.patients FOR SELECT
+TO authenticated
+USING (has_role(auth.uid(), 'admin'::app_role));
 
-### 15. `src/components/analysis/ImageAnalysisDialog.tsx`
-- Replace glass classes
+-- Allow admins to see ALL treatment_plans
+CREATE POLICY "Admins can view all treatment_plans"
+ON public.treatment_plans FOR SELECT
+TO authenticated
+USING (has_role(auth.uid(), 'admin'::app_role));
 
-### 16. Dark mode adjustments
-- Update `.dark` variables in `index.css` to use solid dark colors (no transparency)
-- Remove `.dark .mesh-gradient-bg`, `.dark .glass-card-solid`, `.dark .glass-nav` overrides
+-- Allow admins to see ALL sessions
+CREATE POLICY "Admins can view all sessions"
+ON public.sessions FOR SELECT
+TO authenticated
+USING (has_role(auth.uid(), 'admin'::app_role));
+```
 
-## Performance Gains
-- Eliminating `backdrop-filter: blur(24px)` removes the heaviest GPU operation on every glass element
-- Removing animated mesh gradients with multiple radial gradients removes continuous repainting
-- Removing film grain SVG texture overlay eliminates an extra compositing layer
-- Reducing transition durations from 200-300ms to 100ms or instant makes navigation feel snappy
-- Removing `hover:scale` transforms prevents layout thrashing
+## 7. Login Loop Fix (src/pages/Auth.tsx)
 
-## Approach
-Files will be edited in parallel where possible. The CSS file (`index.css`) and config (`tailwind.config.ts`) will be updated first as they define the design system, then all component files will be updated to use the new flat classes.
+- After successful `signInWithPassword`, use `window.location.href` instead of `navigate()` for a hard redirect to force full state refresh
+- This prevents the "Signing in..." stuck state
+
+## 8. Remove Theme Toggle
+
+- Remove `ThemeToggle` component usage since app is dark-only
+- Remove `useTheme` hook references
+
+## 9. Other Pages
+
+Update all remaining pages to work with dark theme:
+- `AdminDashboard.tsx` - dark backgrounds
+- `EditPatient.tsx` - dark form backgrounds
+- `CaseManagement.tsx` - dark theme
+- `ResetPassword.tsx` - dark auth card
+- `ProtectedRoute.tsx` - dark loading screen
+- `PatientProfile.tsx` - dark profile cards
+
+## 10. Admin Credentials Note
+
+Cannot directly set passwords in the database (auth schema is managed by the platform). The admin should use the "Forgot Password" flow to reset to their desired password. The admin role for `kararalkhafaji892@gmail.com` is already confirmed in the database.
+
+---
+
+## Files to modify:
+1. `src/index.css` - Dark theme variables
+2. `tailwind.config.ts` - Remove light-mode related config
+3. `src/pages/Auth.tsx` - Dark styling + hard redirect fix
+4. `src/components/PatientDashboard.tsx` - Dark dashboard + system status + purple New Case button
+5. `src/components/case-sheet/CaseSheetForm.tsx` - Dark sidebar styling
+6. `src/pages/AdminDashboard.tsx` - Add Global Case View tab
+7. `src/hooks/useAdmin.ts` - Add `useAllPatients` query for admin
+8. `src/components/ProtectedRoute.tsx` - Dark loading
+9. `src/pages/ResetPassword.tsx` - Dark styling
+10. `src/pages/EditPatient.tsx` - Dark styling
+11. `src/pages/CaseManagement.tsx` - Dark styling
+12. `src/hooks/useTheme.ts` - Simplify (always dark)
+13. Database migration - Admin RLS policies for patients, treatment_plans, sessions
+
+## Content Preservation
+All form fields, data structures, clinical steps, and diagnosis logic remain completely unchanged. Only visual styling is updated.
 
