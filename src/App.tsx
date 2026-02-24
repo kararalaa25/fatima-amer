@@ -13,6 +13,7 @@ import EditPatientPage from "./pages/EditPatient";
 import CaseManagement from "./pages/CaseManagement";
 import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
+import ResetPassword from "./pages/ResetPassword";
 
 const queryClient = new QueryClient();
 
@@ -23,6 +24,7 @@ function AppRoutes() {
     <PageTransition key={location.pathname}>
       <Routes location={location}>
         <Route path="/auth" element={<Auth />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         <Route
           path="/"
           element={
