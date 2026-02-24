@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { toast } from 'sonner';
-import { Loader2, Mail, Lock, User, Shield, Eye, EyeOff, Info, Stethoscope, Clock, CheckCircle } from 'lucide-react';
+import { Loader2, Mail, Lock, User, Shield, Eye, EyeOff, Info, Stethoscope } from 'lucide-react';
 
 const PREVIEW_BYPASS_KEY = 'ortho_preview_bypass';
 
@@ -17,8 +17,6 @@ export default function AuthPage() {
   const [loading, setLoading] = useState(false);
   const [checkingSession, setCheckingSession] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
-  const [showPendingScreen, setShowPendingScreen] = useState(false);
-  const [pendingUserName, setPendingUserName] = useState('');
 
   // Form fields
   const [fullName, setFullName] = useState('');
@@ -26,6 +24,20 @@ export default function AuthPage() {
   const [password, setPassword] = useState('');
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [resetEmail, setResetEmail] = useState('');
+
+  // Helper to check session and redirect
+  const redirectIfAuthenticated = async (userId: string) => {
+    const [profileResult, rolesResult] = await Promise.all([
+      supabase.from('profiles').select('full_name').eq('user_id', userId).maybeSingle(),
+      supabase.from('user_roles').select('role').eq('user_id', userId),
+    ]);
+    const isAdmin = rolesResult.data?.some(r => r.role === 'admin');
+    if (profileResult.data) {
+      navigate(isAdmin ? '/admin' : '/');
+      return true;
+    }
+    return false;
+  };
 
   useEffect(() => {
     // Check for preview bypass
@@ -38,42 +50,16 @@ export default function AuthPage() {
     // Check for existing session
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (session) {
-        // Check if user email is verified and if they're activated
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('is_activated, full_name')
-          .eq('user_id', session.user.id)
-          .maybeSingle();
-
-        if (profile?.is_activated) {
-          navigate('/');
-        } else if (profile) {
-          // User exists but not activated - show pending screen
-          setPendingUserName(profile.full_name);
-          setShowPendingScreen(true);
-        }
+        await redirectIfAuthenticated(session.user.id);
       }
       setCheckingSession(false);
     });
 
-    // Listen for auth changes
+    // Listen for auth changes (e.g. email verification callback)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (event === 'SIGNED_IN' && session) {
-          // Check activation status
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('is_activated, full_name')
-            .eq('user_id', session.user.id)
-            .maybeSingle();
-
-          if (profile?.is_activated) {
-            navigate('/');
-          } else if (profile) {
-            // User verified email but not activated
-            setPendingUserName(profile.full_name);
-            setShowPendingScreen(true);
-          }
+          await redirectIfAuthenticated(session.user.id);
         }
       }
     );
@@ -91,41 +77,6 @@ export default function AuthPage() {
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
-    setShowPendingScreen(false);
-    setPendingUserName('');
-  };
-
-  const handleRefreshStatus = async () => {
-    setLoading(true);
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        toast.error('Session expired. Please sign in again.');
-        setShowPendingScreen(false);
-        return;
-      }
-
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('is_activated, full_name')
-        .eq('user_id', session.user.id)
-        .maybeSingle();
-
-      if (profile?.is_activated) {
-        toast.success(`Welcome, ${profile.full_name}!`, {
-          description: 'Your workspace has been activated.',
-        });
-        navigate('/');
-      } else {
-        toast.info('Still waiting for activation', {
-          description: 'Please wait for admin approval.',
-        });
-      }
-    } catch (error: any) {
-      toast.error('Failed to check status', { description: error.message });
-    } finally {
-      setLoading(false);
-    }
   };
 
   const handleForgotPassword = async (e: React.FormEvent) => {
@@ -206,36 +157,21 @@ export default function AuthPage() {
 
       if (error) throw error;
 
-      // Check if user is activated and check admin role in parallel
+      // Check profile and admin role in parallel
       const [profileResult, rolesResult] = await Promise.all([
-        supabase
-          .from('profiles')
-          .select('is_activated, full_name')
-          .eq('user_id', data.user.id)
-          .maybeSingle(),
-        supabase
-          .from('user_roles')
-          .select('role')
-          .eq('user_id', data.user.id),
+        supabase.from('profiles').select('full_name').eq('user_id', data.user.id).maybeSingle(),
+        supabase.from('user_roles').select('role').eq('user_id', data.user.id),
       ]);
 
       const profile = profileResult.data;
       const isAdmin = rolesResult.data?.some(r => r.role === 'admin');
 
-      if (profile?.is_activated) {
+      if (profile) {
         toast.success(`Welcome back, ${profile.full_name}!`);
-        // Auto-redirect admins to admin dashboard
         navigate(isAdmin ? '/admin' : '/');
-      } else if (profile) {
-        // Show pending activation screen
-        setPendingUserName(profile.full_name || 'User');
-        setShowPendingScreen(true);
       } else {
-        // Profile not found - edge case, sign out and show error
-        await supabase.auth.signOut();
-        toast.error('Account setup incomplete', {
-          description: 'Please contact support or try registering again.',
-        });
+        // Profile not created yet (edge case) — redirect to home, trigger will create it
+        navigate('/');
       }
     } catch (error: any) {
       toast.error('Login failed', {
@@ -252,68 +188,6 @@ export default function AuthPage() {
         <div className="glass-card p-8">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
-      </div>
-    );
-  }
-
-  // Pending Activation Screen
-  if (showPendingScreen) {
-    return (
-      <div className="min-h-screen mesh-gradient-bg flex items-center justify-center p-4">
-        <Card className="max-w-md w-full glass-card-solid">
-          <CardHeader className="text-center">
-            <div className="mx-auto mb-4 h-20 w-20 rounded-full bg-amber-500/10 flex items-center justify-center">
-              <Clock className="h-10 w-10 text-amber-600" />
-            </div>
-            <CardTitle className="text-2xl">Email Verified</CardTitle>
-            <CardDescription className="text-base mt-2">
-              Please wait for admin activation
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="flex items-start gap-3 p-4 rounded-lg bg-primary/5 border border-primary/10">
-              <CheckCircle className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
-              <div>
-                <p className="font-medium text-foreground">Hello, {pendingUserName}!</p>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Your email has been verified successfully. Our admin will review and activate your private clinical workspace within 24 hours.
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-3 p-4 rounded-lg bg-muted/50 border border-border">
-              <Info className="h-5 w-5 text-muted-foreground mt-0.5 flex-shrink-0" />
-              <div>
-                <p className="text-sm text-muted-foreground">
-                  Once activated, you'll have access to your encrypted, private workspace where only you can see your patient data.
-                </p>
-              </div>
-            </div>
-
-            <div className="space-y-3">
-              <Button
-                variant="default"
-                className="w-full"
-                onClick={handleRefreshStatus}
-                disabled={loading}
-              >
-                {loading ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  <CheckCircle className="mr-2 h-4 w-4" />
-                )}
-                Refresh Status
-              </Button>
-              <Button
-                variant="ghost"
-                className="w-full text-muted-foreground"
-                onClick={handleSignOut}
-              >
-                Sign Out
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
       </div>
     );
   }
@@ -475,7 +349,7 @@ export default function AuthPage() {
             {/* Admin Activation Notice - Only for Registration */}
             {!isLogin && (
               <p className="text-xs text-center text-muted-foreground">
-                After verifying your email, our admin will activate your private suite within 24 hours.
+                After verifying your email, you'll have instant access to your private workspace.
               </p>
             )}
           </form>
