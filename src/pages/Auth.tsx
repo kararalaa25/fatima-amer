@@ -150,9 +150,10 @@ export default function AuthPage() {
 
       if (profile) {
         toast.success(`Welcome back, ${profile.full_name}!`);
-        navigate(isAdmin ? '/admin' : '/');
+        // Hard redirect to prevent "Signing in..." stuck state
+        window.location.href = isAdmin ? '/admin' : '/';
       } else {
-        navigate('/');
+        window.location.href = '/';
       }
     } catch (error: any) {
       toast.error('Login failed', { description: error.message });

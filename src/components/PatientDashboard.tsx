@@ -56,7 +56,17 @@ export function PatientDashboard() {
                 <p className="text-sm text-muted-foreground">Clinical Management</p>
               </div>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
+              {/* System Operational Indicator */}
+              <div className="hidden sm:flex items-center gap-2 text-sm text-muted-foreground">
+                <span className="h-2 w-2 rounded-full bg-success" />
+                System Operational
+              </div>
+              {/* New Case button */}
+              <Button onClick={() => navigate('/patient/new')} className="gap-2">
+                <Plus className="h-4 w-4" />
+                New Case
+              </Button>
               {isAdmin && (
                 <Button
                   variant="outline"
@@ -199,14 +209,6 @@ export function PatientDashboard() {
         </Card>
       </main>
 
-      {/* Floating Add Button */}
-      <button
-        onClick={() => navigate('/patient/new')}
-        className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg hover:shadow-xl hover:bg-primary/90 flex items-center justify-center transition-shadow"
-        aria-label="Add new patient"
-      >
-        <Plus className="h-6 w-6" />
-      </button>
     </div>
   );
 }

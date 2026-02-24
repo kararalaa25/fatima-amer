@@ -1,6 +1,6 @@
 import { PageTransition } from '@/components/PageTransition';
 import { CaseManagementDashboard } from '@/components/case-management/CaseManagementDashboard';
-import { ThemeToggle } from '@/components/ThemeToggle';
+
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, FolderOpen } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -40,7 +40,7 @@ export default function CaseManagement() {
                   <p className="text-sm text-muted-foreground">Multi-image upload & assessment</p>
                 </div>
               </div>
-              <ThemeToggle />
+              {/* Theme toggle removed - dark only */}
             </div>
           </div>
         </header>
