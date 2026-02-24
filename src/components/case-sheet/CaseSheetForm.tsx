@@ -5,7 +5,7 @@ import { useUpdateToothStatus } from '@/hooks/useDentalChart';
 import { useUpsertTreatmentPlan } from '@/hooks/useTreatmentPlan';
 import { useCreateInitialPhoto } from '@/hooks/useInitialPhotos';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { BasicInfoStep } from './BasicInfoStep';
 import { ClinicalRelationsStep } from './ClinicalRelationsStep';
@@ -15,23 +15,33 @@ import { TreatmentPlanStep } from './TreatmentPlanStep';
 import { MediaUploadStep, UploadedImage } from './MediaUploadStep';
 import { AITreatmentPlanStep } from './AITreatmentPlanStep';
 import { CephalometricStep } from './CephalometricStep';
+import { SoftTissueStep } from './SoftTissueStep';
 import { PalmerNotationChart } from '@/components/dental-chart/PalmerNotationChart';
-import { ThemeToggle } from '@/components/ThemeToggle';
 import { ToothStatus } from '@/types/patient';
-import { ArrowLeft, ArrowRight, Save, Stethoscope, Check, Brain } from 'lucide-react';
+import {
+  ArrowLeft,
+  ArrowRight,
+  Save,
+  User,
+  Activity,
+  Grid3X3,
+  Circle,
+  Tag,
+  Image,
+  Sparkles,
+  ChevronRight,
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 
-// Updated 8-step workflow
 const STEPS = [
-  { id: 1, title: 'Basic Info', icon: '📋' },
-  { id: 2, title: 'Clinical', icon: '🔬' },
-  { id: 3, title: 'Extra-Oral', icon: '👤' },
-  { id: 4, title: 'Dental Chart', icon: '🦷' },
-  { id: 5, title: 'Segments', icon: '📐' },
-  { id: 6, title: 'Cephalometric', icon: '📊' },
-  { id: 7, title: 'Media', icon: '📷' },
-  { id: 8, title: 'AI Treatment', icon: '🧠' },
+  { id: 1, title: 'Basic Info', icon: User },
+  { id: 2, title: 'Clinical Relations', icon: Activity },
+  { id: 3, title: 'Dental Chart', icon: Grid3X3 },
+  { id: 4, title: 'Soft Tissue', icon: Circle },
+  { id: 5, title: 'Segment Analysis', icon: Tag },
+  { id: 6, title: 'Media', icon: Image },
+  { id: 7, title: 'AI Plan', icon: Sparkles },
 ];
 
 export function CaseSheetForm() {
@@ -44,9 +54,8 @@ export function CaseSheetForm() {
 
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isTransitioning, setIsTransitioning] = useState(false);
 
-  // Form state - Basic Info (expanded)
+  // Form state - Basic Info
   const [basicData, setBasicData] = useState({
     name: '',
     age: '' as number | '',
@@ -57,7 +66,7 @@ export function CaseSheetForm() {
     current_medications: [] as string[],
   });
 
-  // Clinical Relations (enhanced)
+  // Clinical Relations
   const [clinicalData, setClinicalData] = useState({
     ap_relation: '',
     horizontal_relation: '',
@@ -76,7 +85,7 @@ export function CaseSheetForm() {
     midline_discrepancy: '' as number | '',
   });
 
-  // Extra-Oral Examination (new)
+  // Extra-Oral / Soft Tissue
   const [extraOralData, setExtraOralData] = useState({
     lips: '',
     habits: '',
@@ -100,7 +109,7 @@ export function CaseSheetForm() {
     lower_space_required: '' as number | '',
   });
 
-  // Cephalometric Analysis (new)
+  // Cephalometric Analysis
   const [cephData, setCephData] = useState({
     ceph_sna: '' as number | '',
     ceph_snb: '' as number | '',
@@ -153,15 +162,18 @@ export function CaseSheetForm() {
     setDentalChart((prev) => ({ ...prev, [key]: newStatus }));
   };
 
-  const handleAIPlanApply = useCallback((aiPlan: {
-    primary_goals: string;
-    appliance_types: string[];
-    extraction_plan: string;
-    estimated_duration: string;
-    special_instructions: string;
-  }) => {
-    setTreatmentData(aiPlan);
-  }, []);
+  const handleAIPlanApply = useCallback(
+    (aiPlan: {
+      primary_goals: string;
+      appliance_types: string[];
+      extraction_plan: string;
+      estimated_duration: string;
+      special_instructions: string;
+    }) => {
+      setTreatmentData(aiPlan);
+    },
+    []
+  );
 
   const handleFinalizePlan = () => {
     setAiPlanFinalized(true);
@@ -171,17 +183,11 @@ export function CaseSheetForm() {
     });
   };
 
-  // Smooth step transition
   const changeStep = (newStep: number) => {
-    if (newStep === currentStep || newStep < 1 || newStep > STEPS.length) return;
-    setIsTransitioning(true);
-    setTimeout(() => {
-      setCurrentStep(newStep);
-      setIsTransitioning(false);
-    }, 100);
+    if (newStep < 1 || newStep > STEPS.length) return;
+    setCurrentStep(newStep);
   };
 
-  // Combine all form data for AI analysis
   const getAllFormData = () => ({
     ...basicData,
     ...clinicalData,
@@ -201,7 +207,6 @@ export function CaseSheetForm() {
       return;
     }
 
-    // Check for images without types
     const missingTypes = uploadedImages.filter((img) => !img.type);
     if (missingTypes.length > 0) {
       toast({
@@ -209,14 +214,13 @@ export function CaseSheetForm() {
         description: 'Please assign a type to all uploaded images',
         variant: 'destructive',
       });
-      changeStep(7);
+      changeStep(6);
       return;
     }
 
     setIsSubmitting(true);
 
     try {
-      // Create patient with all data
       const patientPayload = {
         name: basicData.name,
         age: basicData.age as number,
@@ -238,15 +242,22 @@ export function CaseSheetForm() {
         lower_buccal: (segmentData.lower_buccal as 'Aligned' | 'Crowded' | 'Spacing') || undefined,
         upper_labial: (segmentData.upper_labial as 'Aligned' | 'Crowded' | 'Spacing') || undefined,
         lower_labial: (segmentData.lower_labial as 'Aligned' | 'Crowded' | 'Spacing') || undefined,
-        upper_space_available: segmentData.upper_space_available ? Number(segmentData.upper_space_available) : undefined,
-        upper_space_required: segmentData.upper_space_required ? Number(segmentData.upper_space_required) : undefined,
-        lower_space_available: segmentData.lower_space_available ? Number(segmentData.lower_space_available) : undefined,
-        lower_space_required: segmentData.lower_space_required ? Number(segmentData.lower_space_required) : undefined,
+        upper_space_available: segmentData.upper_space_available
+          ? Number(segmentData.upper_space_available)
+          : undefined,
+        upper_space_required: segmentData.upper_space_required
+          ? Number(segmentData.upper_space_required)
+          : undefined,
+        lower_space_available: segmentData.lower_space_available
+          ? Number(segmentData.lower_space_available)
+          : undefined,
+        lower_space_required: segmentData.lower_space_required
+          ? Number(segmentData.lower_space_required)
+          : undefined,
       };
 
       const patient = await createPatient.mutateAsync(patientPayload);
 
-      // Save dental chart
       for (const [key, status] of Object.entries(dentalChart)) {
         const [quadrant, toothNumber] = key.split('-').map(Number);
         await updateToothStatus.mutateAsync({
@@ -257,7 +268,6 @@ export function CaseSheetForm() {
         });
       }
 
-      // Save treatment plan if any data exists
       if (
         treatmentData.primary_goals ||
         treatmentData.appliance_types.length > 0 ||
@@ -271,7 +281,6 @@ export function CaseSheetForm() {
         });
       }
 
-      // Upload images to storage and save references
       for (const image of uploadedImages) {
         const fileExt = image.file.name.split('.').pop();
         const filePath = `${patient.id}/${crypto.randomUUID()}.${fileExt}`;
@@ -285,9 +294,7 @@ export function CaseSheetForm() {
           continue;
         }
 
-        const { data: urlData } = supabase.storage
-          .from('patient-images')
-          .getPublicUrl(filePath);
+        const { data: urlData } = supabase.storage.from('patient-images').getPublicUrl(filePath);
 
         await createInitialPhoto.mutateAsync({
           patient_id: patient.id,
@@ -315,185 +322,137 @@ export function CaseSheetForm() {
   };
 
   const renderStep = () => {
-    const stepContent = (() => {
-      switch (currentStep) {
-        case 1:
-          return <BasicInfoStep data={basicData} onChange={handleBasicChange} />;
-        case 2:
-          return <ClinicalRelationsStep data={clinicalData} onChange={handleClinicalChange} />;
-        case 3:
-          return <ExtraOralStep data={extraOralData} onChange={handleExtraOralChange} />;
-        case 4:
-          return <PalmerNotationChart teeth={dentalChart} onToothClick={handleToothClick} />;
-        case 5:
-          return <SegmentAnalysisStep data={segmentData} onChange={handleSegmentChange} />;
-        case 6:
-          return <CephalometricStep data={cephData} onChange={handleCephChange} />;
-        case 7:
-          return <MediaUploadStep images={uploadedImages} onImagesChange={setUploadedImages} />;
-        case 8:
-          return (
-            <AITreatmentPlanStep
-              clinicalData={getAllFormData()}
-              dentalChart={dentalChart}
-              uploadedImages={uploadedImages}
-              treatmentData={treatmentData}
-              onTreatmentChange={handleTreatmentChange}
-              onApplyAIPlan={handleAIPlanApply}
-              onFinalizePlan={handleFinalizePlan}
-              isFinalized={aiPlanFinalized}
-            />
-          );
-        default:
-          return null;
-      }
-    })();
-
-    return (
-      <div
-        className={cn(
-          'transition-all duration-150 ease-out',
-          isTransitioning ? 'translate-x-4 opacity-0' : 'translate-x-0 opacity-100'
-        )}
-      >
-        {stepContent}
-      </div>
-    );
+    switch (currentStep) {
+      case 1:
+        return <BasicInfoStep data={basicData} onChange={handleBasicChange} />;
+      case 2:
+        return <ClinicalRelationsStep data={clinicalData} onChange={handleClinicalChange} />;
+      case 3:
+        return <PalmerNotationChart teeth={dentalChart} onToothClick={handleToothClick} />;
+      case 4:
+        return <SoftTissueStep data={extraOralData} onChange={handleExtraOralChange} />;
+      case 5:
+        return <SegmentAnalysisStep data={segmentData} onChange={handleSegmentChange} />;
+      case 6:
+        return <MediaUploadStep images={uploadedImages} onImagesChange={setUploadedImages} />;
+      case 7:
+        return (
+          <AITreatmentPlanStep
+            clinicalData={getAllFormData()}
+            dentalChart={dentalChart}
+            uploadedImages={uploadedImages}
+            treatmentData={treatmentData}
+            onTreatmentChange={handleTreatmentChange}
+            onApplyAIPlan={handleAIPlanApply}
+            onFinalizePlan={handleFinalizePlan}
+            isFinalized={aiPlanFinalized}
+          />
+        );
+      default:
+        return null;
+    }
   };
 
-  return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="flat-nav relative z-10">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Button variant="ghost" size="icon" onClick={() => navigate('/')} className="rounded-2xl">
-                <ArrowLeft className="h-5 w-5" />
-              </Button>
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                  <Stethoscope className="h-5 w-5 text-primary" />
-                </div>
-                <div>
-                  <h1 className="text-lg font-bold text-foreground">New Patient Case Sheet</h1>
-                  <p className="text-sm text-muted-foreground font-medium">
-                    Step {currentStep} of {STEPS.length} — {STEPS[currentStep - 1]?.title}
-                  </p>
-                </div>
-              </div>
-            </div>
-            <ThemeToggle />
-          </div>
-        </div>
-      </header>
+  const currentStepData = STEPS[currentStep - 1];
 
-      {/* Sticky Progress Steps with Navigation */}
-      <div className="sticky top-0 z-50 flat-nav">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between py-3">
-            {/* Previous Button */}
+  return (
+    <div className="flex h-screen bg-sidebar text-sidebar-foreground">
+      {/* Left Sidebar */}
+      <aside className="flex w-72 flex-col border-r border-sidebar-border bg-sidebar">
+        {/* Back button + title */}
+        <div className="p-5">
+          <button
+            onClick={() => navigate('/')}
+            className="mb-4 flex items-center gap-2 text-sm text-sidebar-foreground/70 hover:text-sidebar-foreground transition-colors"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to Dashboard
+          </button>
+          <h1 className="text-xl font-bold text-sidebar-foreground">New Case</h1>
+        </div>
+
+        {/* Step Navigation */}
+        <nav className="flex-1 px-3 space-y-1">
+          {STEPS.map((step) => {
+            const Icon = step.icon;
+            const isActive = currentStep === step.id;
+            const isCompleted = currentStep > step.id;
+
+            return (
+              <button
+                key={step.id}
+                onClick={() => changeStep(step.id)}
+                className={cn(
+                  'flex w-full items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium transition-colors',
+                  isActive
+                    ? 'bg-primary text-primary-foreground'
+                    : 'text-sidebar-foreground/60 hover:bg-sidebar-accent/10 hover:text-sidebar-foreground'
+                )}
+              >
+                <Icon className="h-5 w-5 shrink-0" />
+                <span className="flex-1 text-left">{step.title}</span>
+                {isCompleted && (
+                  <span className="h-2 w-2 rounded-full bg-success" />
+                )}
+              </button>
+            );
+          })}
+        </nav>
+      </aside>
+
+      {/* Main Content */}
+      <div className="flex flex-1 flex-col bg-background">
+        {/* Content Header */}
+        <header className="border-b border-border px-8 py-6">
+          <h2 className="text-2xl font-bold text-foreground">{currentStepData?.title}</h2>
+          <p className="text-sm text-muted-foreground mt-1">
+            Step {currentStep} of {STEPS.length}
+          </p>
+          <Separator className="mt-4" />
+        </header>
+
+        {/* Scrollable Content */}
+        <main className="flex-1 overflow-y-auto px-8 py-6">
+          <div className="mx-auto max-w-3xl">{renderStep()}</div>
+        </main>
+
+        {/* Bottom Bar */}
+        <footer className="border-t border-border bg-card px-8 py-4">
+          <div className="mx-auto flex max-w-3xl items-center justify-between">
             <Button
               variant="ghost"
-              size="sm"
-              onClick={() => changeStep(currentStep - 1)}
-              disabled={currentStep === 1}
-              className="shrink-0 rounded-xl font-semibold"
+              onClick={() => navigate('/')}
+              className="text-muted-foreground"
             >
-              <ArrowLeft className="mr-1 h-4 w-4" />
-              <span className="hidden sm:inline">Previous</span>
+              Cancel
             </Button>
 
-            {/* Step Indicators */}
-            <div className="flex overflow-x-auto px-2 scrollbar-hide">
-              {STEPS.map((step, index) => (
-                <button
-                  key={step.id}
-                  onClick={() => changeStep(step.id)}
-                  className={cn(
-                    'flex min-w-max items-center gap-1 px-2 py-1 text-sm transition-all duration-150 sm:gap-2 sm:px-3',
-                    currentStep === step.id
-                      ? 'font-bold text-primary scale-105'
-                      : 'text-muted-foreground hover:text-foreground'
-                  )}
+            <div className="flex items-center gap-3">
+              {currentStep > 1 && (
+                <Button
+                  variant="outline"
+                  onClick={() => changeStep(currentStep - 1)}
                 >
-                  <span
-                    className={cn(
-                      'flex h-8 w-8 items-center justify-center rounded-xl text-xs font-bold transition-all duration-150',
-                      currentStep === step.id
-                        ? 'bg-primary text-primary-foreground shadow-md'
-                        : currentStep > step.id
-                        ? 'bg-success text-success-foreground'
-                        : 'bg-muted text-muted-foreground'
-                    )}
-                  >
-                    {currentStep > step.id ? (
-                      <Check className="h-4 w-4" />
-                    ) : step.id === 8 ? (
-                      <Brain className="h-4 w-4" />
-                    ) : (
-                      step.id
-                    )}
-                  </span>
-                  <span className="hidden lg:inline font-medium">{step.title}</span>
-                  {index < STEPS.length - 1 && (
-                    <ArrowRight className="ml-1 h-3 w-3 text-muted-foreground/50 sm:ml-2 sm:h-4 sm:w-4" />
-                  )}
-                </button>
-              ))}
+                  <ArrowLeft className="mr-2 h-4 w-4" />
+                  Previous
+                </Button>
+              )}
+
+              {currentStep < STEPS.length ? (
+                <Button onClick={() => changeStep(currentStep + 1)}>
+                  Next Step
+                  <ChevronRight className="ml-2 h-4 w-4" />
+                </Button>
+              ) : (
+                <Button onClick={handleSubmit} disabled={isSubmitting}>
+                  <Save className="mr-2 h-4 w-4" />
+                  {isSubmitting ? 'Saving...' : 'Save Case Sheet'}
+                </Button>
+              )}
             </div>
-
-            {/* Next/Save Button */}
-            {currentStep < STEPS.length ? (
-              <Button
-                size="sm"
-                onClick={() => changeStep(currentStep + 1)}
-                className="shrink-0 rounded-xl font-semibold"
-              >
-                <span className="hidden sm:inline">Next</span>
-                <ArrowRight className="ml-1 h-4 w-4" />
-              </Button>
-            ) : (
-              <Button size="sm" onClick={handleSubmit} disabled={isSubmitting} className="shrink-0 rounded-xl font-semibold">
-                <Save className="mr-1 h-4 w-4" />
-                <span className="hidden sm:inline">{isSubmitting ? 'Saving...' : 'Save'}</span>
-              </Button>
-            )}
           </div>
-        </div>
+        </footer>
       </div>
-
-      {/* Form Content */}
-      <main className="container mx-auto px-4 py-8 relative z-10">
-        <Card className="mx-auto max-w-4xl">
-          <CardContent className="p-6">{renderStep()}</CardContent>
-        </Card>
-
-        {/* Bottom Navigation Buttons */}
-        <div className="mx-auto mt-6 flex max-w-4xl justify-between">
-          <Button
-            variant="outline"
-            onClick={() => changeStep(currentStep - 1)}
-            disabled={currentStep === 1}
-            className="font-semibold"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Previous
-          </Button>
-
-          {currentStep < STEPS.length ? (
-            <Button onClick={() => changeStep(currentStep + 1)} className="rounded-2xl font-semibold">
-              Next
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-          ) : (
-            <Button onClick={handleSubmit} disabled={isSubmitting} className="rounded-2xl font-semibold">
-              <Save className="mr-2 h-4 w-4" />
-              {isSubmitting ? 'Saving...' : 'Save Case Sheet'}
-            </Button>
-          )}
-        </div>
-      </main>
     </div>
   );
 }
