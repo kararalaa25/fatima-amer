@@ -31,62 +31,66 @@ export function useAuth() {
       return;
     }
 
-    // Safety timeout to prevent infinite loading
-    const loadingTimeout = setTimeout(() => setLoading(false), 5000);
+    let mounted = true;
 
-    // Set up auth state listener FIRST
+    // Hard safety timeout - always resolve loading after 3s
+    const safetyTimeout = setTimeout(() => {
+      if (mounted) setLoading(false);
+    }, 3000);
+
+    async function fetchProfile(userId: string) {
+      try {
+        const { data } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('user_id', userId)
+          .single();
+        if (mounted) setProfile(data);
+      } catch {
+        // Profile fetch failed, continue without it
+      }
+    }
+
+    // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        clearTimeout(loadingTimeout);
-        setSession(session);
-        setUser(session?.user ?? null);
+      async (_event, newSession) => {
+        if (!mounted) return;
+        setSession(newSession);
+        setUser(newSession?.user ?? null);
         
-        if (session?.user) {
-          const { data: profileData } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('user_id', session.user.id)
-            .single();
-          
-          setProfile(profileData);
+        if (newSession?.user) {
+          await fetchProfile(newSession.user.id);
         } else {
           setProfile(null);
         }
         
-        setLoading(false);
+        if (mounted) setLoading(false);
       }
     );
 
-    // THEN check for existing session
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      clearTimeout(loadingTimeout);
-      setSession(session);
-      setUser(session?.user ?? null);
+    // Check for existing session
+    supabase.auth.getSession().then(async ({ data: { session: existingSession } }) => {
+      if (!mounted) return;
+      setSession(existingSession);
+      setUser(existingSession?.user ?? null);
       
-      if (session?.user) {
-        const { data: profileData } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('user_id', session.user.id)
-          .single();
-        
-        setProfile(profileData);
+      if (existingSession?.user) {
+        await fetchProfile(existingSession.user.id);
       }
       
-      setLoading(false);
+      if (mounted) setLoading(false);
     }).catch(() => {
-      clearTimeout(loadingTimeout);
-      setLoading(false);
+      if (mounted) setLoading(false);
     });
 
     return () => {
-      clearTimeout(loadingTimeout);
+      mounted = false;
+      clearTimeout(safetyTimeout);
       subscription.unsubscribe();
     };
   }, []);
 
   const signOut = async () => {
-    // Clear preview bypass
     localStorage.removeItem(PREVIEW_BYPASS_KEY);
     setIsPreviewMode(false);
     setProfile(null);
