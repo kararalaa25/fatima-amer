@@ -219,7 +219,7 @@ export function ImageViewerDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-5xl h-[90vh] flex flex-col p-0 glass-card border-primary/30">
+      <DialogContent className="max-w-5xl h-[90vh] flex flex-col p-0">
         <DialogHeader className="px-6 py-4 border-b border-border/50">
           <div className="flex items-center justify-between">
             <DialogTitle className="text-foreground">Image Viewer - {imageType}</DialogTitle>
@@ -247,7 +247,7 @@ export function ImageViewerDialog({
 
           <div className="h-4 w-px bg-border mx-2" />
 
-          <Button variant="outline" size="sm" onClick={handleRotate} className="transition-ultra">
+          <Button variant="outline" size="sm" onClick={handleRotate}>
             <RotateCw className="h-4 w-4 mr-1" />
             Rotate
           </Button>
@@ -256,7 +256,6 @@ export function ImageViewerDialog({
             variant={highContrast ? 'default' : 'outline'}
             size="sm"
             onClick={handleToggleContrast}
-            className="transition-ultra"
           >
             <Contrast className="h-4 w-4 mr-1" />
             X-Ray Mode
@@ -272,13 +271,12 @@ export function ImageViewerDialog({
                 setIsCropping(true);
               }
             }}
-            className="transition-ultra"
           >
             <Crop className="h-4 w-4 mr-1" />
             Crop
           </Button>
 
-          <Button variant="ghost" size="sm" onClick={resetView} className="transition-ultra">
+          <Button variant="ghost" size="sm" onClick={resetView}>
             <RefreshCw className="h-4 w-4 mr-1" />
             Reset View
           </Button>

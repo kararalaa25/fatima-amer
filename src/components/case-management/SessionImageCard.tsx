@@ -11,28 +11,18 @@ interface SessionImageCardProps {
   onView: (src: string) => void;
 }
 
-export function SessionImageCard({
-  id,
-  src,
-  onRemove,
-  onEdit,
-  onView,
-}: SessionImageCardProps) {
+export function SessionImageCard({ id, src, onRemove, onEdit, onView }: SessionImageCardProps) {
   const [isLoaded, setIsLoaded] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
 
   return (
     <div
-      className={cn(
-        'group relative glass-image-card aspect-[4/3] overflow-hidden transition-all duration-300',
-        isHovered && 'scale-[1.02] shadow-xl'
-      )}
+      className="group relative aspect-[4/3] overflow-hidden rounded-lg border border-border bg-muted"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Skeleton loader */}
       {!isLoaded && (
-        <div className="absolute inset-0 animate-pulse bg-muted rounded-3xl" />
+        <div className="absolute inset-0 animate-pulse bg-muted" />
       )}
 
       <img
@@ -41,9 +31,8 @@ export function SessionImageCard({
         loading="lazy"
         onLoad={() => setIsLoaded(true)}
         className={cn(
-          'h-full w-full object-cover transition-all duration-300',
-          isLoaded ? 'opacity-100' : 'opacity-0',
-          isHovered && 'scale-105'
+          'h-full w-full object-cover',
+          isLoaded ? 'opacity-100' : 'opacity-0'
         )}
         onClick={() => onView(src)}
       />
@@ -51,7 +40,7 @@ export function SessionImageCard({
       {/* Overlay */}
       <div
         className={cn(
-          'absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent transition-opacity duration-300',
+          'absolute inset-0 bg-gradient-to-t from-foreground/60 via-transparent to-transparent transition-opacity',
           isHovered ? 'opacity-100' : 'opacity-0'
         )}
       />
@@ -59,43 +48,28 @@ export function SessionImageCard({
       {/* Action Buttons */}
       <div
         className={cn(
-          'absolute inset-x-0 bottom-0 p-3 flex items-center justify-center gap-2 transition-all duration-300',
-          isHovered ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-0'
+          'absolute inset-x-0 bottom-0 p-3 flex items-center justify-center gap-2 transition-opacity',
+          isHovered ? 'opacity-100' : 'opacity-0'
         )}
       >
-        <Button
-          size="icon"
-          variant="ghost"
-          onClick={() => onView(src)}
-          className="h-9 w-9 glass-card-solid rounded-xl hover:bg-primary/10"
-        >
-          <ZoomIn className="h-4 w-4 text-foreground" />
+        <Button size="icon" variant="secondary" onClick={() => onView(src)} className="h-8 w-8">
+          <ZoomIn className="h-4 w-4" />
         </Button>
-        <Button
-          size="icon"
-          variant="ghost"
-          onClick={() => onEdit(id, src)}
-          className="h-9 w-9 glass-card-solid rounded-xl hover:bg-primary/10"
-        >
-          <Edit2 className="h-4 w-4 text-foreground" />
+        <Button size="icon" variant="secondary" onClick={() => onEdit(id, src)} className="h-8 w-8">
+          <Edit2 className="h-4 w-4" />
         </Button>
-        <Button
-          size="icon"
-          variant="ghost"
-          onClick={() => onRemove(id)}
-          className="h-9 w-9 glass-card-solid rounded-xl hover:bg-destructive/10"
-        >
+        <Button size="icon" variant="secondary" onClick={() => onRemove(id)} className="h-8 w-8">
           <X className="h-4 w-4 text-destructive" />
         </Button>
       </div>
 
-      {/* Remove button (always visible, top-right) */}
+      {/* Remove button top-right */}
       <Button
         size="icon"
-        variant="ghost"
+        variant="secondary"
         onClick={() => onRemove(id)}
         className={cn(
-          'absolute top-2 right-2 h-7 w-7 glass-card-solid rounded-xl hover:bg-destructive/10 transition-opacity duration-300',
+          'absolute top-2 right-2 h-7 w-7 transition-opacity',
           isHovered ? 'opacity-100' : 'opacity-0 md:opacity-100'
         )}
       >

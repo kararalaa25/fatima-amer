@@ -305,7 +305,7 @@ export function CaseManagementDashboard({ patientId }: CaseManagementDashboardPr
   return (
     <div className="space-y-6">
       {/* Session Selector */}
-      <Card className="glass-card border-0">
+      <Card>
         <CardHeader className="pb-4">
           <div className="flex items-center justify-between flex-wrap gap-4">
             <CardTitle className="text-foreground font-bold">Sessions</CardTitle>
@@ -353,7 +353,7 @@ export function CaseManagementDashboard({ patientId }: CaseManagementDashboardPr
       </Card>
 
       {/* Severity Assessment Card */}
-      <Card className="glass-card border-0 overflow-hidden">
+      <Card className="overflow-hidden">
         <CardHeader className="pb-4">
           <div className="flex items-center justify-between flex-wrap gap-4">
             <CardTitle className="flex items-center gap-3 text-foreground font-bold">
@@ -374,7 +374,7 @@ export function CaseManagementDashboard({ patientId }: CaseManagementDashboardPr
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Describe the case details, symptoms, and observations..."
-                className="glass-input min-h-[120px] rounded-2xl resize-none text-foreground placeholder:text-muted-foreground"
+                className="min-h-[120px] resize-none text-foreground placeholder:text-muted-foreground"
               />
               <p className="text-xs text-muted-foreground">
                 Keywords like "urgent", "broken", "danger" will increase severity assessment
@@ -387,10 +387,10 @@ export function CaseManagementDashboard({ patientId }: CaseManagementDashboardPr
                 Category
               </Label>
               <Select value={category} onValueChange={setCategory}>
-                <SelectTrigger className="glass-input rounded-2xl h-11 text-foreground">
+                <SelectTrigger className="h-11 text-foreground">
                   <SelectValue placeholder="Select category" />
                 </SelectTrigger>
-                <SelectContent className="glass-card border-0 rounded-2xl">
+                <SelectContent>
                   {CATEGORIES.map((cat) => (
                     <SelectItem
                       key={cat}
@@ -405,13 +405,13 @@ export function CaseManagementDashboard({ patientId }: CaseManagementDashboardPr
 
               {/* Stats */}
               <div className="grid grid-cols-2 gap-3 mt-4">
-                <div className="glass-card-solid p-4 rounded-2xl text-center">
+                <div className="border border-border rounded-lg p-4 text-center">
                   <div className="text-2xl font-bold text-foreground">
                     {sessionImages?.length || 0}
                   </div>
                   <div className="text-xs text-muted-foreground font-medium">Images</div>
                 </div>
-                <div className="glass-card-solid p-4 rounded-2xl text-center">
+                <div className="border border-border rounded-lg p-4 text-center">
                   <div className="text-2xl font-bold text-foreground">
                     {description.split(/\s+/).filter(Boolean).length}
                   </div>
@@ -424,7 +424,7 @@ export function CaseManagementDashboard({ patientId }: CaseManagementDashboardPr
       </Card>
 
       {/* Image Upload Section */}
-      <Card className="glass-card border-0">
+      <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-foreground font-bold">
             <ImagePlus className="h-5 w-5 text-primary" />
@@ -434,7 +434,7 @@ export function CaseManagementDashboard({ patientId }: CaseManagementDashboardPr
         <CardContent className="space-y-6">
           {/* Upload Errors */}
           {uploadErrors.length > 0 && (
-            <div className="glass-card-solid border border-destructive/20 rounded-2xl p-4 space-y-2">
+            <div className="border border-destructive/20 rounded-lg p-4 space-y-2 bg-destructive/5">
               <div className="flex items-center gap-2 text-destructive font-medium">
                 <AlertCircle className="h-4 w-4" />
                 Upload Errors
@@ -471,7 +471,7 @@ export function CaseManagementDashboard({ patientId }: CaseManagementDashboardPr
             <div className="flex flex-col items-center gap-4">
               <div className={cn(
                 'h-16 w-16 rounded-3xl flex items-center justify-center transition-colors',
-                isDragging ? 'bg-primary/20' : 'glass-card-solid'
+                isDragging ? 'bg-primary/20' : 'bg-muted'
               )}>
                 {isUploading ? (
                   <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -528,7 +528,7 @@ export function CaseManagementDashboard({ patientId }: CaseManagementDashboardPr
           variant="outline"
           onClick={handleDeleteSession}
           disabled={!selectedSessionId || deleteSession.isPending}
-          className="glass-card-solid border-0 rounded-2xl font-semibold hover:bg-destructive/10 hover:text-destructive"
+          className="font-semibold hover:bg-destructive/10 hover:text-destructive"
         >
           {deleteSession.isPending ? (
             <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -568,7 +568,7 @@ export function CaseManagementDashboard({ patientId }: CaseManagementDashboardPr
             <Button
               variant="ghost"
               size="icon"
-              className="absolute right-2 top-2 z-10 glass-card-solid rounded-xl hover:bg-primary/10"
+              className="absolute right-2 top-2 z-10 bg-card border border-border rounded-md"
               onClick={() => setViewingImage(null)}
             >
               <X className="h-5 w-5" />
@@ -579,7 +579,7 @@ export function CaseManagementDashboard({ patientId }: CaseManagementDashboardPr
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="absolute left-2 top-1/2 z-10 -translate-y-1/2 glass-card-solid rounded-xl hover:bg-primary/10"
+                  className="absolute left-2 top-1/2 z-10 -translate-y-1/2 bg-card border border-border rounded-md"
                   onClick={() => navigateViewer('prev')}
                 >
                   <ChevronLeft className="h-5 w-5" />
@@ -587,7 +587,7 @@ export function CaseManagementDashboard({ patientId }: CaseManagementDashboardPr
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="absolute right-2 top-1/2 z-10 -translate-y-1/2 glass-card-solid rounded-xl hover:bg-primary/10"
+                  className="absolute right-2 top-1/2 z-10 -translate-y-1/2 bg-card border border-border rounded-md"
                   onClick={() => navigateViewer('next')}
                 >
                   <ChevronRight className="h-5 w-5" />
@@ -605,7 +605,7 @@ export function CaseManagementDashboard({ patientId }: CaseManagementDashboardPr
 
                 {sessionImages && sessionImages.length > 1 && (
                   <div className="absolute bottom-4 left-1/2 -translate-x-1/2">
-                    <span className="glass-card-solid rounded-full px-4 py-2 text-sm font-semibold text-foreground">
+                    <span className="bg-card border border-border rounded-full px-4 py-2 text-sm font-semibold text-foreground">
                       {currentViewIndex + 1} / {sessionImages.length}
                     </span>
                   </div>

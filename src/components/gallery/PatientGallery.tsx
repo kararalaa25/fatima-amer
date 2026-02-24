@@ -64,7 +64,7 @@ function ImageCard({
   const [isLoaded, setIsLoaded] = useState(false);
 
   return (
-    <div className="group relative glass-image-card aspect-[4/3] overflow-hidden">
+    <div className="group relative aspect-[4/3] overflow-hidden rounded-lg border border-border bg-muted">
       {/* Skeleton loader */}
       {!isLoaded && (
         <div className="absolute inset-0 animate-pulse bg-muted rounded-3xl" />
@@ -85,7 +85,7 @@ function ImageCard({
       <div className="absolute bottom-3 right-3 opacity-0 transition-opacity group-hover:opacity-100">
         <Button
           size="sm"
-          className="h-8 gap-1 glass-card-solid text-xs font-semibold rounded-xl hover:bg-primary/10"
+          className="h-8 gap-1 text-xs font-semibold"
           variant="ghost"
           onClick={(e) => {
             e.stopPropagation();
@@ -136,7 +136,7 @@ export function PatientGallery({ patientId, initialPhotos, sessions }: PatientGa
   return (
     <div className="space-y-8">
       {/* Initial Photography */}
-      <Card className="glass-card border-0">
+      <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 font-bold text-foreground">
             <Camera className="h-5 w-5 text-primary" />
@@ -167,7 +167,7 @@ export function PatientGallery({ patientId, initialPhotos, sessions }: PatientGa
 
       {/* Session Photos */}
       {sessions.map((session) => (
-        <Card key={session.id} className="glass-card border-0">
+        <Card key={session.id}>
           <CardHeader>
             <CardTitle className="text-base font-bold text-foreground">
               Session: {format(new Date(session.session_date), 'MMMM d, yyyy')}
@@ -193,7 +193,7 @@ export function PatientGallery({ patientId, initialPhotos, sessions }: PatientGa
             <Button
               variant="ghost"
               size="icon"
-              className="absolute right-2 top-2 z-10 glass-card-solid rounded-xl hover:bg-primary/10"
+              className="absolute right-2 top-2 z-10 bg-card border border-border rounded-md"
               onClick={() => setSelectedImage(null)}
             >
               <X className="h-5 w-5" />
@@ -204,7 +204,7 @@ export function PatientGallery({ patientId, initialPhotos, sessions }: PatientGa
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="absolute left-2 top-1/2 z-10 -translate-y-1/2 glass-card-solid rounded-xl hover:bg-primary/10"
+                  className="absolute left-2 top-1/2 z-10 -translate-y-1/2 bg-card border border-border rounded-md"
                   onClick={() => navigate('prev')}
                 >
                   <ChevronLeft className="h-5 w-5" />
@@ -212,7 +212,7 @@ export function PatientGallery({ patientId, initialPhotos, sessions }: PatientGa
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="absolute right-2 top-1/2 z-10 -translate-y-1/2 glass-card-solid rounded-xl hover:bg-primary/10"
+                  className="absolute right-2 top-1/2 z-10 -translate-y-1/2 bg-card border border-border rounded-md"
                   onClick={() => navigate('next')}
                 >
                   <ChevronRight className="h-5 w-5" />
@@ -231,7 +231,7 @@ export function PatientGallery({ patientId, initialPhotos, sessions }: PatientGa
                 {/* Analyze button in lightbox */}
                 <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 items-center gap-4">
                   <Button
-                    className="glass-card-solid rounded-xl font-semibold hover:bg-primary/10"
+                    className="bg-card border border-border rounded-md font-semibold"
                     variant="ghost"
                     onClick={() => {
                       setSelectedImage(null);
@@ -243,7 +243,7 @@ export function PatientGallery({ patientId, initialPhotos, sessions }: PatientGa
                   </Button>
                   
                   {allImages.length > 1 && (
-                    <span className="glass-card-solid rounded-full px-4 py-2 text-sm font-semibold text-foreground">
+                    <span className="bg-card border border-border rounded-full px-4 py-2 text-sm font-semibold text-foreground">
                       {currentIndex + 1} / {allImages.length}
                     </span>
                   )}

@@ -107,7 +107,7 @@ export function SmileTransformation({ patientId, patientName }: SmileTransformat
   };
 
   return (
-    <Card className="glass-card">
+    <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Sparkles className="h-5 w-5 text-primary" />
