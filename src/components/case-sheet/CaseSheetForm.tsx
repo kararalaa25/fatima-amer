@@ -362,9 +362,9 @@ export function CaseSheetForm() {
   };
 
   return (
-    <div className="min-h-screen mesh-gradient-bg relative">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="relative z-10 glass-nav">
+      <header className="flat-nav relative z-10">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -372,7 +372,7 @@ export function CaseSheetForm() {
                 <ArrowLeft className="h-5 w-5" />
               </Button>
               <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-2xl glass-card">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
                   <Stethoscope className="h-5 w-5 text-primary" />
                 </div>
                 <div>
@@ -389,7 +389,7 @@ export function CaseSheetForm() {
       </header>
 
       {/* Sticky Progress Steps with Navigation */}
-      <div className="sticky top-0 z-50 glass-nav shadow-lg">
+      <div className="sticky top-0 z-50 flat-nav">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between py-3">
             {/* Previous Button */}
@@ -424,7 +424,7 @@ export function CaseSheetForm() {
                         ? 'bg-primary text-primary-foreground shadow-md'
                         : currentStep > step.id
                         ? 'bg-success text-success-foreground'
-                        : 'glass-card-solid text-muted-foreground'
+                        : 'bg-muted text-muted-foreground'
                     )}
                   >
                     {currentStep > step.id ? (
@@ -465,7 +465,7 @@ export function CaseSheetForm() {
 
       {/* Form Content */}
       <main className="container mx-auto px-4 py-8 relative z-10">
-        <Card className="mx-auto max-w-4xl glass-card border-0">
+        <Card className="mx-auto max-w-4xl">
           <CardContent className="p-6">{renderStep()}</CardContent>
         </Card>
 
@@ -475,7 +475,7 @@ export function CaseSheetForm() {
             variant="outline"
             onClick={() => changeStep(currentStep - 1)}
             disabled={currentStep === 1}
-            className="rounded-2xl glass-card border-0 font-semibold"
+            className="font-semibold"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
             Previous

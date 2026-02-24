@@ -276,7 +276,7 @@ export default function EditPatientPage() {
 
   if (patientLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center mesh-gradient-bg">
+      <div className="flex min-h-screen items-center justify-center bg-background">
         <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
       </div>
     );
@@ -284,7 +284,7 @@ export default function EditPatientPage() {
 
   if (!patient) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center mesh-gradient-bg">
+      <div className="flex min-h-screen flex-col items-center justify-center bg-background">
         <p className="text-lg text-muted-foreground">Patient not found</p>
         <Button variant="link" onClick={() => navigate('/')}>
           Return to Dashboard
@@ -294,13 +294,13 @@ export default function EditPatientPage() {
   }
 
   return (
-    <div className="min-h-screen mesh-gradient-bg">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="glass-nav sticky top-0 z-50">
+      <header className="flat-nav sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Button variant="ghost" size="icon" onClick={() => navigate(`/patient/${id}`)} className="rounded-2xl">
+              <Button variant="ghost" size="icon" onClick={() => navigate(`/patient/${id}`)}>
                 <ArrowLeft className="h-5 w-5" />
               </Button>
               <div>
@@ -317,19 +317,19 @@ export default function EditPatientPage() {
       </header>
 
       {/* Content */}
-      <main className="container mx-auto px-4 py-8 relative z-10">
+      <main className="container mx-auto px-4 py-8">
         <Tabs defaultValue="basic" className="space-y-6">
-          <TabsList className="inline-flex h-auto w-full flex-wrap justify-start gap-1 glass-card-solid p-1 sm:w-auto sm:flex-nowrap border-0">
-            <TabsTrigger value="basic" className="px-3 py-2 rounded-xl">Basic Info</TabsTrigger>
-            <TabsTrigger value="clinical" className="px-3 py-2 rounded-xl">Clinical</TabsTrigger>
-            <TabsTrigger value="extra-oral" className="px-3 py-2 rounded-xl">Extra-Oral</TabsTrigger>
-            <TabsTrigger value="segment" className="px-3 py-2 rounded-xl">Segments</TabsTrigger>
-            <TabsTrigger value="dental-chart" className="px-3 py-2 rounded-xl">Dental Chart</TabsTrigger>
-            <TabsTrigger value="ceph" className="px-3 py-2 rounded-xl">Cephalometric</TabsTrigger>
-            <TabsTrigger value="treatment" className="px-3 py-2 rounded-xl">Treatment</TabsTrigger>
+          <TabsList className="inline-flex h-auto w-full flex-wrap justify-start gap-1 p-1 sm:w-auto sm:flex-nowrap">
+            <TabsTrigger value="basic" className="px-3 py-2">Basic Info</TabsTrigger>
+            <TabsTrigger value="clinical" className="px-3 py-2">Clinical</TabsTrigger>
+            <TabsTrigger value="extra-oral" className="px-3 py-2">Extra-Oral</TabsTrigger>
+            <TabsTrigger value="segment" className="px-3 py-2">Segments</TabsTrigger>
+            <TabsTrigger value="dental-chart" className="px-3 py-2">Dental Chart</TabsTrigger>
+            <TabsTrigger value="ceph" className="px-3 py-2">Cephalometric</TabsTrigger>
+            <TabsTrigger value="treatment" className="px-3 py-2">Treatment</TabsTrigger>
           </TabsList>
 
-          <Card className="glass-card border-0">
+          <Card>
             <CardContent className="p-6">
               <TabsContent value="basic" className="mt-0">
                 <BasicInfoStep data={basicData} onChange={handleBasicChange} />

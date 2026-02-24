@@ -14,7 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Search, Plus, Stethoscope, Users, LogOut, User, Sparkles, Shield } from 'lucide-react';
+import { Search, Plus, Users, LogOut, User, Sparkles, Shield } from 'lucide-react';
 import { format } from 'date-fns';
 import { PatientActionsMenu } from './dashboard/PatientActionsMenu';
 
@@ -32,20 +32,23 @@ export function PatientDashboard() {
   );
 
   return (
-    <div className="min-h-screen mesh-gradient-bg relative">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="relative z-10 glass-nav sticky top-0">
+      <header className="flat-nav sticky top-0 z-10">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl glass-card">
-                <Stethoscope className="h-6 w-6 text-primary" />
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
+                <svg className="h-5 w-5 text-primary-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 2C8.5 2 6 5 6 8c0 2 .5 3 1 4s1 2 1 4v1a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-1c0-2 .5-3 1-4s1-2 1-4c0-3-2.5-6-6-6z" />
+                  <path d="M9 22h6" />
+                </svg>
               </div>
               <div>
                 <h1 className="text-xl font-bold text-foreground flex items-center gap-2">
                   Ortho Smart Suite
                   {isPreviewMode && (
-                    <span className="text-xs font-medium text-primary bg-primary/10 px-2 py-0.5 rounded-full">
+                    <span className="text-xs font-medium text-primary bg-primary/10 px-2 py-0.5 rounded">
                       Preview
                     </span>
                   )}
@@ -55,29 +58,19 @@ export function PatientDashboard() {
             </div>
             <div className="flex items-center gap-2">
               {isAdmin && (
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
+                <Button
+                  variant="outline"
+                  size="icon"
                   onClick={() => navigate('/admin')}
-                  className="rounded-2xl glass-card text-muted-foreground hover:text-foreground transition-smooth"
                   title="Admin Dashboard"
                 >
                   <Shield className="h-5 w-5" />
                 </Button>
               )}
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="rounded-2xl glass-card text-muted-foreground hover:text-foreground transition-smooth"
-              >
+              <Button variant="outline" size="icon">
                 <User className="h-5 w-5" />
               </Button>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                onClick={signOut}
-                className="rounded-2xl glass-card text-muted-foreground hover:text-foreground transition-smooth"
-              >
+              <Button variant="outline" size="icon" onClick={signOut}>
                 <LogOut className="h-5 w-5" />
               </Button>
             </div>
@@ -86,15 +79,13 @@ export function PatientDashboard() {
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-8 relative z-10 pb-24">
+      <main className="container mx-auto px-4 py-8 pb-24">
         {/* Stats Cards */}
         <div className="mb-8 grid gap-4 md:grid-cols-3">
-          <Card className="glass-card border-0 transition-smooth hover:scale-[1.02]">
+          <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-semibold text-muted-foreground">
-                Total Patients
-              </CardTitle>
-              <div className="h-10 w-10 rounded-2xl glass-card-solid flex items-center justify-center">
+              <CardTitle className="text-sm font-semibold text-muted-foreground">Total Patients</CardTitle>
+              <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
                 <Users className="h-5 w-5 text-primary" />
               </div>
             </CardHeader>
@@ -102,25 +93,23 @@ export function PatientDashboard() {
               <div className="text-3xl font-extrabold text-foreground">{patients?.length || 0}</div>
             </CardContent>
           </Card>
-          <Card className="glass-card border-0 transition-smooth hover:scale-[1.02]">
+          <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-semibold text-muted-foreground">
-                Active Cases
-              </CardTitle>
-              <div className="h-10 w-10 rounded-2xl glass-card-solid flex items-center justify-center">
-                <Stethoscope className="h-5 w-5 text-accent" />
+              <CardTitle className="text-sm font-semibold text-muted-foreground">Active Cases</CardTitle>
+              <div className="h-10 w-10 rounded-lg bg-accent/10 flex items-center justify-center">
+                <svg className="h-5 w-5 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 2C8.5 2 6 5 6 8c0 2 .5 3 1 4s1 2 1 4v1a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-1c0-2 .5-3 1-4s1-2 1-4c0-3-2.5-6-6-6z" />
+                </svg>
               </div>
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-extrabold text-foreground">{patients?.length || 0}</div>
             </CardContent>
           </Card>
-          <Card className="glass-card border-0 transition-smooth hover:scale-[1.02]">
+          <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-semibold text-muted-foreground">
-                This Week
-              </CardTitle>
-              <div className="h-10 w-10 rounded-2xl glass-card-solid flex items-center justify-center">
+              <CardTitle className="text-sm font-semibold text-muted-foreground">This Week</CardTitle>
+              <div className="h-10 w-10 rounded-lg bg-success/10 flex items-center justify-center">
                 <Sparkles className="h-5 w-5 text-success" />
               </div>
             </CardHeader>
@@ -135,17 +124,17 @@ export function PatientDashboard() {
         </div>
 
         {/* Patient Table */}
-        <Card className="glass-card border-0 overflow-hidden">
+        <Card className="overflow-hidden">
           <CardHeader>
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <CardTitle className="text-foreground font-bold">Patient Records</CardTitle>
               <div className="relative w-full max-w-sm">
-                <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
                   placeholder="Search patients..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-11 glass-input rounded-2xl h-11 text-foreground placeholder:text-muted-foreground"
+                  className="pl-10 h-10"
                 />
               </div>
             </div>
@@ -168,10 +157,10 @@ export function PatientDashboard() {
                 </Button>
               </div>
             ) : (
-              <div className="overflow-x-auto rounded-2xl">
+              <div className="overflow-x-auto rounded-lg border border-border">
                 <Table>
                   <TableHeader>
-                    <TableRow className="border-border/50 hover:bg-transparent">
+                    <TableRow className="hover:bg-transparent">
                       <TableHead className="text-muted-foreground font-semibold">Name</TableHead>
                       <TableHead className="text-muted-foreground font-semibold">Age</TableHead>
                       <TableHead className="hidden md:table-cell text-muted-foreground font-semibold">Chief Complaint</TableHead>
@@ -183,7 +172,7 @@ export function PatientDashboard() {
                     {filteredPatients?.map((patient) => (
                       <TableRow
                         key={patient.id}
-                        className="cursor-pointer border-border/30 hover:bg-primary/5 transition-smooth"
+                        className="cursor-pointer hover:bg-muted/50"
                         onClick={() => navigate(`/patient/${patient.id}`)}
                       >
                         <TableCell className="font-semibold text-foreground">{patient.name}</TableCell>
@@ -210,13 +199,13 @@ export function PatientDashboard() {
         </Card>
       </main>
 
-      {/* Floating Add Case Button - iOS Style */}
+      {/* Floating Add Button */}
       <button
         onClick={() => navigate('/patient/new')}
-        className="fixed bottom-6 right-6 z-50 fab-glass w-16 h-16 flex items-center justify-center"
+        className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg hover:shadow-xl hover:bg-primary/90 flex items-center justify-center transition-shadow"
         aria-label="Add new patient"
       >
-        <Plus className="h-7 w-7 text-primary-foreground" />
+        <Plus className="h-6 w-6" />
       </button>
     </div>
   );

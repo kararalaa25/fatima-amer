@@ -111,7 +111,7 @@ export function MediaUploadStep({ images, onImagesChange }: MediaUploadStepProps
       </div>
 
       {/* Upload Area */}
-      <Card className="border-2 border-dashed border-primary/30 bg-primary/5 glass-card hover:border-primary/50 transition-smooth">
+      <Card className="border-2 border-dashed border-primary/30 bg-primary/5 hover:border-primary/50">
         <CardContent className="p-8">
           <div className="flex flex-col items-center gap-4">
             <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/20 border border-primary/30">
@@ -137,7 +137,7 @@ export function MediaUploadStep({ images, onImagesChange }: MediaUploadStepProps
               type="button" 
               variant="outline" 
               onClick={handleButtonClick}
-              className="glow-border transition-smooth"
+              className=""
             >
               <Camera className="mr-2 h-4 w-4" />
               Select Images
@@ -162,7 +162,7 @@ export function MediaUploadStep({ images, onImagesChange }: MediaUploadStepProps
           <Label className="text-base text-foreground">Uploaded Images ({images.length})</Label>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {images.map((image, index) => (
-              <Card key={image.id} className="overflow-hidden glass-card border-0 glow-border transition-smooth hover:scale-[1.02]">
+              <Card key={image.id} className="overflow-hidden">
                 <div className="relative aspect-[4/3]">
                   <img
                     src={image.preview}

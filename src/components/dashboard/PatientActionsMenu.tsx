@@ -4,19 +4,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
+  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from '@/components/ui/dialog';
 import { MoreHorizontal, Eye, Eraser, Trash2, AlertTriangle, Shield } from 'lucide-react';
 import { useDeletePatient, useUpdatePatient } from '@/hooks/usePatients';
@@ -45,59 +36,24 @@ export function PatientActionsMenu({ patientId, patientName, onActionComplete }:
 
   const handleClearClinicalData = async () => {
     if (confirmText !== 'DELETE') return;
-    
     setIsProcessing(true);
     try {
-      // Clear clinical data (Steps 2-6) but keep basic info
       await updatePatient.mutateAsync({
         id: patientId,
-        // Clear Clinical Relations
-        ap_relation: null,
-        horizontal_relation: null,
-        vertical_relation: null,
-        overbite_mm: null,
-        overjet_mm: null,
-        molar_relation: null,
-        canine_relation: null,
-        incisor_relation: null,
-        oral_hygiene: null,
-        // Clear Soft Tissue
-        lips: null,
-        habits: null,
-        tongue_position: null,
-        tongue_size: null,
-        // Clear Segment Analysis
-        upper_buccal: null,
-        lower_buccal: null,
-        upper_labial: null,
-        lower_labial: null,
-        upper_space_available: null,
-        upper_space_required: null,
-        lower_space_available: null,
-        lower_space_required: null,
+        ap_relation: null, horizontal_relation: null, vertical_relation: null,
+        overbite_mm: null, overjet_mm: null, molar_relation: null, canine_relation: null,
+        incisor_relation: null, oral_hygiene: null, lips: null, habits: null,
+        tongue_position: null, tongue_size: null, upper_buccal: null, lower_buccal: null,
+        upper_labial: null, lower_labial: null, upper_space_available: null,
+        upper_space_required: null, lower_space_available: null, lower_space_required: null,
       });
-
-      // Delete treatment plan
       await deleteTreatmentPlan.mutateAsync(patientId);
-
-      // Clear dental chart
       await clearDentalChart.mutateAsync(patientId);
-
-      toast({
-        title: 'Clinical Data Cleared',
-        description: `Clinical data for ${patientName} has been cleared. Basic info is preserved.`,
-      });
-      
-      setShowClearDataDialog(false);
-      setConfirmText('');
-      onActionComplete?.();
+      toast({ title: 'Clinical Data Cleared', description: `Clinical data for ${patientName} has been cleared. Basic info is preserved.` });
+      setShowClearDataDialog(false); setConfirmText(''); onActionComplete?.();
     } catch (error) {
       console.error('Error clearing clinical data:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to clear clinical data.',
-        variant: 'destructive',
-      });
+      toast({ title: 'Error', description: 'Failed to clear clinical data.', variant: 'destructive' });
     } finally {
       setIsProcessing(false);
     }
@@ -105,95 +61,52 @@ export function PatientActionsMenu({ patientId, patientName, onActionComplete }:
 
   const handleDeletePatient = async () => {
     if (confirmText !== 'DELETE') return;
-    
     setIsProcessing(true);
     try {
       await deletePatient.mutateAsync(patientId);
-      
-      toast({
-        title: 'Patient Deleted',
-        description: `${patientName} has been permanently removed.`,
-      });
-      
-      setShowDeleteDialog(false);
-      setConfirmText('');
-      onActionComplete?.();
+      toast({ title: 'Patient Deleted', description: `${patientName} has been permanently removed.` });
+      setShowDeleteDialog(false); setConfirmText(''); onActionComplete?.();
     } catch (error) {
       console.error('Error deleting patient:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to delete patient.',
-        variant: 'destructive',
-      });
+      toast({ title: 'Error', description: 'Failed to delete patient.', variant: 'destructive' });
     } finally {
       setIsProcessing(false);
     }
   };
 
   const handleCloseDialog = (setter: (val: boolean) => void) => {
-    setter(false);
-    setConfirmText('');
+    setter(false); setConfirmText('');
   };
 
   return (
     <>
       <div className="flex items-center gap-1">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={(e) => {
-            e.stopPropagation();
-            navigate(`/patient/${patientId}`);
-          }}
-          className="text-primary hover:text-primary/80 transition-ultra"
-        >
-          <Eye className="mr-1 h-4 w-4" />
-          View
+        <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); navigate(`/patient/${patientId}`); }} className="text-primary hover:text-primary/80">
+          <Eye className="mr-1 h-4 w-4" /> View
         </Button>
-        
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="h-8 w-8 text-muted-foreground hover:text-foreground transition-ultra"
-              onClick={(e) => e.stopPropagation()}
-            >
+            <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground" onClick={(e) => e.stopPropagation()}>
               <MoreHorizontal className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="glass-card border-border/50">
-            <DropdownMenuItem
-              onClick={(e) => {
-                e.stopPropagation();
-                setShowClearDataDialog(true);
-              }}
-              className="text-warning focus:text-warning cursor-pointer"
-            >
-              <Eraser className="mr-2 h-4 w-4" />
-              Clear Clinical Data
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={(e) => { e.stopPropagation(); setShowClearDataDialog(true); }} className="text-warning focus:text-warning cursor-pointer">
+              <Eraser className="mr-2 h-4 w-4" /> Clear Clinical Data
             </DropdownMenuItem>
-            <DropdownMenuSeparator className="bg-border/50" />
-            <DropdownMenuItem
-              onClick={(e) => {
-                e.stopPropagation();
-                setShowDeleteDialog(true);
-              }}
-              className="text-destructive focus:text-destructive cursor-pointer"
-            >
-              <Trash2 className="mr-2 h-4 w-4" />
-              Delete Patient
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={(e) => { e.stopPropagation(); setShowDeleteDialog(true); }} className="text-destructive focus:text-destructive cursor-pointer">
+              <Trash2 className="mr-2 h-4 w-4" /> Delete Patient
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
 
-      {/* Clear Clinical Data Confirmation */}
-      <Dialog open={showClearDataDialog} onOpenChange={(open) => handleCloseDialog(setShowClearDataDialog)}>
-        <DialogContent className="glass-card border-warning/30 glow-border-accent">
+      <Dialog open={showClearDataDialog} onOpenChange={() => handleCloseDialog(setShowClearDataDialog)}>
+        <DialogContent className="border-warning/30">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-warning">
-              <div className="h-10 w-10 rounded-full bg-warning/20 flex items-center justify-center">
+              <div className="h-10 w-10 rounded-lg bg-warning/20 flex items-center justify-center">
                 <AlertTriangle className="h-5 w-5" />
               </div>
               Clear Clinical Data
@@ -207,57 +120,37 @@ export function PatientActionsMenu({ patientId, patientName, onActionComplete }:
                 <li>Segment Analysis (Step 5)</li>
                 <li>Media & Treatment Plan (Steps 6-7)</li>
               </ul>
-              <p className="mt-4 p-3 rounded-lg bg-success/10 border border-success/30 text-success text-sm">
+              <p className="mt-4 p-3 rounded-md bg-success/10 border border-success/30 text-success text-sm">
                 <strong>Basic Info (Name, Age, Chief Complaint)</strong> will be preserved.
               </p>
             </DialogDescription>
           </DialogHeader>
-          
           <div className="space-y-3 pt-2">
             <Label htmlFor="confirm-clear" className="text-sm text-muted-foreground">
               Type <span className="font-mono font-bold text-warning">DELETE</span> to confirm
             </Label>
-            <Input
-              id="confirm-clear"
-              value={confirmText}
-              onChange={(e) => setConfirmText(e.target.value.toUpperCase())}
-              placeholder="Type DELETE"
-              className="font-mono text-center text-lg bg-muted/50 border-warning/30 focus:border-warning"
-              autoComplete="off"
-            />
+            <Input id="confirm-clear" value={confirmText} onChange={(e) => setConfirmText(e.target.value.toUpperCase())} placeholder="Type DELETE" className="font-mono text-center text-lg border-warning/30 focus:border-warning" autoComplete="off" />
           </div>
-
           <DialogFooter className="gap-2 sm:gap-0">
-            <Button 
-              variant="ghost" 
-              onClick={() => handleCloseDialog(setShowClearDataDialog)} 
-              disabled={isProcessing}
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={handleClearClinicalData}
-              disabled={isProcessing || confirmText !== 'DELETE'}
-              className="bg-warning text-warning-foreground hover:bg-warning/90 glow-border-accent"
-            >
+            <Button variant="ghost" onClick={() => handleCloseDialog(setShowClearDataDialog)} disabled={isProcessing}>Cancel</Button>
+            <Button onClick={handleClearClinicalData} disabled={isProcessing || confirmText !== 'DELETE'} className="bg-warning text-warning-foreground hover:bg-warning/90">
               {isProcessing ? 'Clearing...' : 'Clear Data'}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* Delete Patient Confirmation */}
-      <Dialog open={showDeleteDialog} onOpenChange={(open) => handleCloseDialog(setShowDeleteDialog)}>
-        <DialogContent className="glass-card border-destructive/30">
+      <Dialog open={showDeleteDialog} onOpenChange={() => handleCloseDialog(setShowDeleteDialog)}>
+        <DialogContent className="border-destructive/30">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-destructive">
-              <div className="h-10 w-10 rounded-full bg-destructive/20 flex items-center justify-center">
+              <div className="h-10 w-10 rounded-lg bg-destructive/20 flex items-center justify-center">
                 <Shield className="h-5 w-5" />
               </div>
               Permanent Deletion
             </DialogTitle>
             <DialogDescription className="text-muted-foreground pt-4">
-              <p className="p-3 rounded-lg bg-destructive/10 border border-destructive/30 text-destructive text-sm mb-4">
+              <p className="p-3 rounded-md bg-destructive/10 border border-destructive/30 text-destructive text-sm mb-4">
                 ⚠️ This action <strong>cannot be undone</strong>. All data will be permanently lost.
               </p>
               This will permanently delete <strong className="text-foreground">{patientName}</strong> and all associated data:
@@ -270,34 +163,15 @@ export function PatientActionsMenu({ patientId, patientName, onActionComplete }:
               </ul>
             </DialogDescription>
           </DialogHeader>
-
           <div className="space-y-3 pt-2">
             <Label htmlFor="confirm-delete" className="text-sm text-muted-foreground">
               Type <span className="font-mono font-bold text-destructive">DELETE</span> to confirm
             </Label>
-            <Input
-              id="confirm-delete"
-              value={confirmText}
-              onChange={(e) => setConfirmText(e.target.value.toUpperCase())}
-              placeholder="Type DELETE"
-              className="font-mono text-center text-lg bg-muted/50 border-destructive/30 focus:border-destructive"
-              autoComplete="off"
-            />
+            <Input id="confirm-delete" value={confirmText} onChange={(e) => setConfirmText(e.target.value.toUpperCase())} placeholder="Type DELETE" className="font-mono text-center text-lg border-destructive/30 focus:border-destructive" autoComplete="off" />
           </div>
-
           <DialogFooter className="gap-2 sm:gap-0">
-            <Button 
-              variant="ghost" 
-              onClick={() => handleCloseDialog(setShowDeleteDialog)} 
-              disabled={isProcessing}
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={handleDeletePatient}
-              disabled={isProcessing || confirmText !== 'DELETE'}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
+            <Button variant="ghost" onClick={() => handleCloseDialog(setShowDeleteDialog)} disabled={isProcessing}>Cancel</Button>
+            <Button onClick={handleDeletePatient} disabled={isProcessing || confirmText !== 'DELETE'} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
               {isProcessing ? 'Deleting...' : 'Delete Permanently'}
             </Button>
           </DialogFooter>
