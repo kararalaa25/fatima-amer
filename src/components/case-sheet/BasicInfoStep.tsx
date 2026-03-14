@@ -12,6 +12,7 @@ interface BasicInfoStepProps {
     chief_complaint: string;
     date_of_birth: string;
     address: string;
+    phone_number: string;
     medical_history: string[];
     current_medications: string[];
   };
