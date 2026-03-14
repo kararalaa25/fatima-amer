@@ -31,6 +31,7 @@ function AppRoutes() {
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/patient-join" element={<PatientJoin />} />
         <Route path="/patient-login" element={<PatientLogin />} />
+        <Route path="/view" element={<PatientAccess />} />
         <Route
           path="/patient-dashboard"
           element={
