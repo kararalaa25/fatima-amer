@@ -230,10 +230,17 @@ export function CaseSheetForm() {
     setIsSubmitting(true);
 
     try {
+      // Generate patient code
+      const { data: patientCode, error: codeError } = await supabase.rpc('generate_patient_code');
+      if (codeError) throw codeError;
+
       const patientPayload = {
         name: basicData.name,
         age: basicData.age as number,
         chief_complaint: basicData.chief_complaint || undefined,
+        phone_number: basicData.phone_number || undefined,
+        patient_code: patientCode,
+        doctor_id: doctor?.id || undefined,
         ap_relation: clinicalData.ap_relation || undefined,
         horizontal_relation: clinicalData.horizontal_relation || undefined,
         vertical_relation: clinicalData.vertical_relation || undefined,
