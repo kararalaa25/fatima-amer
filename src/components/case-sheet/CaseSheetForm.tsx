@@ -1,6 +1,7 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCreatePatient } from '@/hooks/usePatients';
+import { useDoctor, useEnsureDoctor } from '@/hooks/useDoctor';
 import { useUpdateToothStatus } from '@/hooks/useDentalChart';
 import { useUpsertTreatmentPlan } from '@/hooks/useTreatmentPlan';
 import { useCreateInitialPhoto } from '@/hooks/useInitialPhotos';
