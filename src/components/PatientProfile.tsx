@@ -583,6 +583,49 @@ export function PatientProfile() {
           </TabsContent>
         </Tabs>
       </main>
+
+      {/* QR Code Dialog */}
+      <Dialog open={showQR} onOpenChange={setShowQR}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Patient Access QR Code</DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col items-center gap-4 py-4">
+            <div className="p-4 bg-white rounded-xl">
+              <QRCodeSVG
+                value={`${window.location.origin}/view?doc=${doctor?.doctor_code || ''}&pat=${(patient as any).patient_code || ''}`}
+                size={200}
+                level="H"
+              />
+            </div>
+            <div className="text-center space-y-1">
+              <p className="text-sm text-muted-foreground">
+                Patient can scan this code to view their case
+              </p>
+              <div className="flex items-center gap-2 justify-center">
+                <Badge variant="outline" className="font-mono">{doctor?.doctor_code}</Badge>
+                <span className="text-muted-foreground">+</span>
+                <Badge variant="outline" className="font-mono">{(patient as any).patient_code}</Badge>
+              </div>
+            </div>
+            <div className="flex gap-2 w-full">
+              <Button
+                variant="outline"
+                className="flex-1"
+                onClick={() => {
+                  const url = `${window.location.origin}/view?doc=${doctor?.doctor_code}&pat=${(patient as any).patient_code}`;
+                  navigator.clipboard.writeText(url);
+                  setCopiedId(true);
+                  setTimeout(() => setCopiedId(false), 2000);
+                }}
+              >
+                {copiedId ? <Check className="mr-2 h-4 w-4" /> : <Copy className="mr-2 h-4 w-4" />}
+                {copiedId ? 'Copied!' : 'Copy Link'}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
