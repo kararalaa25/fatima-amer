@@ -12,6 +12,7 @@ interface BasicInfoStepProps {
     chief_complaint: string;
     date_of_birth: string;
     address: string;
+    phone_number: string;
     medical_history: string[];
     current_medications: string[];
   };
@@ -85,6 +86,17 @@ export function BasicInfoStep({ data, onChange }: BasicInfoStepProps) {
             value={data.age}
             onChange={(e) => onChange('age', parseInt(e.target.value) || '')}
             placeholder="Enter age"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="phone_number">Phone Number</Label>
+          <Input
+            id="phone_number"
+            type="tel"
+            value={data.phone_number || ''}
+            onChange={(e) => onChange('phone_number', e.target.value)}
+            placeholder="Patient phone number"
           />
         </div>
 

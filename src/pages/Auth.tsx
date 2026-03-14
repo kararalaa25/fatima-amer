@@ -340,6 +340,34 @@ export default function AuthPage() {
             <p className="text-xs text-center text-muted-foreground mt-2">
               Explore the platform with sample data (no account needed)
             </p>
+
+            <div className="relative my-4">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-border" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-card px-2 text-muted-foreground">patients</span>
+              </div>
+            </div>
+
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                className="flex-1 text-sm"
+                onClick={() => navigate('/patient-login')}
+              >
+                Patient Login
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                className="flex-1 text-sm"
+                onClick={() => navigate('/patient-join')}
+              >
+                Patient Join
+              </Button>
+            </div>
           </CardContent>
         </Card>
 

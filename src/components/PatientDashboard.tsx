@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usePatients } from '@/hooks/usePatients';
 import { useAuth } from '@/hooks/useAuth';
 import { useAdmin } from '@/hooks/useAdmin';
+import { useDoctor, useEnsureDoctor } from '@/hooks/useDoctor';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -23,7 +24,16 @@ export function PatientDashboard() {
   const { data: patients, isLoading } = usePatients();
   const { signOut, isPreviewMode } = useAuth();
   const { isAdmin } = useAdmin();
+  const { data: doctor } = useDoctor();
+  const ensureDoctor = useEnsureDoctor();
   const navigate = useNavigate();
+
+  // Ensure doctor record exists
+  useEffect(() => {
+    if (!isPreviewMode) {
+      ensureDoctor.mutate();
+    }
+  }, [isPreviewMode]);
 
   const filteredPatients = patients?.filter(
     (patient) =>
@@ -55,6 +65,12 @@ export function PatientDashboard() {
                 </h1>
                 <p className="text-sm text-muted-foreground">Clinical Management</p>
               </div>
+              {doctor && (
+                <div className="hidden md:flex items-center gap-2 ml-4 px-3 py-1.5 rounded-md bg-primary/10 border border-primary/20">
+                  <span className="text-xs text-muted-foreground">Your Doctor ID:</span>
+                  <span className="text-sm font-mono font-bold text-primary">{doctor.doctor_code}</span>
+                </div>
+              )}
             </div>
             <div className="flex items-center gap-3">
               {/* System Operational Indicator */}

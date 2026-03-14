@@ -1,6 +1,7 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCreatePatient } from '@/hooks/usePatients';
+import { useDoctor, useEnsureDoctor } from '@/hooks/useDoctor';
 import { useUpdateToothStatus } from '@/hooks/useDentalChart';
 import { useUpsertTreatmentPlan } from '@/hooks/useTreatmentPlan';
 import { useCreateInitialPhoto } from '@/hooks/useInitialPhotos';
@@ -48,6 +49,13 @@ export function CaseSheetForm() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const createPatient = useCreatePatient();
+  const { data: doctor } = useDoctor();
+  const ensureDoctor = useEnsureDoctor();
+
+  // Ensure doctor record exists on mount
+  useEffect(() => {
+    ensureDoctor.mutate();
+  }, []);
   const updateToothStatus = useUpdateToothStatus();
   const upsertTreatmentPlan = useUpsertTreatmentPlan();
   const createInitialPhoto = useCreateInitialPhoto();
@@ -62,6 +70,7 @@ export function CaseSheetForm() {
     chief_complaint: '',
     date_of_birth: '',
     address: '',
+    phone_number: '',
     medical_history: [] as string[],
     current_medications: [] as string[],
   });
@@ -221,10 +230,17 @@ export function CaseSheetForm() {
     setIsSubmitting(true);
 
     try {
+      // Generate patient code
+      const { data: patientCode, error: codeError } = await supabase.rpc('generate_patient_code');
+      if (codeError) throw codeError;
+
       const patientPayload = {
         name: basicData.name,
         age: basicData.age as number,
         chief_complaint: basicData.chief_complaint || undefined,
+        phone_number: basicData.phone_number || undefined,
+        patient_code: patientCode,
+        doctor_id: doctor?.id || undefined,
         ap_relation: clinicalData.ap_relation || undefined,
         horizontal_relation: clinicalData.horizontal_relation || undefined,
         vertical_relation: clinicalData.vertical_relation || undefined,
@@ -257,6 +273,14 @@ export function CaseSheetForm() {
       };
 
       const patient = await createPatient.mutateAsync(patientPayload);
+
+      // Create patient account record if phone number provided
+      if (basicData.phone_number && doctor?.id) {
+        await supabase.from('patient_accounts').insert({
+          patient_id: patient.id,
+          phone_number: basicData.phone_number,
+        });
+      }
 
       for (const [key, status] of Object.entries(dentalChart)) {
         const [quadrant, toothNumber] = key.split('-').map(Number);
