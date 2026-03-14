@@ -65,14 +65,14 @@ export function PatientDashboard() {
                 </h1>
                 <p className="text-sm text-muted-foreground">Clinical Management</p>
               </div>
+            </div>
+            <div className="flex items-center gap-3">
               {doctor && (
-                <div className="hidden md:flex items-center gap-2 ml-4 px-3 py-1.5 rounded-md bg-primary/10 border border-primary/20">
-                  <span className="text-xs text-muted-foreground">Your Doctor ID:</span>
+                <div className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-primary/10 border border-primary/20">
+                  <span className="text-xs text-muted-foreground">Doctor ID:</span>
                   <span className="text-sm font-mono font-bold text-primary">{doctor.doctor_code}</span>
                 </div>
               )}
-            </div>
-            <div className="flex items-center gap-3">
               {/* System Operational Indicator */}
               <div className="hidden sm:flex items-center gap-2 text-sm text-muted-foreground">
                 <span className="h-2 w-2 rounded-full bg-success" />
