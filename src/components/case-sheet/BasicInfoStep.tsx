@@ -115,17 +115,8 @@ export function BasicInfoStep({ data, onChange }: BasicInfoStepProps) {
               </Button>
             </div>
           ) : (
-            <Button
-              type="button"
-              onClick={handleGeneratePatientId}
-              disabled={generatingId}
-              className="gap-2"
-            >
-              {generatingId ? (
-                <><Loader2 className="h-4 w-4 animate-spin" /> Generating...</>
-              ) : (
-                <><Hash className="h-4 w-4" /> Generate Patient ID</>
-              )}
+            <Button type="button" onClick={handleGeneratePatientId} className="gap-2">
+              <Hash className="h-4 w-4" /> Generate Patient ID
             </Button>
           )}
         </div>
