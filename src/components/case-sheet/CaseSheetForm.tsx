@@ -274,6 +274,14 @@ export function CaseSheetForm() {
 
       const patient = await createPatient.mutateAsync(patientPayload);
 
+      // Create patient account record if phone number provided
+      if (basicData.phone_number && doctor?.id) {
+        await supabase.from('patient_accounts').insert({
+          patient_id: patient.id,
+          phone_number: basicData.phone_number,
+        });
+      }
+
       for (const [key, status] of Object.entries(dentalChart)) {
         const [quadrant, toothNumber] = key.split('-').map(Number);
         await updateToothStatus.mutateAsync({
