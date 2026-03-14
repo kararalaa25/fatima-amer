@@ -38,6 +38,7 @@ export default function EditPatientPage() {
     date_of_birth: '',
     address: '',
     phone_number: '',
+    patient_code: '',
     medical_history: [] as string[],
     current_medications: [] as string[],
   });
