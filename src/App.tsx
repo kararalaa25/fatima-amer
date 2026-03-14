@@ -14,6 +14,9 @@ import CaseManagement from "./pages/CaseManagement";
 import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
 import ResetPassword from "./pages/ResetPassword";
+import PatientJoin from "./pages/PatientJoin";
+import PatientLogin from "./pages/PatientLogin";
+import PatientPortal from "./pages/PatientPortal";
 
 const queryClient = new QueryClient();
 

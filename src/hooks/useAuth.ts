@@ -97,6 +97,8 @@ export function useAuth() {
     await supabase.auth.signOut();
   };
 
+  const isPatient = user?.user_metadata?.is_patient === true;
+
   return {
     user,
     session,
@@ -106,6 +108,7 @@ export function useAuth() {
     isAuthenticated: !!session || isPreviewMode,
     isActivated: profile?.is_activated ?? false,
     isPreviewMode,
+    isPatient,
     workspaceId: profile?.workspace_id ?? null,
   };
 }
