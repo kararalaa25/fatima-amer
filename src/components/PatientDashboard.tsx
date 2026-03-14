@@ -187,8 +187,10 @@ export function PatientDashboard() {
                 <Table>
                   <TableHeader>
                     <TableRow className="hover:bg-transparent">
+                      <TableHead className="text-muted-foreground font-semibold">Patient ID</TableHead>
                       <TableHead className="text-muted-foreground font-semibold">Name</TableHead>
                       <TableHead className="text-muted-foreground font-semibold">Age</TableHead>
+                      <TableHead className="hidden md:table-cell text-muted-foreground font-semibold">Phone</TableHead>
                       <TableHead className="hidden md:table-cell text-muted-foreground font-semibold">Chief Complaint</TableHead>
                       <TableHead className="text-muted-foreground font-semibold">Last Visit</TableHead>
                       <TableHead className="text-right text-muted-foreground font-semibold">Actions</TableHead>
@@ -201,8 +203,14 @@ export function PatientDashboard() {
                         className="cursor-pointer hover:bg-muted/50"
                         onClick={() => navigate(`/patient/${patient.id}`)}
                       >
+                        <TableCell className="font-mono text-sm text-primary font-semibold">
+                          {(patient as any).patient_code || '—'}
+                        </TableCell>
                         <TableCell className="font-semibold text-foreground">{patient.name}</TableCell>
                         <TableCell className="text-foreground">{patient.age}</TableCell>
+                        <TableCell className="hidden md:table-cell text-muted-foreground">
+                          {(patient as any).phone_number || '—'}
+                        </TableCell>
                         <TableCell className="hidden max-w-xs truncate md:table-cell text-muted-foreground">
                           {patient.chief_complaint || '—'}
                         </TableCell>
