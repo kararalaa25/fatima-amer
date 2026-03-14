@@ -5,6 +5,7 @@ import { useDentalChart } from '@/hooks/useDentalChart';
 import { useTreatmentPlan } from '@/hooks/useTreatmentPlan';
 import { useSessions, useCreateSession, useUploadSessionImage } from '@/hooks/useSessions';
 import { useInitialPhotos, useUploadInitialPhoto } from '@/hooks/useInitialPhotos';
+import { useDoctor } from '@/hooks/useDoctor';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -34,9 +35,13 @@ import {
   Stethoscope,
   FolderOpen,
   Sparkles,
+  QrCode,
+  Copy,
+  Check,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { SmileTransformation } from '@/components/smile-transformation/SmileTransformation';
+import { QRCodeSVG } from 'qrcode.react';
 
 export function PatientProfile() {
   const { id } = useParams<{ id: string }>();
