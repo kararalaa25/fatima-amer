@@ -159,7 +159,14 @@ export function PatientProfile() {
                 <User className="h-6 w-6 text-primary-foreground" />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-foreground">{patient.name}</h1>
+                <div className="flex items-center gap-2">
+                  <h1 className="text-xl font-bold text-foreground">{patient.name}</h1>
+                  {(patient as any).patient_code && (
+                    <Badge variant="outline" className="font-mono text-primary border-primary/30">
+                      {(patient as any).patient_code}
+                    </Badge>
+                  )}
+                </div>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <span>{patient.age} years old</span>
                   <span>•</span>
@@ -168,6 +175,12 @@ export function PatientProfile() {
               </div>
             </div>
             <div className="flex gap-2">
+              {(patient as any).patient_code && doctor?.doctor_code && (
+                <Button variant="outline" onClick={() => setShowQR(true)}>
+                  <QrCode className="mr-2 h-4 w-4" />
+                  Access QR
+                </Button>
+              )}
               <Button variant="outline" onClick={() => navigate(`/case-management/${id}`)}>
                 <FolderOpen className="mr-2 h-4 w-4" />
                 Case Management
