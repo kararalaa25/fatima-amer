@@ -28,6 +28,16 @@ function AppRoutes() {
       <Routes location={location}>
         <Route path="/auth" element={<Auth />} />
         <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/patient-join" element={<PatientJoin />} />
+        <Route path="/patient-login" element={<PatientLogin />} />
+        <Route
+          path="/patient-dashboard"
+          element={
+            <ProtectedRoute>
+              <PatientPortal />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/"
           element={
