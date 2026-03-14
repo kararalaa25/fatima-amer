@@ -118,6 +118,7 @@ export default function EditPatientPage() {
         date_of_birth: '',
         address: '',
         phone_number: (patient as any).phone_number || '',
+        patient_code: (patient as any).patient_code || '',
         medical_history: [],
         current_medications: [],
       });
