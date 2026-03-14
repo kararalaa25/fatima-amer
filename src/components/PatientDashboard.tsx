@@ -28,12 +28,16 @@ export function PatientDashboard() {
   const ensureDoctor = useEnsureDoctor();
   const navigate = useNavigate();
 
-  // Ensure doctor record exists
+  // Ensure doctor record exists, then refetch
   useEffect(() => {
-    if (!isPreviewMode) {
-      ensureDoctor.mutate();
+    if (!isPreviewMode && !doctor) {
+      ensureDoctor.mutate(undefined, {
+        onSuccess: () => {
+          // doctor query will auto-refetch via queryClient invalidation in useEnsureDoctor
+        },
+      });
     }
-  }, [isPreviewMode]);
+  }, [isPreviewMode, doctor]);
 
   const filteredPatients = patients?.filter(
     (patient) =>
@@ -67,12 +71,12 @@ export function PatientDashboard() {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              {doctor && (
-                <div className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-primary/10 border border-primary/20">
-                  <span className="text-xs text-muted-foreground">Doctor ID:</span>
-                  <span className="text-sm font-mono font-bold text-primary">{doctor.doctor_code}</span>
-                </div>
-              )}
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-primary/10 border border-primary/20">
+                <span className="text-xs text-muted-foreground">Doctor ID:</span>
+                <span className="text-sm font-mono font-bold text-primary">
+                  {doctor?.doctor_code || 'Loading...'}
+                </span>
+              </div>
               {/* System Operational Indicator */}
               <div className="hidden sm:flex items-center gap-2 text-sm text-muted-foreground">
                 <span className="h-2 w-2 rounded-full bg-success" />
