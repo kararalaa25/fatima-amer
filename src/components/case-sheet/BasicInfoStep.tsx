@@ -90,6 +90,17 @@ export function BasicInfoStep({ data, onChange }: BasicInfoStepProps) {
         </div>
 
         <div className="space-y-2">
+          <Label htmlFor="phone_number">Phone Number</Label>
+          <Input
+            id="phone_number"
+            type="tel"
+            value={data.phone_number || ''}
+            onChange={(e) => onChange('phone_number', e.target.value)}
+            placeholder="Patient phone number"
+          />
+        </div>
+
+        <div className="space-y-2">
           <Label htmlFor="date_of_birth">Date of Birth</Label>
           <div className="relative">
             <Input
