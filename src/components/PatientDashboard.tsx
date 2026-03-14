@@ -28,12 +28,16 @@ export function PatientDashboard() {
   const ensureDoctor = useEnsureDoctor();
   const navigate = useNavigate();
 
-  // Ensure doctor record exists
+  // Ensure doctor record exists, then refetch
   useEffect(() => {
-    if (!isPreviewMode) {
-      ensureDoctor.mutate();
+    if (!isPreviewMode && !doctor) {
+      ensureDoctor.mutate(undefined, {
+        onSuccess: () => {
+          // doctor query will auto-refetch via queryClient invalidation in useEnsureDoctor
+        },
+      });
     }
-  }, [isPreviewMode]);
+  }, [isPreviewMode, doctor]);
 
   const filteredPatients = patients?.filter(
     (patient) =>
