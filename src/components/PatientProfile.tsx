@@ -55,12 +55,15 @@ export function PatientProfile() {
   const { data: treatmentPlan } = useTreatmentPlan(id!);
   const { data: sessions } = useSessions(id!);
   const { data: initialPhotos } = useInitialPhotos(id!);
+  const { data: doctor } = useDoctor();
 
   const createSession = useCreateSession();
   const uploadSessionImage = useUploadSessionImage();
   const uploadInitialPhoto = useUploadInitialPhoto();
 
   const [isAddSessionOpen, setIsAddSessionOpen] = useState(false);
+  const [showQR, setShowQR] = useState(false);
+  const [copiedId, setCopiedId] = useState(false);
   const [sessionForm, setSessionForm] = useState({
     session_date: format(new Date(), 'yyyy-MM-dd'),
     treatment_performed: '',
