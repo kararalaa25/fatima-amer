@@ -65,6 +65,12 @@ export function PatientDashboard() {
                 </h1>
                 <p className="text-sm text-muted-foreground">Clinical Management</p>
               </div>
+              {doctor && (
+                <div className="hidden md:flex items-center gap-2 ml-4 px-3 py-1.5 rounded-md bg-primary/10 border border-primary/20">
+                  <span className="text-xs text-muted-foreground">Your Doctor ID:</span>
+                  <span className="text-sm font-mono font-bold text-primary">{doctor.doctor_code}</span>
+                </div>
+              )}
             </div>
             <div className="flex items-center gap-3">
               {/* System Operational Indicator */}
