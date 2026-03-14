@@ -46,7 +46,6 @@ const COMMON_MEDICATIONS = [
 ];
 
 export function BasicInfoStep({ data, onChange }: BasicInfoStepProps) {
-  const [generatingId, setGeneratingId] = useState(false);
   const [copied, setCopied] = useState(false);
 
   const handleGeneratePatientId = () => {
