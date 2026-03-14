@@ -29,83 +29,19 @@ export default function PatientJoin() {
 
     setLoading(true);
     try {
-      // 1. Find doctor by code
-      const { data: doctor, error: docError } = await supabase
-        .from('doctors')
-        .select('id')
-        .eq('doctor_code', doctorId.toUpperCase().trim())
-        .maybeSingle();
-
-      if (docError || !doctor) {
-        toast.error('Invalid Doctor ID', { description: 'No doctor found with this ID.' });
-        return;
-      }
-
-      // 2. Find patient by code belonging to that doctor
-      const { data: patient, error: ptError } = await supabase
-        .from('patients')
-        .select('id, phone_number, patient_code')
-        .eq('patient_code', patientId.toUpperCase().trim())
-        .eq('doctor_id', doctor.id)
-        .maybeSingle();
-
-      if (ptError || !patient) {
-        toast.error('Invalid Patient ID', { description: 'No patient found with this ID for this doctor.' });
-        return;
-      }
-
-      // 3. Check phone number matches
-      if (patient.phone_number !== phoneNumber.trim()) {
-        toast.error('Phone number mismatch', { description: 'The phone number does not match our records.' });
-        return;
-      }
-
-      // 4. Check if already registered
-      const { data: existingAccount } = await supabase
-        .from('patient_accounts')
-        .select('is_registered')
-        .eq('patient_id', patient.id)
-        .maybeSingle();
-
-      if (existingAccount?.is_registered) {
-        toast.error('Already registered', { description: 'This patient account is already registered. Please log in.' });
-        return;
-      }
-
-      // 5. Create Supabase auth account using phone as email identifier
-      const patientEmail = `${phoneNumber.trim().replace(/[^0-9]/g, '')}@patient.ortho.local`;
-      const { data: authData, error: signUpError } = await supabase.auth.signUp({
-        email: patientEmail,
-        password,
-        options: {
-          data: {
-            full_name: `Patient ${patientId}`,
-            is_patient: true,
-            patient_id: patient.id,
-          },
+      const { data, error } = await supabase.functions.invoke('register-patient', {
+        body: {
+          doctor_code: doctorId.trim(),
+          patient_code: patientId.trim(),
+          phone_number: phoneNumber.trim(),
+          password,
         },
       });
 
-      if (signUpError) throw signUpError;
-
-      // 6. Update patient_accounts
-      if (existingAccount) {
-        await supabase
-          .from('patient_accounts')
-          .update({
-            is_registered: true,
-            auth_user_id: authData.user?.id,
-          })
-          .eq('patient_id', patient.id);
-      } else {
-        await supabase
-          .from('patient_accounts')
-          .insert({
-            patient_id: patient.id,
-            phone_number: phoneNumber.trim(),
-            is_registered: true,
-            auth_user_id: authData.user?.id,
-          });
+      if (error) throw error;
+      if (data?.error) {
+        toast.error(data.error);
+        return;
       }
 
       toast.success('Registration successful!', { description: 'You can now log in with your phone number and password.' });
