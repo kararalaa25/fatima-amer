@@ -116,6 +116,7 @@ export default function EditPatientPage() {
         chief_complaint: patient.chief_complaint || '',
         date_of_birth: '',
         address: '',
+        phone_number: (patient as any).phone_number || '',
         medical_history: [],
         current_medications: [],
       });
