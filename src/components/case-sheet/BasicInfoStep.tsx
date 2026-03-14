@@ -46,21 +46,13 @@ const COMMON_MEDICATIONS = [
 ];
 
 export function BasicInfoStep({ data, onChange }: BasicInfoStepProps) {
-  const [generatingId, setGeneratingId] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  const handleGeneratePatientId = async () => {
-    setGeneratingId(true);
-    try {
-      const { data: code, error } = await supabase.rpc('generate_patient_code');
-      if (error) throw error;
-      onChange('patient_code', code);
-      toast.success(`Patient ID Generated: ${code}`);
-    } catch (err: any) {
-      toast.error('Failed to generate Patient ID', { description: err.message });
-    } finally {
-      setGeneratingId(false);
-    }
+  const handleGeneratePatientId = () => {
+    const num = Math.floor(1000 + Math.random() * 9000);
+    const code = `PAT-${num}`;
+    onChange('patient_code', code);
+    toast.success(`Patient ID Generated: ${code}`);
   };
 
   const handleCopyId = () => {
@@ -123,17 +115,8 @@ export function BasicInfoStep({ data, onChange }: BasicInfoStepProps) {
               </Button>
             </div>
           ) : (
-            <Button
-              type="button"
-              onClick={handleGeneratePatientId}
-              disabled={generatingId}
-              className="gap-2"
-            >
-              {generatingId ? (
-                <><Loader2 className="h-4 w-4 animate-spin" /> Generating...</>
-              ) : (
-                <><Hash className="h-4 w-4" /> Generate Patient ID</>
-              )}
+            <Button type="button" onClick={handleGeneratePatientId} className="gap-2">
+              <Hash className="h-4 w-4" /> Generate Patient ID
             </Button>
           )}
         </div>

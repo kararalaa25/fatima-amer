@@ -593,7 +593,7 @@ export function PatientProfile() {
           <div className="flex flex-col items-center gap-4 py-4">
             <div className="p-4 bg-white rounded-xl">
               <QRCodeSVG
-                value={`${window.location.origin}/view?doc=${doctor?.doctor_code || ''}&pat=${(patient as any).patient_code || ''}`}
+                value={`${window.location.origin}/access?doc=${doctor?.doctor_code || ''}&pat=${(patient as any).patient_code || ''}`}
                 size={200}
                 level="H"
               />
@@ -613,7 +613,7 @@ export function PatientProfile() {
                 variant="outline"
                 className="flex-1"
                 onClick={() => {
-                  const url = `${window.location.origin}/view?doc=${doctor?.doctor_code}&pat=${(patient as any).patient_code}`;
+                  const url = `${window.location.origin}/access?doc=${doctor?.doctor_code}&pat=${(patient as any).patient_code}`;
                   navigator.clipboard.writeText(url);
                   setCopiedId(true);
                   setTimeout(() => setCopiedId(false), 2000);
