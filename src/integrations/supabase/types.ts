@@ -55,6 +55,27 @@ export type Database = {
           },
         ]
       }
+      doctors: {
+        Row: {
+          created_at: string
+          doctor_code: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          doctor_code: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          doctor_code?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       initial_photos: {
         Row: {
           created_at: string
@@ -90,6 +111,44 @@ export type Database = {
           },
         ]
       }
+      patient_accounts: {
+        Row: {
+          auth_user_id: string | null
+          created_at: string
+          id: string
+          is_registered: boolean
+          patient_id: string
+          phone_number: string
+          updated_at: string
+        }
+        Insert: {
+          auth_user_id?: string | null
+          created_at?: string
+          id?: string
+          is_registered?: boolean
+          patient_id: string
+          phone_number: string
+          updated_at?: string
+        }
+        Update: {
+          auth_user_id?: string | null
+          created_at?: string
+          id?: string
+          is_registered?: boolean
+          patient_id?: string
+          phone_number?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "patient_accounts_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       patients: {
         Row: {
           address: string | null
@@ -111,6 +170,7 @@ export type Database = {
           crossbite_posterior: string | null
           current_medications: string[] | null
           date_of_birth: string | null
+          doctor_id: string | null
           habits: string | null
           horizontal_relation: string | null
           id: string
@@ -133,6 +193,8 @@ export type Database = {
           oral_hygiene: string | null
           overbite_mm: number | null
           overjet_mm: number | null
+          patient_code: string | null
+          phone_number: string | null
           tongue_position: string | null
           tongue_size: string | null
           updated_at: string
@@ -163,6 +225,7 @@ export type Database = {
           crossbite_posterior?: string | null
           current_medications?: string[] | null
           date_of_birth?: string | null
+          doctor_id?: string | null
           habits?: string | null
           horizontal_relation?: string | null
           id?: string
@@ -185,6 +248,8 @@ export type Database = {
           oral_hygiene?: string | null
           overbite_mm?: number | null
           overjet_mm?: number | null
+          patient_code?: string | null
+          phone_number?: string | null
           tongue_position?: string | null
           tongue_size?: string | null
           updated_at?: string
@@ -215,6 +280,7 @@ export type Database = {
           crossbite_posterior?: string | null
           current_medications?: string[] | null
           date_of_birth?: string | null
+          doctor_id?: string | null
           habits?: string | null
           horizontal_relation?: string | null
           id?: string
@@ -237,6 +303,8 @@ export type Database = {
           oral_hygiene?: string | null
           overbite_mm?: number | null
           overjet_mm?: number | null
+          patient_code?: string | null
+          phone_number?: string | null
           tongue_position?: string | null
           tongue_size?: string | null
           updated_at?: string
@@ -247,7 +315,15 @@ export type Database = {
           user_id?: string | null
           vertical_relation?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "patients_doctor_id_fkey"
+            columns: ["doctor_id"]
+            isOneToOne: false
+            referencedRelation: "doctors"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -425,6 +501,8 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      generate_doctor_code: { Args: never; Returns: string }
+      generate_patient_code: { Args: never; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
