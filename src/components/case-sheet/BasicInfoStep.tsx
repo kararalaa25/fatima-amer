@@ -3,7 +3,11 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
-import { Calendar } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Calendar, Hash, Loader2, Copy, Check } from 'lucide-react';
+import { useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 interface BasicInfoStepProps {
   data: {
@@ -13,6 +17,7 @@ interface BasicInfoStepProps {
     date_of_birth: string;
     address: string;
     phone_number: string;
+    patient_code: string;
     medical_history: string[];
     current_medications: string[];
   };
@@ -41,6 +46,32 @@ const COMMON_MEDICATIONS = [
 ];
 
 export function BasicInfoStep({ data, onChange }: BasicInfoStepProps) {
+  const [generatingId, setGeneratingId] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const handleGeneratePatientId = async () => {
+    setGeneratingId(true);
+    try {
+      const { data: code, error } = await supabase.rpc('generate_patient_code');
+      if (error) throw error;
+      onChange('patient_code', code);
+      toast.success(`Patient ID Generated: ${code}`);
+    } catch (err: any) {
+      toast.error('Failed to generate Patient ID', { description: err.message });
+    } finally {
+      setGeneratingId(false);
+    }
+  };
+
+  const handleCopyId = () => {
+    if (data.patient_code) {
+      navigator.clipboard.writeText(data.patient_code);
+      setCopied(true);
+      toast.success('Patient ID copied to clipboard');
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
   const handleMedicalHistoryChange = (conditionId: string, checked: boolean) => {
     const current = data.medical_history || [];
     const updated = checked
@@ -62,6 +93,50 @@ export function BasicInfoStep({ data, onChange }: BasicInfoStepProps) {
       <div>
         <h3 className="text-lg font-semibold text-foreground">Basic Information</h3>
         <p className="text-sm text-muted-foreground">Enter the patient's basic details and medical history</p>
+      </div>
+
+      {/* Patient ID Generator */}
+      <div className="rounded-xl border-2 border-dashed border-primary/30 bg-primary/5 p-5">
+        <div className="flex items-center justify-between">
+          <div>
+            <h4 className="font-semibold text-foreground flex items-center gap-2">
+              <Hash className="h-4 w-4 text-primary" />
+              Patient ID
+            </h4>
+            <p className="text-xs text-muted-foreground mt-1">
+              Generate a unique ID to share with your patient for access
+            </p>
+          </div>
+          {data.patient_code ? (
+            <div className="flex items-center gap-2">
+              <div className="px-4 py-2 rounded-lg bg-primary/10 border border-primary/30">
+                <span className="text-lg font-mono font-bold text-primary">{data.patient_code}</span>
+              </div>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={handleCopyId}
+                className="h-9 w-9"
+              >
+                {copied ? <Check className="h-4 w-4 text-success" /> : <Copy className="h-4 w-4" />}
+              </Button>
+            </div>
+          ) : (
+            <Button
+              type="button"
+              onClick={handleGeneratePatientId}
+              disabled={generatingId}
+              className="gap-2"
+            >
+              {generatingId ? (
+                <><Loader2 className="h-4 w-4 animate-spin" /> Generating...</>
+              ) : (
+                <><Hash className="h-4 w-4" /> Generate Patient ID</>
+              )}
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Core Details */}

@@ -71,6 +71,7 @@ export function CaseSheetForm() {
     date_of_birth: '',
     address: '',
     phone_number: '',
+    patient_code: '',
     medical_history: [] as string[],
     current_medications: [] as string[],
   });
@@ -230,9 +231,13 @@ export function CaseSheetForm() {
     setIsSubmitting(true);
 
     try {
-      // Generate patient code
-      const { data: patientCode, error: codeError } = await supabase.rpc('generate_patient_code');
-      if (codeError) throw codeError;
+      // Use pre-generated patient code, or generate one if not yet created
+      let patientCode = basicData.patient_code;
+      if (!patientCode) {
+        const { data: code, error: codeError } = await supabase.rpc('generate_patient_code');
+        if (codeError) throw codeError;
+        patientCode = code;
+      }
 
       const patientPayload = {
         name: basicData.name,

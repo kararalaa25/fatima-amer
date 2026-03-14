@@ -17,6 +17,7 @@ import ResetPassword from "./pages/ResetPassword";
 import PatientJoin from "./pages/PatientJoin";
 import PatientLogin from "./pages/PatientLogin";
 import PatientPortal from "./pages/PatientPortal";
+import PatientAccess from "./pages/PatientAccess";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +31,7 @@ function AppRoutes() {
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/patient-join" element={<PatientJoin />} />
         <Route path="/patient-login" element={<PatientLogin />} />
+        <Route path="/view" element={<PatientAccess />} />
         <Route
           path="/patient-dashboard"
           element={

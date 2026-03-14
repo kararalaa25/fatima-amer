@@ -38,6 +38,7 @@ export default function EditPatientPage() {
     date_of_birth: '',
     address: '',
     phone_number: '',
+    patient_code: '',
     medical_history: [] as string[],
     current_medications: [] as string[],
   });
@@ -117,6 +118,7 @@ export default function EditPatientPage() {
         date_of_birth: '',
         address: '',
         phone_number: (patient as any).phone_number || '',
+        patient_code: (patient as any).patient_code || '',
         medical_history: [],
         current_medications: [],
       });

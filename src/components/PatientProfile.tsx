@@ -5,6 +5,7 @@ import { useDentalChart } from '@/hooks/useDentalChart';
 import { useTreatmentPlan } from '@/hooks/useTreatmentPlan';
 import { useSessions, useCreateSession, useUploadSessionImage } from '@/hooks/useSessions';
 import { useInitialPhotos, useUploadInitialPhoto } from '@/hooks/useInitialPhotos';
+import { useDoctor } from '@/hooks/useDoctor';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -34,9 +35,13 @@ import {
   Stethoscope,
   FolderOpen,
   Sparkles,
+  QrCode,
+  Copy,
+  Check,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { SmileTransformation } from '@/components/smile-transformation/SmileTransformation';
+import { QRCodeSVG } from 'qrcode.react';
 
 export function PatientProfile() {
   const { id } = useParams<{ id: string }>();
@@ -50,12 +55,15 @@ export function PatientProfile() {
   const { data: treatmentPlan } = useTreatmentPlan(id!);
   const { data: sessions } = useSessions(id!);
   const { data: initialPhotos } = useInitialPhotos(id!);
+  const { data: doctor } = useDoctor();
 
   const createSession = useCreateSession();
   const uploadSessionImage = useUploadSessionImage();
   const uploadInitialPhoto = useUploadInitialPhoto();
 
   const [isAddSessionOpen, setIsAddSessionOpen] = useState(false);
+  const [showQR, setShowQR] = useState(false);
+  const [copiedId, setCopiedId] = useState(false);
   const [sessionForm, setSessionForm] = useState({
     session_date: format(new Date(), 'yyyy-MM-dd'),
     treatment_performed: '',
@@ -151,7 +159,14 @@ export function PatientProfile() {
                 <User className="h-6 w-6 text-primary-foreground" />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-foreground">{patient.name}</h1>
+                <div className="flex items-center gap-2">
+                  <h1 className="text-xl font-bold text-foreground">{patient.name}</h1>
+                  {(patient as any).patient_code && (
+                    <Badge variant="outline" className="font-mono text-primary border-primary/30">
+                      {(patient as any).patient_code}
+                    </Badge>
+                  )}
+                </div>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <span>{patient.age} years old</span>
                   <span>•</span>
@@ -160,6 +175,12 @@ export function PatientProfile() {
               </div>
             </div>
             <div className="flex gap-2">
+              {(patient as any).patient_code && doctor?.doctor_code && (
+                <Button variant="outline" onClick={() => setShowQR(true)}>
+                  <QrCode className="mr-2 h-4 w-4" />
+                  Access QR
+                </Button>
+              )}
               <Button variant="outline" onClick={() => navigate(`/case-management/${id}`)}>
                 <FolderOpen className="mr-2 h-4 w-4" />
                 Case Management
@@ -562,6 +583,49 @@ export function PatientProfile() {
           </TabsContent>
         </Tabs>
       </main>
+
+      {/* QR Code Dialog */}
+      <Dialog open={showQR} onOpenChange={setShowQR}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Patient Access QR Code</DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col items-center gap-4 py-4">
+            <div className="p-4 bg-white rounded-xl">
+              <QRCodeSVG
+                value={`${window.location.origin}/view?doc=${doctor?.doctor_code || ''}&pat=${(patient as any).patient_code || ''}`}
+                size={200}
+                level="H"
+              />
+            </div>
+            <div className="text-center space-y-1">
+              <p className="text-sm text-muted-foreground">
+                Patient can scan this code to view their case
+              </p>
+              <div className="flex items-center gap-2 justify-center">
+                <Badge variant="outline" className="font-mono">{doctor?.doctor_code}</Badge>
+                <span className="text-muted-foreground">+</span>
+                <Badge variant="outline" className="font-mono">{(patient as any).patient_code}</Badge>
+              </div>
+            </div>
+            <div className="flex gap-2 w-full">
+              <Button
+                variant="outline"
+                className="flex-1"
+                onClick={() => {
+                  const url = `${window.location.origin}/view?doc=${doctor?.doctor_code}&pat=${(patient as any).patient_code}`;
+                  navigator.clipboard.writeText(url);
+                  setCopiedId(true);
+                  setTimeout(() => setCopiedId(false), 2000);
+                }}
+              >
+                {copiedId ? <Check className="mr-2 h-4 w-4" /> : <Copy className="mr-2 h-4 w-4" />}
+                {copiedId ? 'Copied!' : 'Copy Link'}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
