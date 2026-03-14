@@ -18,6 +18,7 @@ import PatientJoin from "./pages/PatientJoin";
 import PatientLogin from "./pages/PatientLogin";
 import PatientPortal from "./pages/PatientPortal";
 import PatientAccess from "./pages/PatientAccess";
+import Access from "./pages/Access";
 
 const queryClient = new QueryClient();
 
