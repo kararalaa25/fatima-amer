@@ -24,7 +24,16 @@ export function PatientDashboard() {
   const { data: patients, isLoading } = usePatients();
   const { signOut, isPreviewMode } = useAuth();
   const { isAdmin } = useAdmin();
+  const { data: doctor } = useDoctor();
+  const ensureDoctor = useEnsureDoctor();
   const navigate = useNavigate();
+
+  // Ensure doctor record exists
+  useEffect(() => {
+    if (!isPreviewMode) {
+      ensureDoctor.mutate();
+    }
+  }, [isPreviewMode]);
 
   const filteredPatients = patients?.filter(
     (patient) =>
