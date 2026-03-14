@@ -62,6 +62,7 @@ export function CaseSheetForm() {
     chief_complaint: '',
     date_of_birth: '',
     address: '',
+    phone_number: '',
     medical_history: [] as string[],
     current_medications: [] as string[],
   });
