@@ -62,7 +62,7 @@ export function PatientDashboard() {
               <div className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-primary/10 border border-primary/20">
                 <span className="text-xs text-muted-foreground">Doctor ID:</span>
                 <span className="text-sm font-mono font-bold text-primary">
-                  {doctor?.doctor_code || 'Loading...'}
+                  {isDoctorLoading ? 'Generating...' : doctor?.doctor_code || 'Unavailable'}
                 </span>
               </div>
               {/* System Operational Indicator */}

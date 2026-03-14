@@ -50,12 +50,6 @@ export function CaseSheetForm() {
   const { toast } = useToast();
   const createPatient = useCreatePatient();
   const { data: doctor } = useDoctor();
-  const ensureDoctor = useEnsureDoctor();
-
-  // Ensure doctor record exists on mount
-  useEffect(() => {
-    ensureDoctor.mutate();
-  }, []);
   const updateToothStatus = useUpdateToothStatus();
   const upsertTreatmentPlan = useUpsertTreatmentPlan();
   const createInitialPhoto = useCreateInitialPhoto();
