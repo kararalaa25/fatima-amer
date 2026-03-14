@@ -327,9 +327,11 @@ export function CaseSheetForm() {
         });
       }
 
+      // Show patient code in a prominent toast
       toast({
-        title: 'Success',
-        description: 'Patient case sheet created successfully',
+        title: `✅ Case Created — ${patientCode}`,
+        description: `Patient ID: ${patientCode} — Share this with your patient for registration.`,
+        duration: 15000,
       });
 
       navigate(`/patient/${patient.id}`);
