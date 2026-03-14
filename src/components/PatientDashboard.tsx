@@ -13,8 +13,8 @@ import {
   TableCell,
   TableHead,
   TableHeader,
-  TableRow,
-} from '@/components/ui/table';
+  TableRow } from
+'@/components/ui/table';
 import { Search, Plus, Users, LogOut, User, Sparkles, Shield } from 'lucide-react';
 import { format } from 'date-fns';
 import { PatientActionsMenu } from './dashboard/PatientActionsMenu';
@@ -33,16 +33,16 @@ export function PatientDashboard() {
     if (!isPreviewMode && !doctor) {
       ensureDoctor.mutate(undefined, {
         onSuccess: () => {
+
           // doctor query will auto-refetch via queryClient invalidation in useEnsureDoctor
-        },
-      });
+        } });
     }
   }, [isPreviewMode, doctor]);
 
   const filteredPatients = patients?.filter(
     (patient) =>
-      patient.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      patient.chief_complaint?.toLowerCase().includes(searchQuery.toLowerCase())
+    patient.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    patient.chief_complaint?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -61,11 +61,11 @@ export function PatientDashboard() {
               <div>
                 <h1 className="text-xl font-bold text-foreground flex items-center gap-2">
                   Ortho Smart Suite
-                  {isPreviewMode && (
-                    <span className="text-xs font-medium text-primary bg-primary/10 px-2 py-0.5 rounded">
+                  {isPreviewMode &&
+                  <span className="text-xs font-medium text-primary bg-primary/10 px-2 py-0.5 rounded">
                       Preview
                     </span>
-                  )}
+                  }
                 </h1>
                 <p className="text-sm text-muted-foreground">Clinical Management</p>
               </div>
@@ -87,16 +87,16 @@ export function PatientDashboard() {
                 <Plus className="h-4 w-4" />
                 New Case
               </Button>
-              {isAdmin && (
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => navigate('/admin')}
-                  title="Admin Dashboard"
-                >
+              {isAdmin &&
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => navigate('/admin')}
+                title="Admin Dashboard">
+                
                   <Shield className="h-5 w-5" />
                 </Button>
-              )}
+              }
               <Button variant="outline" size="icon">
                 <User className="h-5 w-5" />
               </Button>
@@ -164,30 +164,30 @@ export function PatientDashboard() {
                   placeholder="Search patients..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 h-10"
-                />
+                  className="pl-10 h-10" />
+                
               </div>
             </div>
           </CardHeader>
           <CardContent>
-            {isLoading ? (
-              <div className="flex h-40 items-center justify-center">
-                <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-              </div>
-            ) : filteredPatients?.length === 0 ? (
-              <div className="flex h-40 flex-col items-center justify-center text-muted-foreground">
+            {isLoading ?
+            <div className="flex h-40 items-center justify-center">
+                
+              </div> :
+            filteredPatients?.length === 0 ?
+            <div className="flex h-40 flex-col items-center justify-center text-muted-foreground">
                 <Users className="mb-2 h-12 w-12" />
                 <p className="font-medium">No patients found</p>
                 <Button
-                  variant="link"
-                  className="mt-2 text-primary font-semibold"
-                  onClick={() => navigate('/patient/new')}
-                >
+                variant="link"
+                className="mt-2 text-primary font-semibold"
+                onClick={() => navigate('/patient/new')}>
+                
                   Add your first patient
                 </Button>
-              </div>
-            ) : (
-              <div className="overflow-x-auto rounded-lg border border-border">
+              </div> :
+
+            <div className="overflow-x-auto rounded-lg border border-border">
                 <Table>
                   <TableHeader>
                     <TableRow className="hover:bg-transparent">
@@ -201,12 +201,12 @@ export function PatientDashboard() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filteredPatients?.map((patient) => (
-                      <TableRow
-                        key={patient.id}
-                        className="cursor-pointer hover:bg-muted/50"
-                        onClick={() => navigate(`/patient/${patient.id}`)}
-                      >
+                    {filteredPatients?.map((patient) =>
+                  <TableRow
+                    key={patient.id}
+                    className="cursor-pointer hover:bg-muted/50"
+                    onClick={() => navigate(`/patient/${patient.id}`)}>
+                    
                         <TableCell className="font-mono text-sm text-primary font-semibold">
                           {(patient as any).patient_code || '—'}
                         </TableCell>
@@ -223,20 +223,20 @@ export function PatientDashboard() {
                         </TableCell>
                         <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
                           <PatientActionsMenu
-                            patientId={patient.id}
-                            patientName={patient.name}
-                          />
+                        patientId={patient.id}
+                        patientName={patient.name} />
+                      
                         </TableCell>
                       </TableRow>
-                    ))}
+                  )}
                   </TableBody>
                 </Table>
               </div>
-            )}
+            }
           </CardContent>
         </Card>
       </main>
 
-    </div>
-  );
+    </div>);
+
 }
