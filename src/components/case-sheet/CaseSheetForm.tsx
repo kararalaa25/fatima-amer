@@ -1,7 +1,7 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCreatePatient } from '@/hooks/usePatients';
-import { useDoctor, useEnsureDoctor } from '@/hooks/useDoctor';
+import { useDoctor } from '@/hooks/useDoctor';
 import { useUpdateToothStatus } from '@/hooks/useDentalChart';
 import { useUpsertTreatmentPlan } from '@/hooks/useTreatmentPlan';
 import { useCreateInitialPhoto } from '@/hooks/useInitialPhotos';
@@ -50,12 +50,6 @@ export function CaseSheetForm() {
   const { toast } = useToast();
   const createPatient = useCreatePatient();
   const { data: doctor } = useDoctor();
-  const ensureDoctor = useEnsureDoctor();
-
-  // Ensure doctor record exists on mount
-  useEffect(() => {
-    ensureDoctor.mutate();
-  }, []);
   const updateToothStatus = useUpdateToothStatus();
   const upsertTreatmentPlan = useUpsertTreatmentPlan();
   const createInitialPhoto = useCreateInitialPhoto();

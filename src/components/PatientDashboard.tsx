@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usePatients } from '@/hooks/usePatients';
 import { useAuth } from '@/hooks/useAuth';
 import { useAdmin } from '@/hooks/useAdmin';
-import { useDoctor, useEnsureDoctor } from '@/hooks/useDoctor';
+import { useDoctor } from '@/hooks/useDoctor';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -24,20 +24,8 @@ export function PatientDashboard() {
   const { data: patients, isLoading } = usePatients();
   const { signOut, isPreviewMode } = useAuth();
   const { isAdmin } = useAdmin();
-  const { data: doctor } = useDoctor();
-  const ensureDoctor = useEnsureDoctor();
+  const { data: doctor, isLoading: isDoctorLoading } = useDoctor();
   const navigate = useNavigate();
-
-  // Ensure doctor record exists, then refetch
-  useEffect(() => {
-    if (!isPreviewMode && !doctor) {
-      ensureDoctor.mutate(undefined, {
-        onSuccess: () => {
-
-          // doctor query will auto-refetch via queryClient invalidation in useEnsureDoctor
-        } });
-    }
-  }, [isPreviewMode, doctor]);
 
   const filteredPatients = patients?.filter(
     (patient) =>
@@ -74,7 +62,7 @@ export function PatientDashboard() {
               <div className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-primary/10 border border-primary/20">
                 <span className="text-xs text-muted-foreground">Doctor ID:</span>
                 <span className="text-sm font-mono font-bold text-primary">
-                  {doctor?.doctor_code || 'Loading...'}
+                  {isDoctorLoading ? 'Generating...' : doctor?.doctor_code || 'Unavailable'}
                 </span>
               </div>
               {/* System Operational Indicator */}
