@@ -8,12 +8,12 @@ export function SiteHeader() {
   const navigate = useNavigate();
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-border/60 bg-background/80 backdrop-blur-md">
-      <div className="container mx-auto flex h-16 items-center justify-between px-4">
-        <Link to="/" className="flex items-center gap-2">
-          <div className="h-8 w-8 rounded-full gradient-hero shadow-soft" />
-          <span className="font-display text-xl font-semibold tracking-tight">
-            Dr. Smile<span className="text-primary">.</span>
+    <header className="sticky top-0 z-40 w-full border-b border-border/40 glass">
+      <div className="container mx-auto flex h-20 items-center justify-between px-6">
+        <Link to="/" className="flex items-center gap-3">
+          <div className="h-9 w-9 rounded-2xl gradient-mint shadow-glow" />
+          <span className="font-display text-xl font-bold tracking-tight">
+            Dr. Smile<span className="text-accent">.</span>
           </span>
         </Link>
         <nav className="hidden items-center gap-8 md:flex">

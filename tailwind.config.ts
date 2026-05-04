@@ -101,16 +101,16 @@ export default {
       },
       fontFamily: {
         sans: [
+          'Plus Jakarta Sans',
           'Inter',
           '-apple-system',
           'BlinkMacSystemFont',
-          'SF Pro Display',
           'Segoe UI',
           'Roboto',
-          'Helvetica Neue',
-          'Arial',
           'sans-serif'
-        ]
+        ],
+        script: ['Dancing Script', 'Caveat', 'cursive'],
+        display: ['Plus Jakarta Sans', 'sans-serif']
       },
       fontWeight: {
         normal: '400',
