@@ -102,6 +102,35 @@ export default function Admin() {
           </Button>
         </div>
 
+        <div className="mt-8 rounded-2xl border border-border bg-card p-6">
+          <h2 className="font-display text-lg font-semibold">Admin Access URL</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Anyone visiting this private URL is signed in as admin instantly. Keep it secret.
+          </p>
+          <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+            <div className="flex flex-1 items-center rounded-lg border border-border bg-background px-3">
+              <span className="text-sm text-muted-foreground">{window.location.origin}/</span>
+              <Input
+                value={slugDraft}
+                onChange={(e) => setSlugDraft(e.target.value)}
+                className="border-0 bg-transparent px-1 focus-visible:ring-0"
+                placeholder="your-secret-slug"
+              />
+            </div>
+            <Button onClick={saveSlug}>Save URL</Button>
+            <Button
+              variant="outline"
+              onClick={() => {
+                navigator.clipboard.writeText(adminUrl);
+                toast.success('Copied');
+              }}
+            >
+              <Copy className="mr-2 h-4 w-4" />Copy current
+            </Button>
+          </div>
+          <p className="mt-3 text-xs text-muted-foreground break-all">Current: {adminUrl}</p>
+        </div>
+
         <div className="mt-10 overflow-hidden rounded-2xl border border-border bg-card">
           <table className="w-full text-sm">
             <thead className="border-b border-border bg-muted/40 text-left text-xs uppercase tracking-wider text-muted-foreground">
