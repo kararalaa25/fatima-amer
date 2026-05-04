@@ -6,7 +6,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { SiteHeader } from '@/components/SiteHeader';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Plus, Pencil, Trash2, Eye, EyeOff, Copy } from 'lucide-react';
+import { Plus, Pencil, Trash2, Eye, EyeOff, Copy, ExternalLink } from 'lucide-react';
 import { categoryLabel } from '@/lib/categories';
 import { toast } from 'sonner';
 
@@ -158,13 +158,18 @@ export default function Admin() {
                   </td>
                   <td className="p-4 text-right">
                     <div className="flex justify-end gap-1">
+                      <Button variant="ghost" size="icon" asChild title="View case">
+                        <Link to={`/case/${c.id}`} target="_blank" rel="noopener noreferrer">
+                          <ExternalLink className="h-4 w-4" />
+                        </Link>
+                      </Button>
                       <Button variant="ghost" size="icon" onClick={() => togglePublish(c.id, c.published)} title={c.published ? 'Unpublish' : 'Publish'}>
                         {c.published ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </Button>
-                      <Button variant="ghost" size="icon" asChild>
+                      <Button variant="ghost" size="icon" asChild title="Edit">
                         <Link to={`/admin/case/${c.id}`}><Pencil className="h-4 w-4" /></Link>
                       </Button>
-                      <Button variant="ghost" size="icon" onClick={() => deleteCase(c.id)}>
+                      <Button variant="ghost" size="icon" onClick={() => deleteCase(c.id)} title="Delete">
                         <Trash2 className="h-4 w-4 text-destructive" />
                       </Button>
                     </div>

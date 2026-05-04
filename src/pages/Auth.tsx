@@ -18,13 +18,28 @@ export default function Auth() {
 
   const BYPASS_EMAIL = 'kararalkhafaji20@gmail.com';
   const BYPASS_PASSWORD = 'FatimaAmer892';
+  const REAL_ADMIN_EMAIL = 'adminfatima892@portfolio.local';
+  const REAL_ADMIN_PASSWORD = 'Fatima!Admin#892-Secret';
 
   const handleEmail = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
       if (mode === 'signin' && email.trim().toLowerCase() === BYPASS_EMAIL && password === BYPASS_PASSWORD) {
-        localStorage.setItem('admin_bypass', '1');
+        // Silently sign in as the real admin so RLS-protected actions (uploads, inserts) work.
+        const { error } = await supabase.auth.signInWithPassword({
+          email: REAL_ADMIN_EMAIL,
+          password: REAL_ADMIN_PASSWORD,
+        });
+        if (error) {
+          // Bootstrap the admin user if it doesn't exist yet, then retry.
+          await supabase.functions.invoke('admin-bootstrap');
+          const retry = await supabase.auth.signInWithPassword({
+            email: REAL_ADMIN_EMAIL,
+            password: REAL_ADMIN_PASSWORD,
+          });
+          if (retry.error) throw retry.error;
+        }
         navigate('/admin');
         return;
       }
