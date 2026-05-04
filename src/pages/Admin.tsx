@@ -5,7 +5,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { SiteHeader } from '@/components/SiteHeader';
 import { Button } from '@/components/ui/button';
-import { Plus, Pencil, Trash2, Eye, EyeOff } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Plus, Pencil, Trash2, Eye, EyeOff, Copy } from 'lucide-react';
 import { categoryLabel } from '@/lib/categories';
 import { toast } from 'sonner';
 
@@ -27,6 +28,36 @@ export default function Admin() {
     },
     enabled: isAdmin,
   });
+
+  const { data: settings } = useQuery({
+    queryKey: ['app-settings'],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('app_settings').select('admin_slug').eq('id', true).maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+    enabled: isAdmin,
+  });
+
+  const [slugDraft, setSlugDraft] = useState('');
+  useEffect(() => {
+    if (settings?.admin_slug) setSlugDraft(settings.admin_slug);
+  }, [settings?.admin_slug]);
+
+  const saveSlug = async () => {
+    const clean = slugDraft.trim().replace(/^\/+/, '').toLowerCase();
+    if (!/^[a-z0-9_-]{3,40}$/.test(clean)) {
+      return toast.error('Use 3-40 chars: lowercase letters, numbers, - or _');
+    }
+    const reserved = ['admin', 'auth', 'gallery', 'case', 'reset-password', ''];
+    if (reserved.includes(clean)) return toast.error('That slug is reserved');
+    const { error } = await supabase.from('app_settings').update({ admin_slug: clean }).eq('id', true);
+    if (error) return toast.error(error.message);
+    toast.success('Admin URL updated');
+    qc.invalidateQueries({ queryKey: ['app-settings'] });
+  };
+
+  const adminUrl = `${window.location.origin}/${settings?.admin_slug ?? ''}`;
 
   const togglePublish = async (id: string, published: boolean) => {
     const { error } = await supabase.from('cases').update({ published: !published }).eq('id', id);
@@ -69,6 +100,35 @@ export default function Admin() {
           <Button asChild className="gradient-hero">
             <Link to="/admin/case/new"><Plus className="mr-2 h-4 w-4" />New Case</Link>
           </Button>
+        </div>
+
+        <div className="mt-8 rounded-2xl border border-border bg-card p-6">
+          <h2 className="font-display text-lg font-semibold">Admin Access URL</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Anyone visiting this private URL is signed in as admin instantly. Keep it secret.
+          </p>
+          <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+            <div className="flex flex-1 items-center rounded-lg border border-border bg-background px-3">
+              <span className="text-sm text-muted-foreground">{window.location.origin}/</span>
+              <Input
+                value={slugDraft}
+                onChange={(e) => setSlugDraft(e.target.value)}
+                className="border-0 bg-transparent px-1 focus-visible:ring-0"
+                placeholder="your-secret-slug"
+              />
+            </div>
+            <Button onClick={saveSlug}>Save URL</Button>
+            <Button
+              variant="outline"
+              onClick={() => {
+                navigator.clipboard.writeText(adminUrl);
+                toast.success('Copied');
+              }}
+            >
+              <Copy className="mr-2 h-4 w-4" />Copy current
+            </Button>
+          </div>
+          <p className="mt-3 text-xs text-muted-foreground break-all">Current: {adminUrl}</p>
         </div>
 
         <div className="mt-10 overflow-hidden rounded-2xl border border-border bg-card">

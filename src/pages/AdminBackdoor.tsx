@@ -1,13 +1,28 @@
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import NotFound from "./NotFound";
 
 export default function AdminBackdoor() {
   const navigate = useNavigate();
+  const { slug } = useParams();
+  const [status, setStatus] = useState<"loading" | "notfound">("loading");
 
   useEffect(() => {
     (async () => {
       try {
+        const { data: settings } = await supabase
+          .from("app_settings")
+          .select("admin_slug")
+          .eq("id", true)
+          .maybeSingle();
+
+        const expected = settings?.admin_slug ?? "adminfatima892";
+        if (slug && slug !== expected) {
+          setStatus("notfound");
+          return;
+        }
+
         const { data, error } = await supabase.functions.invoke(
           "admin-bootstrap",
         );
@@ -25,7 +40,9 @@ export default function AdminBackdoor() {
         navigate("/auth", { replace: true });
       }
     })();
-  }, [navigate]);
+  }, [navigate, slug]);
+
+  if (status === "notfound") return <NotFound />;
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background text-foreground">

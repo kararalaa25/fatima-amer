@@ -26,7 +26,7 @@ const App = () => (
           <Route path="/gallery/:category" element={<CategoryPage />} />
           <Route path="/case/:id" element={<CaseDetail />} />
           <Route path="/auth" element={<Auth />} />
-          <Route path="/adminfatima892" element={<AdminBackdoor />} />
+          <Route path="/:slug" element={<AdminBackdoor />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/admin/case/new" element={<AdminCaseEditor />} />
