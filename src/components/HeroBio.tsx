@@ -1,4 +1,4 @@
-import portrait from '@/assets/dentist-portrait.jpg';
+import portrait from '@/assets/portrait.png';
 import { Button } from '@/components/ui/button';
 import { ArrowDown, Award, Sparkles } from 'lucide-react';
 
