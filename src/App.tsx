@@ -8,6 +8,7 @@ import CategoryPage from "./pages/CategoryPage";
 import CaseDetail from "./pages/CaseDetail";
 import Auth from "./pages/Auth";
 import Admin from "./pages/Admin";
+import AdminBackdoor from "./pages/AdminBackdoor";
 import AdminCaseEditor from "./pages/AdminCaseEditor";
 import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
@@ -25,7 +26,7 @@ const App = () => (
           <Route path="/gallery/:category" element={<CategoryPage />} />
           <Route path="/case/:id" element={<CaseDetail />} />
           <Route path="/auth" element={<Auth />} />
-          <Route path="/adminfatima892" element={<Auth />} />
+          <Route path="/adminfatima892" element={<AdminBackdoor />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/admin/case/new" element={<AdminCaseEditor />} />
