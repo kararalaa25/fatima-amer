@@ -17,7 +17,6 @@ export function useAuth() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [bypass, setBypass] = useState(() => typeof window !== 'undefined' && localStorage.getItem('admin_bypass') === '1');
 
   useEffect(() => {
     let mounted = true;
@@ -63,7 +62,6 @@ export function useAuth() {
 
   const signOut = async () => {
     localStorage.removeItem('admin_bypass');
-    setBypass(false);
     await supabase.auth.signOut();
   };
 
@@ -71,9 +69,9 @@ export function useAuth() {
     user,
     session,
     profile,
-    isAdmin: isAdmin || bypass,
+    isAdmin,
     loading,
-    isAuthenticated: !!session || bypass,
+    isAuthenticated: !!session,
     signOut,
   };
 }

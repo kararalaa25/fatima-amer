@@ -16,18 +16,10 @@ export default function Auth() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const BYPASS_EMAIL = 'kararalkhafaji20@gmail.com';
-  const BYPASS_PASSWORD = 'FatimaAmer892';
-
   const handleEmail = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
-      if (mode === 'signin' && email.trim().toLowerCase() === BYPASS_EMAIL && password === BYPASS_PASSWORD) {
-        localStorage.setItem('admin_bypass', '1');
-        navigate('/admin');
-        return;
-      }
       if (mode === 'signin') {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
