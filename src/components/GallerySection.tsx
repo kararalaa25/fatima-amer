@@ -36,7 +36,8 @@ export function GallerySection() {
             <Link
               key={cat.value}
               to={`/gallery/${cat.value}`}
-              className={`group relative flex flex-col justify-between overflow-hidden bento-card ${SPANS[cat.value] ?? 'lg:col-span-6'}`}
+              aria-label={`View ${cat.short} cases`}
+              className={`group relative flex flex-col justify-between overflow-hidden bento-card outline-none focus-visible:ring-4 focus-visible:ring-accent/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:-translate-y-1.5 focus-visible:shadow-glow hover:-translate-y-1.5 hover:shadow-glow ${SPANS[cat.value] ?? 'lg:col-span-6'}`}
               style={{ animation: `fade-up 0.7s ease-out ${i * 0.1}s both` }}
             >
               <div className="absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100 gradient-mint" />
