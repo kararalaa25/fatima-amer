@@ -36,11 +36,12 @@ export function GallerySection() {
             <Link
               key={cat.value}
               to={`/gallery/${cat.value}`}
-              className={`group relative flex flex-col justify-between overflow-hidden bento-card ${SPANS[cat.value] ?? 'lg:col-span-6'}`}
+              aria-label={`View ${cat.short} cases`}
+              className={`group relative flex flex-col justify-between overflow-hidden bento-card outline-none focus-visible:ring-4 focus-visible:ring-accent/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:-translate-y-1.5 focus-visible:shadow-glow hover:-translate-y-1.5 hover:shadow-glow ${SPANS[cat.value] ?? 'lg:col-span-6'}`}
               style={{ animation: `fade-up 0.7s ease-out ${i * 0.1}s both` }}
             >
-              <div className="absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100 gradient-mint" />
-              <div className="absolute -right-20 -bottom-20 h-64 w-64 rounded-full bg-accent/10 blur-3xl transition-all duration-500 group-hover:bg-accent/30" />
+              <div className="absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100 group-focus-visible:opacity-100 gradient-mint" />
+              <div className="absolute -right-20 -bottom-20 h-64 w-64 rounded-full bg-accent/10 blur-3xl transition-all duration-500 group-hover:bg-accent/40 group-focus-visible:bg-accent/40" />
 
               <div className="relative">
                 <div className="inline-flex items-center gap-2 rounded-full border border-border bg-background/60 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
@@ -49,13 +50,13 @@ export function GallerySection() {
               </div>
 
               <div className="relative">
-                <h3 className="font-display text-3xl font-bold leading-tight tracking-tight transition-colors group-hover:text-primary md:text-4xl">
+                <h3 className="font-display text-3xl font-bold leading-tight tracking-tight transition-colors group-hover:text-primary group-focus-visible:text-primary md:text-4xl">
                   {cat.short}
                 </h3>
-                <p className="mt-3 max-w-md text-base text-muted-foreground transition-colors group-hover:text-primary/80">
+                <p className="mt-3 max-w-md text-base text-muted-foreground transition-colors group-hover:text-primary/80 group-focus-visible:text-primary/80">
                   {DESCRIPTIONS[cat.value]}
                 </p>
-                <p className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-accent transition-transform group-hover:translate-x-1 group-hover:text-primary">
+                <p className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-accent transition-transform group-hover:translate-x-1 group-focus-visible:translate-x-1 group-hover:text-primary group-focus-visible:text-primary">
                   View cases <span aria-hidden>→</span>
                 </p>
               </div>
