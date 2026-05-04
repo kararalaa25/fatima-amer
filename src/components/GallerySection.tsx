@@ -50,13 +50,13 @@ export function GallerySection() {
               </div>
 
               <div className="relative">
-                <h3 className="font-display text-3xl font-bold leading-tight tracking-tight transition-colors group-hover:text-primary md:text-4xl">
+                <h3 className="font-display text-3xl font-bold leading-tight tracking-tight transition-colors group-hover:text-primary group-focus-visible:text-primary md:text-4xl">
                   {cat.short}
                 </h3>
-                <p className="mt-3 max-w-md text-base text-muted-foreground transition-colors group-hover:text-primary/80">
+                <p className="mt-3 max-w-md text-base text-muted-foreground transition-colors group-hover:text-primary/80 group-focus-visible:text-primary/80">
                   {DESCRIPTIONS[cat.value]}
                 </p>
-                <p className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-accent transition-transform group-hover:translate-x-1 group-hover:text-primary">
+                <p className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-accent transition-transform group-hover:translate-x-1 group-focus-visible:translate-x-1 group-hover:text-primary group-focus-visible:text-primary">
                   View cases <span aria-hidden>→</span>
                 </p>
               </div>
