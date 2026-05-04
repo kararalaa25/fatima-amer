@@ -64,7 +64,7 @@ export function HeroBio() {
             />
           </div>
           <div className="absolute -bottom-6 -left-6 rounded-2xl border border-border bg-card p-4 shadow-card animate-fade-up delay-700">
-            <p className="font-script text-2xl text-primary">8+ years</p>
+            <p className="font-script text-2xl text-primary">2+ years</p>
             <p className="text-xs uppercase tracking-wider text-muted-foreground">Digital dentistry</p>
           </div>
           <div className="absolute -right-4 top-10 rounded-2xl border border-border bg-card p-4 shadow-card animate-fade-up delay-500">
