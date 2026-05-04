@@ -2,15 +2,11 @@ import { useState, useEffect } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 
-const PREVIEW_BYPASS_KEY = 'ortho_preview_bypass';
-
 interface Profile {
   id: string;
   user_id: string;
-  full_name: string;
-  email: string;
-  workspace_id: string;
-  is_activated: boolean;
+  full_name: string | null;
+  email: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -19,96 +15,62 @@ export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [isPreviewMode, setIsPreviewMode] = useState(false);
 
   useEffect(() => {
-    // Check for preview bypass first
-    const bypassActive = localStorage.getItem(PREVIEW_BYPASS_KEY) === 'true';
-    if (bypassActive) {
-      setIsPreviewMode(true);
-      setLoading(false);
-      return;
-    }
-
     let mounted = true;
 
-    // Hard safety timeout - always resolve loading after 3s
-    const safetyTimeout = setTimeout(() => {
-      if (mounted) setLoading(false);
-    }, 3000);
+    async function fetchExtras(userId: string) {
+      const { data: prof } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', userId)
+        .maybeSingle();
+      if (!mounted) return;
+      setProfile(prof as Profile | null);
 
-    async function fetchProfile(userId: string) {
-      try {
-        const { data } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('user_id', userId)
-          .single();
-        if (mounted) setProfile(data);
-      } catch {
-        // Profile fetch failed, continue without it
-      }
+      const { data: roles } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', userId);
+      if (!mounted) return;
+      setIsAdmin(!!roles?.some((r) => r.role === 'admin'));
     }
 
-    // Set up auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, newSession) => {
-        if (!mounted) return;
-        setSession(newSession);
-        setUser(newSession?.user ?? null);
-        
-        if (newSession?.user) {
-          await fetchProfile(newSession.user.id);
-        } else {
-          setProfile(null);
-        }
-        
-        if (mounted) setLoading(false);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, newSession) => {
+      setSession(newSession);
+      setUser(newSession?.user ?? null);
+      if (newSession?.user) {
+        setTimeout(() => fetchExtras(newSession.user.id), 0);
+      } else {
+        setProfile(null);
+        setIsAdmin(false);
       }
-    );
-
-    // Check for existing session
-    supabase.auth.getSession().then(async ({ data: { session: existingSession } }) => {
-      if (!mounted) return;
-      setSession(existingSession);
-      setUser(existingSession?.user ?? null);
-      
-      if (existingSession?.user) {
-        await fetchProfile(existingSession.user.id);
-      }
-      
-      if (mounted) setLoading(false);
-    }).catch(() => {
-      if (mounted) setLoading(false);
+      setLoading(false);
     });
 
-    return () => {
-      mounted = false;
-      clearTimeout(safetyTimeout);
-      subscription.unsubscribe();
-    };
+    supabase.auth.getSession().then(({ data: { session: existing } }) => {
+      setSession(existing);
+      setUser(existing?.user ?? null);
+      if (existing?.user) fetchExtras(existing.user.id);
+      setLoading(false);
+    });
+
+    return () => { mounted = false; subscription.unsubscribe(); };
   }, []);
 
   const signOut = async () => {
-    localStorage.removeItem(PREVIEW_BYPASS_KEY);
-    setIsPreviewMode(false);
-    setProfile(null);
     await supabase.auth.signOut();
   };
-
-  const isPatient = user?.user_metadata?.is_patient === true;
 
   return {
     user,
     session,
     profile,
+    isAdmin,
     loading,
+    isAuthenticated: !!session,
     signOut,
-    isAuthenticated: !!session || isPreviewMode,
-    isActivated: profile?.is_activated ?? false,
-    isPreviewMode,
-    isPatient,
-    workspaceId: profile?.workspace_id ?? null,
   };
 }
