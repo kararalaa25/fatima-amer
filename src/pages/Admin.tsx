@@ -29,6 +29,36 @@ export default function Admin() {
     enabled: isAdmin,
   });
 
+  const { data: settings } = useQuery({
+    queryKey: ['app-settings'],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('app_settings').select('admin_slug').eq('id', true).maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+    enabled: isAdmin,
+  });
+
+  const [slugDraft, setSlugDraft] = useState('');
+  useEffect(() => {
+    if (settings?.admin_slug) setSlugDraft(settings.admin_slug);
+  }, [settings?.admin_slug]);
+
+  const saveSlug = async () => {
+    const clean = slugDraft.trim().replace(/^\/+/, '').toLowerCase();
+    if (!/^[a-z0-9_-]{3,40}$/.test(clean)) {
+      return toast.error('Use 3-40 chars: lowercase letters, numbers, - or _');
+    }
+    const reserved = ['admin', 'auth', 'gallery', 'case', 'reset-password', ''];
+    if (reserved.includes(clean)) return toast.error('That slug is reserved');
+    const { error } = await supabase.from('app_settings').update({ admin_slug: clean }).eq('id', true);
+    if (error) return toast.error(error.message);
+    toast.success('Admin URL updated');
+    qc.invalidateQueries({ queryKey: ['app-settings'] });
+  };
+
+  const adminUrl = `${window.location.origin}/${settings?.admin_slug ?? ''}`;
+
   const togglePublish = async (id: string, published: boolean) => {
     const { error } = await supabase.from('cases').update({ published: !published }).eq('id', id);
     if (error) return toast.error(error.message);
