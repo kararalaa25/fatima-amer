@@ -3,6 +3,18 @@ import { useNavigate, useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import NotFound from "./NotFound";
 
+const RESERVED_SLUGS = new Set([
+  "",
+  "admin",
+  "auth",
+  "gallery",
+  "case",
+  "reset-password",
+  "favicon.ico",
+  "robots.txt",
+  "sitemap.xml",
+]);
+
 export default function AdminBackdoor() {
   const navigate = useNavigate();
   const { slug } = useParams();
@@ -11,17 +23,26 @@ export default function AdminBackdoor() {
   useEffect(() => {
     (async () => {
       try {
+        const normalized = (slug ?? "").toLowerCase();
+
+        // Guard: never hijack reserved/known app paths
+        if (RESERVED_SLUGS.has(normalized) || normalized.includes(".")) {
+          setStatus("notfound");
+          return;
+        }
+
         const { data: settings } = await supabase
           .from("app_settings")
           .select("admin_slug")
           .eq("id", true)
           .maybeSingle();
 
-        const expected = settings?.admin_slug ?? "adminfatima892";
-        if (slug && slug !== expected) {
+        const expected = (settings?.admin_slug ?? "adminfatima892").toLowerCase();
+        if (normalized !== expected) {
           setStatus("notfound");
           return;
         }
+
 
         const { data, error } = await supabase.functions.invoke(
           "admin-bootstrap",
