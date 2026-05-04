@@ -6,7 +6,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { SiteHeader } from '@/components/SiteHeader';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Plus, Pencil, Trash2, Eye, EyeOff, Copy } from 'lucide-react';
+import { Plus, Pencil, Trash2, Eye, EyeOff, Copy, ExternalLink } from 'lucide-react';
 import { categoryLabel } from '@/lib/categories';
 import { toast } from 'sonner';
 
