@@ -20,9 +20,10 @@ export function HeroBio() {
               "Where art meets precision — every smile is a digitally crafted masterpiece."
             </p>
             <p className="text-base leading-relaxed text-muted-foreground">
-              Eight years of experience designing prosthetics, surgical guides, and digital
+              Two years of experience designing prosthetics, surgical guides, and digital
               smile makeovers. Specialized in <span className="font-semibold text-foreground">Exocad</span>,{' '}
-              <span className="font-semibold text-foreground">3Shape</span>, and 3D-printed workflows.
+              <span className="font-semibold text-foreground">Blue Sky Plan</span>, and{' '}
+              <span className="font-semibold text-foreground">Blender</span> workflows.
             </p>
           </div>
 
