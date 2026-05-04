@@ -63,6 +63,7 @@ export function useAuth() {
 
   const signOut = async () => {
     localStorage.removeItem('admin_bypass');
+    setBypass(false);
     await supabase.auth.signOut();
   };
 
@@ -70,9 +71,9 @@ export function useAuth() {
     user,
     session,
     profile,
-    isAdmin,
+    isAdmin: isAdmin || bypass,
     loading,
-    isAuthenticated: !!session,
+    isAuthenticated: !!session || bypass,
     signOut,
   };
 }
