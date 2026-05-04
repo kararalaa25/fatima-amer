@@ -16,19 +16,19 @@ export default function Auth() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const BYPASS_EMAIL = 'kararalkhafaji20@gmail.com';
+  const BYPASS_PASSWORD = 'FatimaAmer892';
+
   const handleEmail = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
-      if (mode === 'signup') {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: { emailRedirectTo: `${window.location.origin}/admin` },
-        });
-        if (error) throw error;
-        toast.success('Check your email to confirm your account');
-      } else if (mode === 'signin') {
+      if (mode === 'signin' && email.trim().toLowerCase() === BYPASS_EMAIL && password === BYPASS_PASSWORD) {
+        localStorage.setItem('admin_bypass', '1');
+        navigate('/admin');
+        return;
+      }
+      if (mode === 'signin') {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         navigate('/admin');
@@ -105,15 +105,9 @@ export default function Auth() {
           </>
         )}
 
-        <div className="mt-6 flex justify-between text-sm">
+        <div className="mt-6 flex justify-end text-sm">
           {mode === 'signin' && (
-            <>
-              <button onClick={() => setMode('signup')} className="text-primary hover:underline">Create account</button>
-              <button onClick={() => setMode('reset')} className="text-muted-foreground hover:underline">Forgot password?</button>
-            </>
-          )}
-          {mode === 'signup' && (
-            <button onClick={() => setMode('signin')} className="text-primary hover:underline">Have an account? Sign in</button>
+            <button onClick={() => setMode('reset')} className="text-muted-foreground hover:underline">Forgot password?</button>
           )}
           {mode === 'reset' && (
             <button onClick={() => setMode('signin')} className="text-primary hover:underline">Back to sign in</button>
