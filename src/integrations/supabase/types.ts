@@ -14,482 +14,99 @@ export type Database = {
   }
   public: {
     Tables: {
-      dental_chart: {
+      cases: {
         Row: {
+          after_image: string | null
+          before_image: string | null
+          category: string
+          cover_image: string | null
           created_at: string
+          created_by: string | null
+          description: string | null
           id: string
-          patient_id: string
-          quadrant: number
-          status: string
-          tooth_number: number
+          images: string[] | null
+          published: boolean
+          stl_file_url: string | null
+          title: string
+          tools_used: string[] | null
           updated_at: string
-          user_id: string | null
         }
         Insert: {
+          after_image?: string | null
+          before_image?: string | null
+          category: string
+          cover_image?: string | null
           created_at?: string
+          created_by?: string | null
+          description?: string | null
           id?: string
-          patient_id: string
-          quadrant: number
-          status?: string
-          tooth_number: number
+          images?: string[] | null
+          published?: boolean
+          stl_file_url?: string | null
+          title: string
+          tools_used?: string[] | null
           updated_at?: string
-          user_id?: string | null
         }
         Update: {
+          after_image?: string | null
+          before_image?: string | null
+          category?: string
+          cover_image?: string | null
           created_at?: string
+          created_by?: string | null
+          description?: string | null
           id?: string
-          patient_id?: string
-          quadrant?: number
-          status?: string
-          tooth_number?: number
+          images?: string[] | null
+          published?: boolean
+          stl_file_url?: string | null
+          title?: string
+          tools_used?: string[] | null
           updated_at?: string
-          user_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "dental_chart_patient_id_fkey"
-            columns: ["patient_id"]
-            isOneToOne: false
-            referencedRelation: "patients"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      doctors: {
-        Row: {
-          created_at: string
-          doctor_code: string
-          id: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          doctor_code: string
-          id?: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          doctor_code?: string
-          id?: string
-          user_id?: string
         }
         Relationships: []
-      }
-      initial_photos: {
-        Row: {
-          created_at: string
-          id: string
-          image_type: string | null
-          image_url: string
-          patient_id: string
-          user_id: string | null
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          image_type?: string | null
-          image_url: string
-          patient_id: string
-          user_id?: string | null
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          image_type?: string | null
-          image_url?: string
-          patient_id?: string
-          user_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "initial_photos_patient_id_fkey"
-            columns: ["patient_id"]
-            isOneToOne: false
-            referencedRelation: "patients"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      patient_accounts: {
-        Row: {
-          auth_user_id: string | null
-          created_at: string
-          id: string
-          is_registered: boolean
-          patient_id: string
-          phone_number: string
-          updated_at: string
-        }
-        Insert: {
-          auth_user_id?: string | null
-          created_at?: string
-          id?: string
-          is_registered?: boolean
-          patient_id: string
-          phone_number: string
-          updated_at?: string
-        }
-        Update: {
-          auth_user_id?: string | null
-          created_at?: string
-          id?: string
-          is_registered?: boolean
-          patient_id?: string
-          phone_number?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "patient_accounts_patient_id_fkey"
-            columns: ["patient_id"]
-            isOneToOne: false
-            referencedRelation: "patients"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      patients: {
-        Row: {
-          address: string | null
-          age: number
-          ap_relation: string | null
-          canine_class_subdivision: string | null
-          canine_relation: string | null
-          ceph_anb: number | null
-          ceph_facial_angle: number | null
-          ceph_fma: number | null
-          ceph_gonial_angle: number | null
-          ceph_sn_mp: number | null
-          ceph_sna: number | null
-          ceph_snb: number | null
-          ceph_wits: number | null
-          chief_complaint: string | null
-          created_at: string
-          crossbite_anterior: string | null
-          crossbite_posterior: string | null
-          current_medications: string[] | null
-          date_of_birth: string | null
-          doctor_id: string | null
-          habits: string | null
-          horizontal_relation: string | null
-          id: string
-          incisor_relation: string | null
-          lip_strain: boolean | null
-          lips: string | null
-          lower_buccal: string | null
-          lower_labial: string | null
-          lower_space_available: number | null
-          lower_space_required: number | null
-          max_jaw_opening: number | null
-          medical_history: string[] | null
-          mentolabial_sulcus: string | null
-          midline_discrepancy: number | null
-          midline_shift: string | null
-          molar_class_subdivision: string | null
-          molar_relation: string | null
-          name: string
-          nasolabial_angle: number | null
-          oral_hygiene: string | null
-          overbite_mm: number | null
-          overjet_mm: number | null
-          patient_code: string | null
-          phone_number: string | null
-          tongue_position: string | null
-          tongue_size: string | null
-          updated_at: string
-          upper_buccal: string | null
-          upper_labial: string | null
-          upper_space_available: number | null
-          upper_space_required: number | null
-          user_id: string | null
-          vertical_relation: string | null
-        }
-        Insert: {
-          address?: string | null
-          age: number
-          ap_relation?: string | null
-          canine_class_subdivision?: string | null
-          canine_relation?: string | null
-          ceph_anb?: number | null
-          ceph_facial_angle?: number | null
-          ceph_fma?: number | null
-          ceph_gonial_angle?: number | null
-          ceph_sn_mp?: number | null
-          ceph_sna?: number | null
-          ceph_snb?: number | null
-          ceph_wits?: number | null
-          chief_complaint?: string | null
-          created_at?: string
-          crossbite_anterior?: string | null
-          crossbite_posterior?: string | null
-          current_medications?: string[] | null
-          date_of_birth?: string | null
-          doctor_id?: string | null
-          habits?: string | null
-          horizontal_relation?: string | null
-          id?: string
-          incisor_relation?: string | null
-          lip_strain?: boolean | null
-          lips?: string | null
-          lower_buccal?: string | null
-          lower_labial?: string | null
-          lower_space_available?: number | null
-          lower_space_required?: number | null
-          max_jaw_opening?: number | null
-          medical_history?: string[] | null
-          mentolabial_sulcus?: string | null
-          midline_discrepancy?: number | null
-          midline_shift?: string | null
-          molar_class_subdivision?: string | null
-          molar_relation?: string | null
-          name: string
-          nasolabial_angle?: number | null
-          oral_hygiene?: string | null
-          overbite_mm?: number | null
-          overjet_mm?: number | null
-          patient_code?: string | null
-          phone_number?: string | null
-          tongue_position?: string | null
-          tongue_size?: string | null
-          updated_at?: string
-          upper_buccal?: string | null
-          upper_labial?: string | null
-          upper_space_available?: number | null
-          upper_space_required?: number | null
-          user_id?: string | null
-          vertical_relation?: string | null
-        }
-        Update: {
-          address?: string | null
-          age?: number
-          ap_relation?: string | null
-          canine_class_subdivision?: string | null
-          canine_relation?: string | null
-          ceph_anb?: number | null
-          ceph_facial_angle?: number | null
-          ceph_fma?: number | null
-          ceph_gonial_angle?: number | null
-          ceph_sn_mp?: number | null
-          ceph_sna?: number | null
-          ceph_snb?: number | null
-          ceph_wits?: number | null
-          chief_complaint?: string | null
-          created_at?: string
-          crossbite_anterior?: string | null
-          crossbite_posterior?: string | null
-          current_medications?: string[] | null
-          date_of_birth?: string | null
-          doctor_id?: string | null
-          habits?: string | null
-          horizontal_relation?: string | null
-          id?: string
-          incisor_relation?: string | null
-          lip_strain?: boolean | null
-          lips?: string | null
-          lower_buccal?: string | null
-          lower_labial?: string | null
-          lower_space_available?: number | null
-          lower_space_required?: number | null
-          max_jaw_opening?: number | null
-          medical_history?: string[] | null
-          mentolabial_sulcus?: string | null
-          midline_discrepancy?: number | null
-          midline_shift?: string | null
-          molar_class_subdivision?: string | null
-          molar_relation?: string | null
-          name?: string
-          nasolabial_angle?: number | null
-          oral_hygiene?: string | null
-          overbite_mm?: number | null
-          overjet_mm?: number | null
-          patient_code?: string | null
-          phone_number?: string | null
-          tongue_position?: string | null
-          tongue_size?: string | null
-          updated_at?: string
-          upper_buccal?: string | null
-          upper_labial?: string | null
-          upper_space_available?: number | null
-          upper_space_required?: number | null
-          user_id?: string | null
-          vertical_relation?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "patients_doctor_id_fkey"
-            columns: ["doctor_id"]
-            isOneToOne: false
-            referencedRelation: "doctors"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       profiles: {
         Row: {
           created_at: string
-          email: string
-          full_name: string
+          email: string | null
+          full_name: string | null
           id: string
-          is_activated: boolean | null
           updated_at: string
           user_id: string
-          workspace_id: string | null
         }
         Insert: {
           created_at?: string
-          email: string
-          full_name: string
+          email?: string | null
+          full_name?: string | null
           id?: string
-          is_activated?: boolean | null
           updated_at?: string
           user_id: string
-          workspace_id?: string | null
         }
         Update: {
           created_at?: string
-          email?: string
-          full_name?: string
+          email?: string | null
+          full_name?: string | null
           id?: string
-          is_activated?: boolean | null
           updated_at?: string
           user_id?: string
-          workspace_id?: string | null
         }
         Relationships: []
       }
-      session_images: {
-        Row: {
-          created_at: string
-          id: string
-          image_type: string | null
-          image_url: string
-          session_id: string
-          user_id: string | null
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          image_type?: string | null
-          image_url: string
-          session_id: string
-          user_id?: string | null
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          image_type?: string | null
-          image_url?: string
-          session_id?: string
-          user_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "session_images_session_id_fkey"
-            columns: ["session_id"]
-            isOneToOne: false
-            referencedRelation: "sessions"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      sessions: {
-        Row: {
-          created_at: string
-          id: string
-          patient_id: string
-          session_date: string
-          treatment_performed: string | null
-          updated_at: string
-          user_id: string | null
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          patient_id: string
-          session_date?: string
-          treatment_performed?: string | null
-          updated_at?: string
-          user_id?: string | null
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          patient_id?: string
-          session_date?: string
-          treatment_performed?: string | null
-          updated_at?: string
-          user_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "sessions_patient_id_fkey"
-            columns: ["patient_id"]
-            isOneToOne: false
-            referencedRelation: "patients"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      treatment_plans: {
-        Row: {
-          appliance_types: string[] | null
-          created_at: string
-          estimated_duration: string | null
-          extraction_plan: string | null
-          id: string
-          patient_id: string
-          primary_goals: string | null
-          special_instructions: string | null
-          updated_at: string
-          user_id: string | null
-        }
-        Insert: {
-          appliance_types?: string[] | null
-          created_at?: string
-          estimated_duration?: string | null
-          extraction_plan?: string | null
-          id?: string
-          patient_id: string
-          primary_goals?: string | null
-          special_instructions?: string | null
-          updated_at?: string
-          user_id?: string | null
-        }
-        Update: {
-          appliance_types?: string[] | null
-          created_at?: string
-          estimated_duration?: string | null
-          extraction_plan?: string | null
-          id?: string
-          patient_id?: string
-          primary_goals?: string | null
-          special_instructions?: string | null
-          updated_at?: string
-          user_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "treatment_plans_patient_id_fkey"
-            columns: ["patient_id"]
-            isOneToOne: false
-            referencedRelation: "patients"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       user_roles: {
         Row: {
+          created_at: string
           id: string
           role: Database["public"]["Enums"]["app_role"]
           user_id: string
         }
         Insert: {
+          created_at?: string
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id: string
         }
         Update: {
+          created_at?: string
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
@@ -501,8 +118,6 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      generate_doctor_code: { Args: never; Returns: string }
-      generate_patient_code: { Args: never; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -510,10 +125,9 @@ export type Database = {
         }
         Returns: boolean
       }
-      is_user_activated: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
-      app_role: "admin" | "doctor" | "user"
+      app_role: "admin" | "viewer"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -641,7 +255,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "doctor", "user"],
+      app_role: ["admin", "viewer"],
     },
   },
 } as const
