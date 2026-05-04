@@ -5,7 +5,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { SiteHeader } from '@/components/SiteHeader';
 import { Button } from '@/components/ui/button';
-import { Plus, Pencil, Trash2, Eye, EyeOff } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Plus, Pencil, Trash2, Eye, EyeOff, Copy } from 'lucide-react';
 import { categoryLabel } from '@/lib/categories';
 import { toast } from 'sonner';
 
