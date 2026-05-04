@@ -42,11 +42,8 @@ export function GallerySection() {
                 style={{ animation: `fade-up 0.6s ease-out ${i * 0.1}s both` }}
               >
                 <div className="absolute inset-0 gradient-hero opacity-0 transition-opacity duration-500 group-hover:opacity-95" />
-                <div className="relative">
-                  <div className="inline-flex h-14 w-14 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-white/20 group-hover:text-white">
-                    <Icon className="h-7 w-7" />
-                  </div>
-                </div>
+                <div className="relative" />
+
                 <div className="relative">
                   <h3 className="font-display text-2xl font-semibold leading-tight transition-colors group-hover:text-white">
                     {cat.short}
