@@ -14,6 +14,24 @@ export type Database = {
   }
   public: {
     Tables: {
+      app_settings: {
+        Row: {
+          admin_slug: string
+          id: boolean
+          updated_at: string
+        }
+        Insert: {
+          admin_slug?: string
+          id?: boolean
+          updated_at?: string
+        }
+        Update: {
+          admin_slug?: string
+          id?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
       cases: {
         Row: {
           after_image: string | null
