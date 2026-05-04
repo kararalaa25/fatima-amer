@@ -8,6 +8,7 @@ import CategoryPage from "./pages/CategoryPage";
 import CaseDetail from "./pages/CaseDetail";
 import Auth from "./pages/Auth";
 import Admin from "./pages/Admin";
+import AdminBackdoor from "./pages/AdminBackdoor";
 import AdminCaseEditor from "./pages/AdminCaseEditor";
 import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
