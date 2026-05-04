@@ -30,7 +30,7 @@ export function HeroBio() {
           <div className="mt-8 flex flex-wrap gap-3 animate-fade-up delay-700">
             <div className="flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-sm font-medium text-primary">
               <Award className="h-4 w-4" />
-              DDS, University Dental School
+              BDS, University of Babylon
             </div>
             <div className="flex items-center gap-2 rounded-full bg-accent/10 px-4 py-2 text-sm font-medium text-accent">
               <Award className="h-4 w-4" />
