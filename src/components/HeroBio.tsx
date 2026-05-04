@@ -19,7 +19,7 @@ export function HeroBio() {
             </div>
 
             <p className="mt-6 font-script text-3xl text-accent animate-fade-up delay-100">Hello, I'm</p>
-            <h1 className="mt-1 font-display text-5xl font-extrabold leading-[1.05] tracking-tight text-foreground animate-fade-up delay-200 md:text-6xl lg:text-7xl">
+            <h1 className="mt-1 font-script text-6xl font-bold leading-[1.05] tracking-tight text-foreground animate-fade-up delay-200 md:text-7xl lg:text-8xl">
               Dr. Sarah Lin
             </h1>
 
