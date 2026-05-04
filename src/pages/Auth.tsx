@@ -105,15 +105,9 @@ export default function Auth() {
           </>
         )}
 
-        <div className="mt-6 flex justify-between text-sm">
+        <div className="mt-6 flex justify-end text-sm">
           {mode === 'signin' && (
-            <>
-              <button onClick={() => setMode('signup')} className="text-primary hover:underline">Create account</button>
-              <button onClick={() => setMode('reset')} className="text-muted-foreground hover:underline">Forgot password?</button>
-            </>
-          )}
-          {mode === 'signup' && (
-            <button onClick={() => setMode('signin')} className="text-primary hover:underline">Have an account? Sign in</button>
+            <button onClick={() => setMode('reset')} className="text-muted-foreground hover:underline">Forgot password?</button>
           )}
           {mode === 'reset' && (
             <button onClick={() => setMode('signin')} className="text-primary hover:underline">Back to sign in</button>
