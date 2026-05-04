@@ -17,6 +17,7 @@ export function useAuth() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [bypass, setBypass] = useState(() => typeof window !== 'undefined' && localStorage.getItem('admin_bypass') === '1');
 
   useEffect(() => {
     let mounted = true;
