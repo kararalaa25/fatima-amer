@@ -1,17 +1,14 @@
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/hooks/useAuth';
 import { SiteHeader } from '@/components/SiteHeader';
 import { Lightbox } from '@/components/Lightbox';
 import { StlViewer } from '@/components/StlViewer';
-import { Button } from '@/components/ui/button';
 import { categoryLabel } from '@/lib/categories';
-import { ArrowLeft, Pencil } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 
 export default function CaseDetail() {
   const { id } = useParams<{ id: string }>();
-  const { isAdmin } = useAuth();
   const { data: c, isLoading } = useQuery({
     queryKey: ['case', id],
     queryFn: async () => {
