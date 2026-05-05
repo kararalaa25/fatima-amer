@@ -5,7 +5,7 @@ import { SiteHeader } from '@/components/SiteHeader';
 import { Lightbox } from '@/components/Lightbox';
 import { StlViewer } from '@/components/StlViewer';
 import { categoryLabel } from '@/lib/categories';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Link as LinkIcon } from 'lucide-react';
 
 export default function CaseDetail() {
   const { id } = useParams<{ id: string }>();
