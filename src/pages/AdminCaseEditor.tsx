@@ -51,6 +51,7 @@ export default function AdminCaseEditor() {
       setBeforeImage(data.before_image ?? '');
       setAfterImage(data.after_image ?? '');
       setStlFileUrl(data.stl_file_url ?? '');
+      setExocadViewerUrl((data as any).exocad_viewer_url ?? '');
       setPublished(data.published);
     });
   }, [id]);
