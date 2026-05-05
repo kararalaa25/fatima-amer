@@ -92,7 +92,7 @@ export default function AdminCaseEditor() {
       title, category, description: description || null,
       tools_used: tools, cover_image: coverImage || null,
       images, before_image: beforeImage || null, after_image: afterImage || null,
-      stl_file_url: stlFileUrl || null, published, created_by: user?.id,
+      stl_file_url: stlFileUrl || null, exocad_viewer_url: exocadViewerUrl || null, published, created_by: user?.id,
     };
     const { error } = isNew
       ? await supabase.from('cases').insert(payload)
