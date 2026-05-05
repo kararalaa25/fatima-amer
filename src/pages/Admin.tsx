@@ -1,11 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { SiteHeader } from '@/components/SiteHeader';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Plus, Pencil, Trash2, Eye, EyeOff, Copy, ExternalLink } from 'lucide-react';
 import { categoryLabel } from '@/lib/categories';
 import { toast } from 'sonner';
@@ -38,24 +37,6 @@ export default function Admin() {
     },
     enabled: isAdmin,
   });
-
-  const [slugDraft, setSlugDraft] = useState('');
-  useEffect(() => {
-    if (settings?.admin_slug) setSlugDraft(settings.admin_slug);
-  }, [settings?.admin_slug]);
-
-  const saveSlug = async () => {
-    const clean = slugDraft.trim().replace(/^\/+/, '').toLowerCase();
-    if (!/^[a-z0-9_-]{3,40}$/.test(clean)) {
-      return toast.error('Use 3-40 chars: lowercase letters, numbers, - or _');
-    }
-    const reserved = ['admin', 'auth', 'gallery', 'case', 'reset-password', ''];
-    if (reserved.includes(clean)) return toast.error('That slug is reserved');
-    const { error } = await supabase.from('app_settings').update({ admin_slug: clean }).eq('id', true);
-    if (error) return toast.error(error.message);
-    toast.success('Admin URL updated');
-    qc.invalidateQueries({ queryKey: ['app-settings'] });
-  };
 
   const adminUrl = `${window.location.origin}/${settings?.admin_slug ?? ''}`;
 
@@ -103,32 +84,24 @@ export default function Admin() {
         </div>
 
         <div className="mt-8 rounded-2xl border border-border bg-card p-6">
-          <h2 className="font-display text-lg font-semibold">Admin Access URL</h2>
+          <h2 className="font-display text-lg font-semibold">Your private admin link</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Anyone visiting this private URL is signed in as admin instantly. Keep it secret.
+            Share this link only with yourself. Opening it signs you straight into the dashboard — no website navigation needed.
           </p>
           <div className="mt-4 flex flex-col gap-3 sm:flex-row">
-            <div className="flex flex-1 items-center rounded-lg border border-border bg-background px-3">
-              <span className="text-sm text-muted-foreground">{window.location.origin}/</span>
-              <Input
-                value={slugDraft}
-                onChange={(e) => setSlugDraft(e.target.value)}
-                className="border-0 bg-transparent px-1 focus-visible:ring-0"
-                placeholder="your-secret-slug"
-              />
+            <div className="flex-1 truncate rounded-lg border border-border bg-background px-3 py-2 text-sm font-mono text-foreground">
+              {adminUrl}
             </div>
-            <Button onClick={saveSlug}>Save URL</Button>
             <Button
               variant="outline"
               onClick={() => {
                 navigator.clipboard.writeText(adminUrl);
-                toast.success('Copied');
+                toast.success('Link copied');
               }}
             >
-              <Copy className="mr-2 h-4 w-4" />Copy current
+              <Copy className="mr-2 h-4 w-4" />Copy link
             </Button>
           </div>
-          <p className="mt-3 text-xs text-muted-foreground break-all">Current: {adminUrl}</p>
         </div>
 
         <div className="mt-10 overflow-hidden rounded-2xl border border-border bg-card">
