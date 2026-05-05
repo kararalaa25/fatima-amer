@@ -180,6 +180,11 @@ export default function AdminCaseEditor() {
             )}
           </div>
 
+          <div>
+            <Label>Exocad Viewer link (URL)</Label>
+            <Input value={exocadViewerUrl} onChange={(e) => setExocadViewerUrl(e.target.value)} placeholder="https://viewer.exocad.com/..." />
+          </div>
+
           <div className="flex items-center gap-3">
             <input id="pub" type="checkbox" checked={published} onChange={(e) => setPublished(e.target.checked)} className="h-4 w-4" />
             <Label htmlFor="pub" className="cursor-pointer">Published (visible on site)</Label>
