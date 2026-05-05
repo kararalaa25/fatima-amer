@@ -30,6 +30,7 @@ export default function AdminCaseEditor() {
   const [beforeImage, setBeforeImage] = useState('');
   const [afterImage, setAfterImage] = useState('');
   const [stlFileUrl, setStlFileUrl] = useState('');
+  const [exocadViewerUrl, setExocadViewerUrl] = useState('');
   const [published, setPublished] = useState(true);
   const [saving, setSaving] = useState(false);
 
