@@ -11,7 +11,7 @@ import { ArrowLeft, Pencil } from 'lucide-react';
 
 export default function CaseDetail() {
   const { id } = useParams<{ id: string }>();
-
+  const { isAdmin } = useAuth();
   const { data: c, isLoading } = useQuery({
     queryKey: ['case', id],
     queryFn: async () => {
