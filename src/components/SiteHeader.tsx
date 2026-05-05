@@ -1,12 +1,6 @@
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '@/hooks/useAuth';
-import { Button } from '@/components/ui/button';
-import { LogOut, Shield } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export function SiteHeader() {
-  const { isAdmin, isAuthenticated, signOut } = useAuth();
-  const navigate = useNavigate();
-
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border/40 glass">
       <div className="container mx-auto flex h-20 items-center justify-between px-6">
@@ -21,18 +15,6 @@ export function SiteHeader() {
           <a href="/#gallery" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Gallery</a>
           <a href="/#contact" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Contact</a>
         </nav>
-        <div className="flex items-center gap-2">
-          {isAdmin && (
-            <Button variant="outline" size="sm" onClick={() => navigate('/admin')}>
-              <Shield className="mr-2 h-4 w-4" />Admin
-            </Button>
-          )}
-          {isAuthenticated ? (
-            <Button variant="ghost" size="sm" onClick={signOut}>
-              <LogOut className="h-4 w-4" />
-            </Button>
-          ) : null}
-        </div>
       </div>
     </header>
   );
