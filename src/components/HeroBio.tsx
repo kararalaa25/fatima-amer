@@ -20,7 +20,7 @@ export function HeroBio() {
 
             <p className="mt-6 font-script text-3xl text-accent animate-fade-up delay-100">Hello, I'm</p>
             <h1 className="mt-1 font-script text-6xl font-bold leading-[1.05] tracking-tight text-foreground animate-fade-up delay-200 md:text-7xl lg:text-8xl">
-              Dr. Sarah Lin
+              Dr. Fatima Amer
             </h1>
 
             <p className="mt-8 font-script text-2xl leading-relaxed text-foreground/80 animate-fade-up delay-300">
@@ -64,7 +64,7 @@ export function HeroBio() {
           <div className="relative overflow-hidden rounded-[2rem] border border-white shadow-soft animate-pop-in">
             <img
               src={portrait}
-              alt="Dr. Sarah Lin, digital dentist and CAD-CAM specialist"
+              alt="Dr. Fatima Amer, digital dentist and CAD-CAM specialist"
               width={1024}
               height={1024}
               className="h-full w-full object-cover"

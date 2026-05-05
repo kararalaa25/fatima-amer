@@ -34,7 +34,7 @@ export function ContactSection() {
         </div>
       </div>
       <div className="container mx-auto mt-16 border-t border-border px-4 pt-8 text-center text-sm text-muted-foreground">
-        © {new Date().getFullYear()} Dr. Sarah Lin · Digital Dentistry Portfolio
+        © {new Date().getFullYear()} Dr. Fatima Amer · Digital Dentistry Portfolio
       </div>
     </section>
   );
