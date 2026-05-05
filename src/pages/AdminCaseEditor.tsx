@@ -30,6 +30,7 @@ export default function AdminCaseEditor() {
   const [beforeImage, setBeforeImage] = useState('');
   const [afterImage, setAfterImage] = useState('');
   const [stlFileUrl, setStlFileUrl] = useState('');
+  const [exocadViewerUrl, setExocadViewerUrl] = useState('');
   const [published, setPublished] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -50,6 +51,7 @@ export default function AdminCaseEditor() {
       setBeforeImage(data.before_image ?? '');
       setAfterImage(data.after_image ?? '');
       setStlFileUrl(data.stl_file_url ?? '');
+      setExocadViewerUrl((data as any).exocad_viewer_url ?? '');
       setPublished(data.published);
     });
   }, [id]);
@@ -90,7 +92,7 @@ export default function AdminCaseEditor() {
       title, category, description: description || null,
       tools_used: tools, cover_image: coverImage || null,
       images, before_image: beforeImage || null, after_image: afterImage || null,
-      stl_file_url: stlFileUrl || null, published, created_by: user?.id,
+      stl_file_url: stlFileUrl || null, exocad_viewer_url: exocadViewerUrl || null, published, created_by: user?.id,
     };
     const { error } = isNew
       ? await supabase.from('cases').insert(payload)
@@ -176,6 +178,11 @@ export default function AdminCaseEditor() {
                 <input type="file" accept=".stl" className="hidden" onChange={(e) => handleFile(e, setStlFileUrl)} />
               </label>
             )}
+          </div>
+
+          <div>
+            <Label>Exocad Viewer link (URL)</Label>
+            <Input value={exocadViewerUrl} onChange={(e) => setExocadViewerUrl(e.target.value)} placeholder="https://viewer.exocad.com/..." />
           </div>
 
           <div className="flex items-center gap-3">

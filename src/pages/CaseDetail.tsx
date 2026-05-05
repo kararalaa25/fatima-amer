@@ -5,7 +5,7 @@ import { SiteHeader } from '@/components/SiteHeader';
 import { Lightbox } from '@/components/Lightbox';
 import { StlViewer } from '@/components/StlViewer';
 import { categoryLabel } from '@/lib/categories';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Link as LinkIcon } from 'lucide-react';
 
 export default function CaseDetail() {
   const { id } = useParams<{ id: string }>();
@@ -77,6 +77,17 @@ export default function CaseDetail() {
                   ))}
                 </div>
               </div>
+            )}
+            {(c as any).exocad_viewer_url && (
+              <a
+                href={(c as any).exocad_viewer_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-6 inline-flex flex-col items-center gap-1.5 rounded-xl border border-border bg-card px-5 py-3 text-center transition-colors hover:border-primary hover:text-primary"
+              >
+                <LinkIcon className="h-5 w-5" />
+                <span className="text-xs font-semibold uppercase tracking-wider">Exocad Viewer</span>
+              </a>
             )}
           </div>
         </div>
