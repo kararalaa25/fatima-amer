@@ -70,19 +70,7 @@ export default function Admin() {
     qc.invalidateQueries({ queryKey: ['admin-cases'] });
   };
 
-  if (loading) return <div className="flex min-h-screen items-center justify-center text-muted-foreground">Loading…</div>;
-
-  if (!isAdmin) {
-    return (
-      <div className="min-h-screen bg-background">
-        <SiteHeader />
-        <div className="container mx-auto px-4 py-20 text-center">
-          <h1 className="font-display text-2xl">Admin access required</h1>
-          <p className="mt-2 text-muted-foreground">Your account isn't an admin yet.</p>
-        </div>
-      </div>
-    );
-  }
+  if (loading || !isAdmin) return <div className="flex min-h-screen items-center justify-center text-muted-foreground">Opening admin dashboard…</div>;
 
   return (
     <div className="min-h-screen bg-background">
