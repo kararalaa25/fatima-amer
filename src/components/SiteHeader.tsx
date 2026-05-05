@@ -6,9 +6,6 @@ export function SiteHeader() {
       <div className="container mx-auto flex h-20 items-center justify-between px-6">
         <Link to="/" className="flex items-center gap-3">
           <div className="h-9 w-9 rounded-2xl gradient-mint shadow-glow" />
-          <span className="font-display text-xl font-bold tracking-tight">
-            Dr. Smile<span className="text-accent">.</span>
-          </span>
         </Link>
         <nav className="hidden items-center gap-8 md:flex">
           <a href="/#bio" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">About</a>
