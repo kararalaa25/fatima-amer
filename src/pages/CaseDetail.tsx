@@ -49,9 +49,18 @@ export default function CaseDetail() {
     <div className="min-h-screen bg-background">
       <SiteHeader />
       <main className="container mx-auto px-4 py-12">
-        <Link to={`/gallery/${c.category}`} className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
-          <ArrowLeft className="h-4 w-4" /> {categoryLabel(c.category)}
-        </Link>
+        <div className="flex items-center justify-between gap-4">
+          <Link to={`/gallery/${c.category}`} className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+            <ArrowLeft className="h-4 w-4" /> {categoryLabel(c.category)}
+          </Link>
+          {isAdmin && (
+            <Button asChild size="sm" variant="outline">
+              <Link to={`/admin/case/${c.id}`}>
+                <Pencil className="mr-2 h-4 w-4" /> Edit case
+              </Link>
+            </Button>
+          )}
+        </div>
 
         <div className="mt-6 grid grid-cols-1 gap-10 lg:grid-cols-[1.5fr_1fr]">
           <div>
