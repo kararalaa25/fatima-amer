@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -14,9 +14,13 @@ export default function Admin() {
   const navigate = useNavigate();
   const qc = useQueryClient();
 
+  const triedRef = useRef(false);
+
   useEffect(() => {
     if (loading) return;
     if (isAuthenticated && isAdmin) return;
+    if (triedRef.current) return;
+    triedRef.current = true;
     (async () => {
       try {
         const { data, error } = await supabase.functions.invoke('admin-bootstrap');
@@ -26,12 +30,11 @@ export default function Admin() {
           password: data.password,
         });
         if (signInErr) throw signInErr;
-        window.location.href = '/admin';
       } catch (e) {
         console.error('admin auto sign-in failed', e);
       }
     })();
-  }, [loading, isAuthenticated, isAdmin, navigate]);
+  }, [loading, isAuthenticated, isAdmin]);
 
   const { data: cases } = useQuery({
     queryKey: ['admin-cases'],
