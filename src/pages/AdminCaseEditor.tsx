@@ -19,7 +19,7 @@ export default function AdminCaseEditor() {
   const { id } = useParams<{ id: string }>();
   const isNew = !id;
   const navigate = useNavigate();
-  const { user, isAdmin, loading } = useAuth();
+  const { user, isAuthenticated, loading } = useAuth();
 
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState<string>('crown_bridge');
@@ -34,8 +34,8 @@ export default function AdminCaseEditor() {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    if (!loading && !isAdmin) navigate('/auth');
-  }, [loading, isAdmin, navigate]);
+    if (!loading && !isAuthenticated) navigate('/auth');
+  }, [loading, isAuthenticated, navigate]);
 
   useEffect(() => {
     if (!id) return;
