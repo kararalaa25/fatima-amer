@@ -103,32 +103,24 @@ export default function Admin() {
         </div>
 
         <div className="mt-8 rounded-2xl border border-border bg-card p-6">
-          <h2 className="font-display text-lg font-semibold">Admin Access URL</h2>
+          <h2 className="font-display text-lg font-semibold">Your private admin link</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Anyone visiting this private URL is signed in as admin instantly. Keep it secret.
+            Share this link only with yourself. Opening it signs you straight into the dashboard — no website navigation needed.
           </p>
           <div className="mt-4 flex flex-col gap-3 sm:flex-row">
-            <div className="flex flex-1 items-center rounded-lg border border-border bg-background px-3">
-              <span className="text-sm text-muted-foreground">{window.location.origin}/</span>
-              <Input
-                value={slugDraft}
-                onChange={(e) => setSlugDraft(e.target.value)}
-                className="border-0 bg-transparent px-1 focus-visible:ring-0"
-                placeholder="your-secret-slug"
-              />
+            <div className="flex-1 truncate rounded-lg border border-border bg-background px-3 py-2 text-sm font-mono text-foreground">
+              {adminUrl}
             </div>
-            <Button onClick={saveSlug}>Save URL</Button>
             <Button
               variant="outline"
               onClick={() => {
                 navigator.clipboard.writeText(adminUrl);
-                toast.success('Copied');
+                toast.success('Link copied');
               }}
             >
-              <Copy className="mr-2 h-4 w-4" />Copy current
+              <Copy className="mr-2 h-4 w-4" />Copy link
             </Button>
           </div>
-          <p className="mt-3 text-xs text-muted-foreground break-all">Current: {adminUrl}</p>
         </div>
 
         <div className="mt-10 overflow-hidden rounded-2xl border border-border bg-card">
