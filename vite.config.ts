@@ -4,11 +4,10 @@ import path from "path";
 import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
-export default defineConfig(({ mode }) => ({
-  server: {
-    host: "::",
-    port: 8080,
-  },
+export default defineConfig({
+  base: '/smileos/', // This MUST match your repository name
+  // ... leave everything else as it is
+})
   plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
   resolve: {
     // Prevent multiple React copies (fixes "Cannot read properties of null (reading 'useRef')")
