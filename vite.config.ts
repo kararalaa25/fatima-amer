@@ -3,8 +3,10 @@ import react from "@vitejs/plugin-react-swc";
 import path from "path";
 
 // https://vitejs.dev/config/
-export default defineConfig({
-  base: "/fatima-amer/",
+export default defineConfig(({ command }) => ({
+  // If we are building for production (GitHub), use /fatima-amer/
+  // If we are running locally (npm run dev), use /
+  base: command === 'build' ? "/fatima-amer/" : "/",
   server: {
     host: "0.0.0.0",
   },
@@ -15,4 +17,4 @@ export default defineConfig({
     },
   },
   dedupe: ["react", "react-dom"],
-});
+}));
