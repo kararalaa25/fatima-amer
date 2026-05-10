@@ -4,8 +4,7 @@ import path from "path";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ command }) => ({
-  // If we are building for production (GitHub), use /fatima-amer/
-  // If we are running locally (npm run dev), use /
+  // Use subfolder for GitHub Pages build, root for local dev
   base: command === 'build' ? "/fatima-amer/" : "/",
   server: {
     host: "0.0.0.0",
