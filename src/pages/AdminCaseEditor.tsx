@@ -166,17 +166,22 @@ export default function AdminCaseEditor() {
 
           <div>
             <Label>STL file (3D mesh)</Label>
-            {stlFileUrl ? (
+            <Input
+              className="mt-2"
+              value={stlFileUrl}
+              onChange={(e) => setStlFileUrl(e.target.value)}
+              placeholder="Paste a direct .stl URL or upload below"
+            />
+            <label className="mt-2 flex cursor-pointer items-center gap-2 rounded-lg border-2 border-dashed border-border p-4 text-sm text-muted-foreground hover:border-primary hover:text-primary">
+              <Upload className="h-4 w-4" />
+              Upload .stl file
+              <input type="file" accept=".stl" className="hidden" onChange={(e) => handleFile(e, setStlFileUrl)} />
+            </label>
+            {stlFileUrl && (
               <div className="mt-2 flex items-center justify-between rounded-lg border border-border p-3">
                 <span className="truncate text-sm">{stlFileUrl.split('/').pop()}</span>
                 <Button variant="ghost" size="sm" onClick={() => setStlFileUrl('')}>Remove</Button>
               </div>
-            ) : (
-              <label className="mt-2 flex cursor-pointer items-center gap-2 rounded-lg border-2 border-dashed border-border p-4 text-sm text-muted-foreground hover:border-primary hover:text-primary">
-                <Upload className="h-4 w-4" />
-                Upload .stl file
-                <input type="file" accept=".stl" className="hidden" onChange={(e) => handleFile(e, setStlFileUrl)} />
-              </label>
             )}
           </div>
 
